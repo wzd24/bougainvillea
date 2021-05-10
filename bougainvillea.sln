@@ -1,0 +1,85 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.6.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DD533BB9-6E40-4008-A45D-77AB6A23D64D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvilea", "src\Scorpio.Bougainvilea\Scorpio.Bougainvilea.csproj", "{9BAD66A7-1BAA-468A-89DD-65906507CFDE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvilea.Abstractions", "src\Scorpio.Bougainvilea.Abstractions\Scorpio.Bougainvilea.Abstractions.csproj", "{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E0DD92BD-F237-4DC1-BDD1-FC7190675061}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
+		build.cake = build.cake
+		build.cmd = build.cmd
+		build.config = build.config
+		build.ps1 = build.ps1
+		build.sh = build.sh
+		LICENSE = LICENSE
+		nuget.config = nuget.config
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{E5686719-DDEE-4DC9-85F5-ECF548DBEFD2}"
+	ProjectSection(SolutionItems) = preProject
+		build\build.cake = build\build.cake
+		build\buildcontext.cake = build\buildcontext.cake
+		build\common.props = build\common.props
+		build\index.cake = build\index.cake
+		build\util.cake = build\util.cake
+		build\version.cake = build\version.cake
+		build\versions.props = build\versions.props
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9BAD66A7-1BAA-468A-89DD-65906507CFDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BAD66A7-1BAA-468A-89DD-65906507CFDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BAD66A7-1BAA-468A-89DD-65906507CFDE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9BAD66A7-1BAA-468A-89DD-65906507CFDE}.Debug|x64.Build.0 = Debug|Any CPU
+		{9BAD66A7-1BAA-468A-89DD-65906507CFDE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9BAD66A7-1BAA-468A-89DD-65906507CFDE}.Debug|x86.Build.0 = Debug|Any CPU
+		{9BAD66A7-1BAA-468A-89DD-65906507CFDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BAD66A7-1BAA-468A-89DD-65906507CFDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BAD66A7-1BAA-468A-89DD-65906507CFDE}.Release|x64.ActiveCfg = Release|Any CPU
+		{9BAD66A7-1BAA-468A-89DD-65906507CFDE}.Release|x64.Build.0 = Release|Any CPU
+		{9BAD66A7-1BAA-468A-89DD-65906507CFDE}.Release|x86.ActiveCfg = Release|Any CPU
+		{9BAD66A7-1BAA-468A-89DD-65906507CFDE}.Release|x86.Build.0 = Release|Any CPU
+		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Debug|x64.Build.0 = Debug|Any CPU
+		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Debug|x86.Build.0 = Debug|Any CPU
+		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Release|x64.ActiveCfg = Release|Any CPU
+		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Release|x64.Build.0 = Release|Any CPU
+		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Release|x86.ActiveCfg = Release|Any CPU
+		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9BAD66A7-1BAA-468A-89DD-65906507CFDE} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
+		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
+		{E5686719-DDEE-4DC9-85F5-ECF548DBEFD2} = {E0DD92BD-F237-4DC1-BDD1-FC7190675061}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7CD707EC-7121-4BAD-8359-0031FE028920}
+	EndGlobalSection
+EndGlobal
