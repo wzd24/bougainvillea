@@ -21,7 +21,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="name"></param>
+        /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
         Task SetAsync<T>(string key, T value) where T : class;

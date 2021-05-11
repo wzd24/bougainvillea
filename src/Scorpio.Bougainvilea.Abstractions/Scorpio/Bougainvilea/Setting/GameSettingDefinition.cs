@@ -46,6 +46,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// 
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="scope"></param>
         /// <param name="displayName"></param>
         /// <param name="description"></param>
         /// <param name="valueType"></param>

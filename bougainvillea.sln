@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.6.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DD533BB9-6E40-4008-A45D-77AB6A23D64D}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvilea", "src\Scorpio.Bougainvilea\Scorpio.Bougainvilea.csproj", "{9BAD66A7-1BAA-468A-89DD-65906507CFDE}"
 EndProject

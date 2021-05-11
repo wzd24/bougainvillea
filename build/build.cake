@@ -22,7 +22,7 @@ public class BuildService
         _context=new BuildContext(context);
         _nugetRegex = $"{_context.ArtifactsPath.FullPath}**/*.nupkg";
         _nugetApiKey = _cakeContext.EnvironmentVariable("NugetApiKey");
-        _nugetQueryUrl= _cakeContext.EnvironmentVariable("NugetQueryUrl","https://www.myget.org/F/project-scorpio/api/v3/index.json");
+        _nugetQueryUrl= _cakeContext.EnvironmentVariable("NugetQueryUrl","https://www.myget.org/F/wzd24/api/v3/index.json");
         _nugetPushUrl = _cakeContext.EnvironmentVariable("NugetPushUrl");
         _symbolsPushUrl = _cakeContext.EnvironmentVariable("SymbolsPushUrl");
         _msbuildSettings=new DotNetCoreMSBuildSettings()
@@ -46,7 +46,7 @@ public class BuildService
         foreach (var item in _context.Soluations)
         {
             var settings=new DotNetCoreRestoreSettings{
-                Sources=new[]{"https://api.nuget.org/v3/index.json",_nugetQueryUrl}
+                Sources=new[]{"https://api.nuget.org/v3/index.json","https://www.myget.org/F/project-scorpio/api/v3/index.json",_nugetQueryUrl}
 
             };
             _cakeContext.DotNetCoreRestore(item.FullPath,new DotNetCoreRestoreSettings{});
@@ -74,8 +74,8 @@ public class BuildService
 
     private SonarBeginSettings GetSonarBeginSettings(){
         var settings = new SonarBeginSettings() {
-                Key="project-scorpio_scorpio",
-                Organization="project-scorpio",
+                Key="wzd24_bougainvillea",
+                Organization="wzd24",
                 Url="https://sonarcloud.io",
                 Login="748862a8ccbf1654ac8b22ad5ae84b14778ba198",
                 OpenCoverReportsPath ="**/coverage.opencover.xml"
