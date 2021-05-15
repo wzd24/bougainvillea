@@ -39,6 +39,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{E5686719
 		build\versions.props = build\versions.props
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scorpio.Bougainvilea.AspNetCore", "src\Scorpio.Bougainvilea.AspNetCore\Scorpio.Bougainvilea.AspNetCore.csproj", "{DD62DA68-A33F-40ED-BC42-2C69072F90CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,18 @@ Global
 		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Release|x64.Build.0 = Release|Any CPU
 		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Release|x86.ActiveCfg = Release|Any CPU
 		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}.Release|x86.Build.0 = Release|Any CPU
+		{DD62DA68-A33F-40ED-BC42-2C69072F90CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD62DA68-A33F-40ED-BC42-2C69072F90CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD62DA68-A33F-40ED-BC42-2C69072F90CC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DD62DA68-A33F-40ED-BC42-2C69072F90CC}.Debug|x64.Build.0 = Debug|Any CPU
+		{DD62DA68-A33F-40ED-BC42-2C69072F90CC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DD62DA68-A33F-40ED-BC42-2C69072F90CC}.Debug|x86.Build.0 = Debug|Any CPU
+		{DD62DA68-A33F-40ED-BC42-2C69072F90CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD62DA68-A33F-40ED-BC42-2C69072F90CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD62DA68-A33F-40ED-BC42-2C69072F90CC}.Release|x64.ActiveCfg = Release|Any CPU
+		{DD62DA68-A33F-40ED-BC42-2C69072F90CC}.Release|x64.Build.0 = Release|Any CPU
+		{DD62DA68-A33F-40ED-BC42-2C69072F90CC}.Release|x86.ActiveCfg = Release|Any CPU
+		{DD62DA68-A33F-40ED-BC42-2C69072F90CC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,6 +95,7 @@ Global
 		{9BAD66A7-1BAA-468A-89DD-65906507CFDE} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
 		{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
 		{E5686719-DDEE-4DC9-85F5-ECF548DBEFD2} = {E0DD92BD-F237-4DC1-BDD1-FC7190675061}
+		{DD62DA68-A33F-40ED-BC42-2C69072F90CC} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CD707EC-7121-4BAD-8359-0031FE028920}
