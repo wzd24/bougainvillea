@@ -8,9 +8,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DD533BB9-6E4
 		src\Directory.Build.props = src\Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvilea", "src\Scorpio.Bougainvilea\Scorpio.Bougainvilea.csproj", "{9BAD66A7-1BAA-468A-89DD-65906507CFDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvillea", "src\Scorpio.Bougainvillea\Scorpio.Bougainvillea.csproj", "{9BAD66A7-1BAA-468A-89DD-65906507CFDE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvilea.Abstractions", "src\Scorpio.Bougainvilea.Abstractions\Scorpio.Bougainvilea.Abstractions.csproj", "{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvillea.Abstractions", "src\Scorpio.Bougainvillea.Abstractions\Scorpio.Bougainvillea.Abstractions.csproj", "{DB87E420-8FB2-4A8D-BB6F-ABCAC60F3735}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E0DD92BD-F237-4DC1-BDD1-FC7190675061}"
 	ProjectSection(SolutionItems) = preProject
@@ -39,7 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{E5686719
 		build\versions.props = build\versions.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scorpio.Bougainvilea.AspNetCore", "src\Scorpio.Bougainvilea.AspNetCore\Scorpio.Bougainvilea.AspNetCore.csproj", "{DD62DA68-A33F-40ED-BC42-2C69072F90CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scorpio.Bougainvillea.AspNetCore", "src\Scorpio.Bougainvillea.AspNetCore\Scorpio.Bougainvillea.AspNetCore.csproj", "{DD62DA68-A33F-40ED-BC42-2C69072F90CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
