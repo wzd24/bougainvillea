@@ -39,7 +39,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// <param name="settingDefinition"></param>
         /// <returns></returns>
         public async Task<GameSettingValue<T>> GetAsync<T>(GameSettingDefinition<T> settingDefinition)
-            where T : class
+            where T : GameSettingBase
         {
             if (!(_cachedValues.GetOrDefault(settingDefinition.Name) is GameSettingValue<T> value))
             {
@@ -62,7 +62,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public async Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, string key, T value) where T : class
+        public async Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, int key, T value) where T : GameSettingBase
         {
             await SetCoreAsync(settingDefinition, key, value);
             if (_cachedValues.ContainsKey(settingDefinition.Name))
@@ -78,7 +78,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// <param name="settingDefinition"></param>
         /// <param name="values"></param>
         /// <returns></returns>
-        public async Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, IReadOnlyDictionary<string, T> values) where T : class
+        public async Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, IReadOnlyDictionary<int, T> values) where T : GameSettingBase
         {
             await values.ForEachAsync(async v => await SetCoreAsync(settingDefinition, v.Key, v.Value));
             if (_cachedValues.ContainsKey(settingDefinition.Name))
@@ -87,14 +87,14 @@ namespace Scorpio.Bougainvillea.Setting
             }
         }
 
-        private async Task SetCoreAsync<T>(GameSettingDefinition<T> settingDefinition, string key, T value) where T : class
+        private async Task SetCoreAsync<T>(GameSettingDefinition<T> settingDefinition, int key, T value) where T : GameSettingBase
         {
             var context = CreateContext(settingDefinition);
             context.Key = key;
             await _settingStore.SetAsync(context, value);
         }
 
-        private GameSettingStoreContext CreateContext<T>(GameSettingDefinition<T> settingDefinition) where T : class
+        private GameSettingStoreContext CreateContext<T>(GameSettingDefinition<T> settingDefinition) where T : GameSettingBase
         {
             var context = new GameSettingStoreContext(settingDefinition);
             ConfigContext(context);

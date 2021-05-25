@@ -37,7 +37,7 @@ namespace Scorpio.Bougainvillea.Setting
             return setting;
         }
 
-        public GameSettingDefinition<T> Get<T>() where T : class
+        public GameSettingDefinition<T> Get<T>() where T : GameSettingBase
         {
             return Get(typeof(T).Name) as GameSettingDefinition<T>;
         }

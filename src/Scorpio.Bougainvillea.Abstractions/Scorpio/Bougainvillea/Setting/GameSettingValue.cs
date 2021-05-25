@@ -17,12 +17,12 @@ namespace Scorpio.Bougainvillea.Setting
     /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public sealed class GameSettingValue<T>: GameSettingValue where T : class
+    public sealed class GameSettingValue<T>: GameSettingValue where T : GameSettingBase
     {
 
         /// <summary>
         /// 
         /// </summary>
-        public IReadOnlyDictionary<string, T> Value { get; set; }
+        public IReadOnlyDictionary<int, T> Value { get; set; }
     }
 }

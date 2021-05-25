@@ -18,11 +18,11 @@ namespace Scorpio.Bougainvillea.Rewards
         }
 
 
-        public async Task<object> Handle(int[] reward, int avatarId, int serverId)
+        public async Task<(int code,object data)> Handle(int[] reward, int num)
         {
             var handler = _providers.Reverse().Select(provider => provider.GetHandler(reward))
                 .FirstOrDefault(h => h != null) ?? throw new NullReferenceException("未找到对应的奖励处理器");
-            var context = new RewardHandleContext { Rewards = reward, AvatarId = avatarId, ServerId = serverId };
+            var context = new RewardHandleContext { Rewards = reward,Num=num};
             var result = await handler.ExecuteAsync(context);
             return result;
         }

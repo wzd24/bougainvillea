@@ -4,23 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Scorpio.DependencyInjection;
-
 namespace Scorpio.Bougainvillea.Props
 {
-
     /// <summary>
-    /// 
+    /// 扣除道具处理器
     /// </summary>
-    public interface IPropsHandler : ITransientDependency
+    public interface IPropsConsumeHandler
     {
-
-
         /// <summary>
-        /// 使用道具
+        /// 扣除道具
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        Task<(int code, object data)> UseAsync(PropsHandleContext context);
+        Task<(int code, object data)> ConsumeAsync(PropsHandleContext context);
+
     }
 }

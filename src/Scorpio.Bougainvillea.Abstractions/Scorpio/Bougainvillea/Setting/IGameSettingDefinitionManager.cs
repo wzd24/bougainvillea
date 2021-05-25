@@ -28,6 +28,6 @@ namespace Scorpio.Bougainvillea.Setting
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        GameSettingDefinition<T> Get<T>() where T : class;
+        GameSettingDefinition<T> Get<T>() where T : GameSettingBase;
     }
 }

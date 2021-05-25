@@ -27,14 +27,14 @@ namespace Scorpio.Bougainvillea.Setting
             _scopeFactory = scopeFactory;
         }
         public async Task<GameSettingValue<T>> GetAsync<T>(IGameSettingStoreContext context)
-            where T : class
+            where T:GameSettingBase
         {
             using (var scope = _scopeFactory.CreateScope())
             {
                 using (var conn = await GetConnectionAsync(context, scope.ServiceProvider))
                 {
                     var result = await conn.QueryAsync<T>($"SELECT * FROM {context.SettingDefinition.Name}");
-                    return new GameSettingValue<T> { Definition = context.SettingDefinition, Value = result.ToDictionary(r => r.ToString()) };
+                    return new GameSettingValue<T> { Definition = context.SettingDefinition, Value = result.ToDictionary(r => r.Id) };
                 }
             }
         }
@@ -54,7 +54,7 @@ namespace Scorpio.Bougainvillea.Setting
         }
 
         public async Task SetAsync<T>(IGameSettingStoreContext context, T value)
-            where T : class
+            where T : GameSettingBase
         {
             using (var scope = _scopeFactory.CreateScope())
             {

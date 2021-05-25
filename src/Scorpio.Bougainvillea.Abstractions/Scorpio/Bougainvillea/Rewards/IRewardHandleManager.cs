@@ -16,9 +16,8 @@ namespace Scorpio.Bougainvillea.Rewards
         /// 
         /// </summary>
         /// <param name="reward"></param>
-        /// <param name="avatarId"></param>
-        /// <param name="serverId"></param>
+        /// <param name="num"></param>
         /// <returns></returns>
-        Task<object> Handle(int[] reward,int avatarId,int serverId);
+        Task<(int code,object data)> Handle(int[] reward,int num);
     }
 }

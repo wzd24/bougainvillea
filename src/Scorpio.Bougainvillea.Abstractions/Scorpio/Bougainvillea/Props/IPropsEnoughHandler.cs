@@ -4,23 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Scorpio.DependencyInjection;
-
 namespace Scorpio.Bougainvillea.Props
 {
-
     /// <summary>
-    /// 
+    /// 判断道具是否足够处理接口
     /// </summary>
-    public interface IPropsHandler : ITransientDependency
+    public interface IPropsEnoughHandler
     {
-
-
         /// <summary>
-        /// 使用道具
+        /// 判断是否足够
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        Task<(int code, object data)> UseAsync(PropsHandleContext context);
+        Task<(int code,object data)> EnoughAsync(PropsHandleContext context);
+
     }
 }

@@ -15,7 +15,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// <summary>
         /// 
         /// </summary>
-        string Key { get; }
+        int Key { get; }
 
         /// <summary>
         /// 

@@ -7,7 +7,7 @@ using Scorpio.Middleware.Pipeline;
 
 namespace Scorpio.Bougainvillea.Middleware
 {
-    class ExceptionMiddleware
+    internal class ExceptionMiddleware
     {
         private readonly PipelineRequestDelegate<IGameContext> _next;
         private readonly ILogger<ExceptionMiddleware> _logger;

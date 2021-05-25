@@ -18,7 +18,7 @@ namespace Scorpio.Bougainvillea.Setting
             _definitionManager = definitionManager;
             _providerManager = providerManager;
         }
-        public async Task<IReadOnlyDictionary<string, T>> GetAsync<T>() where T : class
+        public async Task<IReadOnlyDictionary<int, T>> GetAsync<T>() where T : GameSettingBase
         {
             var setting = _definitionManager.Get<T>();
             var providers = _providerManager.Providers.Where(p => p.Scope == setting.Scope || p.Scope == GameSettingScope.Default).Reverse();
@@ -26,7 +26,7 @@ namespace Scorpio.Bougainvillea.Setting
             return value;
         }
 
-        public async Task SetAsync<T>(string key, T value) where T : class
+        public async Task SetAsync<T>(int key, T value) where T : GameSettingBase
         {
             var setting = _definitionManager.Get<T>();
             var providers = _providerManager.Providers.Where(p => p.Scope == setting.Scope);
@@ -34,16 +34,16 @@ namespace Scorpio.Bougainvillea.Setting
 
         }
 
-        public async Task SetAsync<T>(IReadOnlyDictionary<string, T> values) where T : class
+        public async Task SetAsync<T>(IReadOnlyDictionary<int, T> values) where T : GameSettingBase
         {
             var setting = _definitionManager.Get<T>();
             var providers = _providerManager.Providers.Where(p => p.Scope == setting.Scope);
             await providers.ForEachAsync(f => f.SetAsync(setting, values));
         }
 
-        protected virtual async Task<IReadOnlyDictionary<string, T>> GetValueFromProvidersAsync<T>(
+        protected virtual async Task<IReadOnlyDictionary<int, T>> GetValueFromProvidersAsync<T>(
          IEnumerable<IGameSettingProvider> providers,
-         GameSettingDefinition<T> setting) where T : class
+         GameSettingDefinition<T> setting) where T : GameSettingBase
         {
             foreach (var provider in providers)
             {

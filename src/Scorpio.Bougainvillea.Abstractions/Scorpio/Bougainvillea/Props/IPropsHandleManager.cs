@@ -19,38 +19,28 @@ namespace Scorpio.Bougainvillea.Props
         /// </summary>
         /// <param name="propId">道具Id</param>
         /// <param name="num">数量</param>
-        /// <returns></returns>
-        Task<int> EnoughAsync(int propId, long num);
+        /// <returns>表示异步获取操作的任务。 其 Result 属性的值包含判断的结果代码。</returns>
+        Task<(int code,object data)> EnoughAsync(int propId, int num);
 
-        /// <summary>
-        /// 判断是否有足够的道具
-        /// </summary>
-        /// <param name="props"></param>
-        /// <returns></returns>
-        Task<(int,Dictionary< int,int>)> EnoughAsync(Dictionary<int, long> props);
 
         /// <summary>
         /// 消费道具，纯扣减道具数量，不做其他操作。
         /// </summary>
         /// <param name="propId">道具Id</param>
         /// <param name="num">消费的数量，正数</param>
-        /// <returns></returns>
-        Task<(int code, object data)> ConsumeAsync(int propId, long num);
+        /// <param name="reason">消费道具原因。</param>
+        /// <returns>表示异步获取操作的任务。 其 Result 属性的值包含消费道具的处理结果。</returns>
+        Task<(int code, object data)> ConsumeAsync(int propId, int num,string reason);
 
-        /// <summary>
-        /// 消费道具，纯扣减道具数量，不做其它操作。
-        /// </summary>
-        /// <param name="props">道具Id, 消费的数量正数</param>
-        /// <returns></returns>
-        Task<(int,Dictionary<int, (int code, object data)>)> ConsumeAsync(Dictionary<int, long> props);
 
         /// <summary>
         /// 添加道具
         /// </summary>
         /// <param name="propId"></param>
         /// <param name="num"></param>
-        /// <returns></returns>
-        Task<(int code, object data)> AddPropAsync(int propId, long num);
+        /// <param name="reason">添加道具原因。</param>
+        /// <returns>表示异步获取操作的任务。 其 Result 属性的值包含添加道具的处理结果。</returns>
+        Task<(int code, object data)> AddPropAsync(int propId, int num, string reason);
 
         /// <summary>
         /// 判断是否可使用
@@ -58,8 +48,8 @@ namespace Scorpio.Bougainvillea.Props
         /// <param name="propId"></param>
         /// <param name="num"></param>
         /// <param name="para"></param>
-        /// <returns></returns>
-        Task<int> CanUseAsync(int propId, long num, dynamic para = null);
+        /// <returns>表示异步获取操作的任务。 其 Result 属性的值包含判断的结果代码。</returns>
+        Task<(int code, object data)> CanUseAsync(int propId, int num, object para = null);
 
         /// <summary>
         /// 使用道具
@@ -67,7 +57,8 @@ namespace Scorpio.Bougainvillea.Props
         /// <param name="propId"></param>
         /// <param name="num"></param>
         /// <param name="para"></param>
-        /// <returns></returns>
-        Task<(int code, object data)> UseAsync(int propId, int num, dynamic para = null);
+        /// <param name="reason">使用道具原因。</param>
+        /// <returns>表示异步获取操作的任务。 其 Result 属性的值包含使用道具的处理结果。</returns>
+        Task<(int code, object data)> UseAsync(int propId, int num, string reason, object para = null);
     }
 }

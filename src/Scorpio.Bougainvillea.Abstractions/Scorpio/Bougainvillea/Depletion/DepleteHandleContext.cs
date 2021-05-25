@@ -1,32 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace Scorpio.Bougainvillea.Props
+namespace Scorpio.Bougainvillea.Depletion
 {
     /// <summary>
     /// 
     /// </summary>
-    public sealed class PropsHandleContext
+    public sealed class DepleteHandleContext
     {
         /// <summary>
         /// 
         /// </summary>
-        public int PropId { get; set; }
+        public ICollection<int> Depletion { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public int Num { get; set; }
+        public int AvatarId { get; set; }
+        
 
         /// <summary>
         /// 
         /// </summary>
-        public object Parameter { get; set; }
-
+        public int ServerId { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
+        public IList AdditionDatas { get; } = new List<object>();
     }
 }

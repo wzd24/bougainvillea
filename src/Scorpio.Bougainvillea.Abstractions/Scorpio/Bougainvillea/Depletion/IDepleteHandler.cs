@@ -6,21 +6,19 @@ using System.Threading.Tasks;
 
 using Scorpio.DependencyInjection;
 
-namespace Scorpio.Bougainvillea.Props
+namespace Scorpio.Bougainvillea.Depletion
 {
 
     /// <summary>
     /// 
     /// </summary>
-    public interface IPropsHandler : ITransientDependency
+    public interface IDepleteHandler : ITransientDependency
     {
-
-
         /// <summary>
-        /// 使用道具
+        /// 
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        Task<(int code, object data)> UseAsync(PropsHandleContext context);
+        Task<object> ExecuteAsync(DepleteHandleContext context);
     }
 }

@@ -15,7 +15,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<IReadOnlyDictionary<string, T>> GetAsync<T>() where T : class;
+        Task<IReadOnlyDictionary<int, T>> GetAsync<T>() where T : GameSettingBase;
 
         /// <summary>
         /// 
@@ -24,7 +24,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        Task SetAsync<T>(string key, T value) where T : class;
+        Task SetAsync<T>(int key, T value) where T : GameSettingBase;
 
         /// <summary>
         /// 
@@ -32,6 +32,6 @@ namespace Scorpio.Bougainvillea.Setting
         /// <typeparam name="T"></typeparam>
         /// <param name="values"></param>
         /// <returns></returns>
-        Task SetAsync<T>(IReadOnlyDictionary<string,T> values) where T : class;
+        Task SetAsync<T>(IReadOnlyDictionary<int,T> values) where T : GameSettingBase;
     }
 }
