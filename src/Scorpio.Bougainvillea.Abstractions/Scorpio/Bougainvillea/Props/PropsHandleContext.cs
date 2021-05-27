@@ -28,5 +28,10 @@ namespace Scorpio.Bougainvillea.Props
         /// 
         /// </summary>
         public IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
+       
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Reason { get; set; }
     }
 }

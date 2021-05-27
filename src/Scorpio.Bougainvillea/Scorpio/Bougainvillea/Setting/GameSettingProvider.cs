@@ -20,8 +20,6 @@ namespace Scorpio.Bougainvillea.Setting
         /// </summary>
         public abstract GameSettingScope Scope { get; }
 
-        private readonly ConcurrentDictionary<string, GameSettingValue> _cachedValues;
-
         /// <summary>
         /// 
         /// </summary>
@@ -29,7 +27,6 @@ namespace Scorpio.Bougainvillea.Setting
         protected GameSettingProvider(IGameSettingStore settingStore)
         {
             _settingStore = settingStore;
-            _cachedValues = new ConcurrentDictionary<string, GameSettingValue>();
         }
 
         /// <summary>
@@ -41,16 +38,8 @@ namespace Scorpio.Bougainvillea.Setting
         public async Task<GameSettingValue<T>> GetAsync<T>(GameSettingDefinition<T> settingDefinition)
             where T : GameSettingBase
         {
-            if (!(_cachedValues.GetOrDefault(settingDefinition.Name) is GameSettingValue<T> value))
-            {
-                var context = CreateContext(settingDefinition);
-                value = await _settingStore.GetAsync<T>(context);
-                if (value == null)
-                {
-                    return null;
-                }
-                _cachedValues.TryAdd(settingDefinition.Name, value);
-            }
+            var context = CreateContext(settingDefinition);
+            var value = await _settingStore.GetAsync<T>(context);
             return value;
         }
 
@@ -65,10 +54,6 @@ namespace Scorpio.Bougainvillea.Setting
         public async Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, int key, T value) where T : GameSettingBase
         {
             await SetCoreAsync(settingDefinition, key, value);
-            if (_cachedValues.ContainsKey(settingDefinition.Name))
-            {
-                _cachedValues.Remove(settingDefinition.Name, out _);
-            }
         }
 
         /// <summary>
@@ -81,10 +66,6 @@ namespace Scorpio.Bougainvillea.Setting
         public async Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, IReadOnlyDictionary<int, T> values) where T : GameSettingBase
         {
             await values.ForEachAsync(async v => await SetCoreAsync(settingDefinition, v.Key, v.Value));
-            if (_cachedValues.ContainsKey(settingDefinition.Name))
-            {
-                _cachedValues.Remove(settingDefinition.Name, out _);
-            }
         }
 
         private async Task SetCoreAsync<T>(GameSettingDefinition<T> settingDefinition, int key, T value) where T : GameSettingBase

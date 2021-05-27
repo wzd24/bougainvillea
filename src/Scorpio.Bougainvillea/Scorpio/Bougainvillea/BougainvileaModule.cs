@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Scorpio.Bougainvillea;
 using Scorpio.Bougainvillea.Middleware;
 using Scorpio.Bougainvillea.Setting;
+using Scorpio.Bougainvillea.Storages;
 using Scorpio.Modularity;
 
 namespace Scorpio.Bougainvillea
@@ -13,6 +14,7 @@ namespace Scorpio.Bougainvillea
     /// 
     /// </summary>
     [DependsOn(typeof(BougainvilleaAbstractionsModule))]
+    [DependsOn(typeof(BougainvilleaStoragesModule))]
     public class BougainvilleaModule:ScorpioModule
     {
         /// <summary>

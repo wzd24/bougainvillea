@@ -9,7 +9,7 @@ using Scorpio.DependencyInjection;
 
 namespace Scorpio.Bougainvillea.Depletion
 {
-    internal class DepleteHandleManager : IDepleteHandleManager,ISingletonDependency
+    internal class DepleteHandleManager : IDepleteHandleManager, ISingletonDependency
     {
         private readonly IEnumerable<IDepleteHandlerProvider> _providers;
 
@@ -19,11 +19,11 @@ namespace Scorpio.Bougainvillea.Depletion
         }
 
 
-        public async Task<object> Handle(int[] depletion, int avatarId, int serverId)
+        public async Task<(int code, object data)> Handle(int[] depletion, int num, string reason)
         {
             var handler = _providers.Reverse().Select(provider => provider.GetHandler(depletion))
                 .FirstOrDefault(h => h != null) ?? throw new NullReferenceException("未找到对应的奖励处理器");
-            var context = new DepleteHandleContext {  Depletion = depletion, AvatarId = avatarId, ServerId = serverId };
+            var context = new DepleteHandleContext { Depletion = depletion, Reason = reason, Num = num };
             var result = await handler.ExecuteAsync(context);
             return result;
         }

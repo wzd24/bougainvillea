@@ -4,10 +4,19 @@
     <TargetFramework>net5.0</TargetFramework>
       <RootNamespace />
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Scorpio\Bougainvillea\Essential\**" />
+    <EmbeddedResource Remove="Scorpio\Bougainvillea\Essential\**" />
+    <None Remove="Scorpio\Bougainvillea\Essential\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Scorpio\Bougainvillea\CurrentGrainExtensions.cs" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Scorpio" Version="$(ScorpioVersion)" />
-    <PackageReference Include="Microsoft.Orleans.Core" Version="$(OrleansVersion)" />
   </ItemGroup>
 
 </Project>

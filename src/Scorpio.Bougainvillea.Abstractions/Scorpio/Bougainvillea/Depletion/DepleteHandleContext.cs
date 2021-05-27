@@ -11,7 +11,7 @@ namespace Scorpio.Bougainvillea.Depletion
         /// <summary>
         /// 
         /// </summary>
-        public ICollection<int> Depletion { get; set; }
+        public int[] Depletion { get; set; }
 
         /// <summary>
         /// 
@@ -28,5 +28,15 @@ namespace Scorpio.Bougainvillea.Depletion
         /// 
         /// </summary>
         public IList AdditionDatas { get; } = new List<object>();
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Reason { get; set; }
+       
+        /// <summary>
+        /// 
+        /// </summary>
+        public int Num { get; set; }
     }
 }

@@ -33,5 +33,11 @@ namespace Scorpio.Bougainvillea.Setting
         /// <param name="values"></param>
         /// <returns></returns>
         Task SetAsync<T>(IReadOnlyDictionary<int,T> values) where T : GameSettingBase;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Task ReloadCachesAsync();
     }
 }

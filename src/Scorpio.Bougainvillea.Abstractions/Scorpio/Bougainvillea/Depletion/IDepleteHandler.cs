@@ -19,6 +19,6 @@ namespace Scorpio.Bougainvillea.Depletion
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        Task<object> ExecuteAsync(DepleteHandleContext context);
+        Task<(int code,object data)> ExecuteAsync(DepleteHandleContext context);
     }
 }

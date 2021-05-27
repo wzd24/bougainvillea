@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Dapper;
-using Dapper.Contrib.Extensions;
+using Dapper.Extensions;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -33,7 +33,7 @@ namespace Scorpio.Bougainvillea.Setting
             {
                 using (var conn = await GetConnectionAsync(context, scope.ServiceProvider))
                 {
-                    var result = await conn.QueryAsync<T>($"SELECT * FROM {context.SettingDefinition.Name}");
+                    var result = await conn.GetAllAsync<T>(tableName: context.SettingDefinition.Name);
                     return new GameSettingValue<T> { Definition = context.SettingDefinition, Value = result.ToDictionary(r => r.Id) };
                 }
             }
@@ -60,7 +60,7 @@ namespace Scorpio.Bougainvillea.Setting
             {
                 using (var conn = await GetConnectionAsync(context, scope.ServiceProvider))
                 {
-                    await conn.InsertAsync(value);
+                    await conn.InsertAsync(value, tableName: context.SettingDefinition.Name);
                 }
             }
         }

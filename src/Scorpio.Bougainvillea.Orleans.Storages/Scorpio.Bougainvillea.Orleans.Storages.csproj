@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Scorpio.Bougainvillea.Orleans\Scorpio.Bougainvillea.Orleans.csproj" />
+    <ProjectReference Include="..\Scorpio.Bougainvillea.Storages\Scorpio.Bougainvillea.Storages.csproj" />
+  </ItemGroup>
+
+</Project>

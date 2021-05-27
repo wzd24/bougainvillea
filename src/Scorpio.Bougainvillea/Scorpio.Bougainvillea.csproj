@@ -6,12 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Scorpio\Bougainvillea\OrleansGameContextAccessor.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Scorpio.Bougainvillea.Abstractions\Scorpio.Bougainvillea.Abstractions.csproj" />
+    <ProjectReference Include="..\Scorpio.Bougainvillea.Storages\Scorpio.Bougainvillea.Storages.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Dapper.Contrib" Version="2.0.78" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Orleans.Core" Version="$(OrleansVersion)" />
     <PackageReference Include="Serilog" Version="2.10.0" />
   </ItemGroup>
 </Project>
