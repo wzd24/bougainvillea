@@ -19,6 +19,16 @@ namespace Scorpio.Bougainvillea.Rewards
         /// <param name="num"></param>
         /// <param name="reason"></param>
         /// <returns></returns>
-        Task<(int code,object data)> Handle(int[] reward,int num,string reason);
+        Task<(int code,object data)> HandleAsync(int[] reward,int num,string reason);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rewards"></param>
+        /// <param name="num"></param>
+        /// <param name="reason"></param>
+        /// <returns></returns>
+        Task<(int code, object data)> HandleAsync(string rewards, int num, string reason);
+
     }
 }

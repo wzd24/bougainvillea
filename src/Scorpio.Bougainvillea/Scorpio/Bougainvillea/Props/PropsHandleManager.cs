@@ -58,7 +58,7 @@ namespace Scorpio.Bougainvillea.Props
                     (code, data) = await _propsSet.AddOrSubtractAsync(propId, num);
                 }
             }
-            _logger.LogInformation("玩家{ServerId}-{AvatarId} 添加数量为 {Num}的道具 {PropId},添加原因：{Reason}，添加返回结果：{@Result}", _currentUser.ServerId, _currentUser.Id, num, propId, reason, (code, data));
+            _logger.LogInformation("玩家{ServerId}-{AvatarId} 添加数量为 {Num}的道具 {PropId},添加原因：{Reason}，添加返回结果：{@Result}", _currentUser.ServerId, _currentUser.AvatarId, num, propId, reason, (code, data));
             return (code, data);
         }
 
@@ -104,7 +104,7 @@ namespace Scorpio.Bougainvillea.Props
         public async Task<(int code, object data)> ConsumeAsync(int propId, int num, string reason)
         {
             var (code, data) =await ConsumeAsync(propId, num);
-            _logger.LogInformation("玩家{ServerId}-{AvatarId} 消费数量为 {Num}的道具 {PropId},消费原因：{Reason}，消费返回结果：{@Result}", _currentUser.ServerId, _currentUser.Id, num, propId, reason, (code, data));
+            _logger.LogInformation("玩家{ServerId}-{AvatarId} 消费数量为 {Num}的道具 {PropId},消费原因：{Reason}，消费返回结果：{@Result}", _currentUser.ServerId, _currentUser.AvatarId, num, propId, reason, (code, data));
             return (code, data);
         }
 
@@ -148,7 +148,7 @@ namespace Scorpio.Bougainvillea.Props
             {
                 (_, code, data) = await Handle<IPropsHandler>(propId, num, para, (h, c) => h.UseAsync(c));
             }
-            _logger.LogInformation("玩家{ServerId}-{AvatarId} 使用数量为 {Num}道具 {PropId},使用原因：{Reason}，附加参数：{@Parameter},使用返回结果：{@Result}", _currentUser.ServerId, _currentUser.Id, num, propId, reason,para, (code, data));
+            _logger.LogInformation("玩家{ServerId}-{AvatarId} 使用数量为 {Num}道具 {PropId},使用原因：{Reason}，附加参数：{@Parameter},使用返回结果：{@Result}", _currentUser.ServerId, _currentUser.AvatarId, num, propId, reason,para, (code, data));
             return (code, data);
         }
 

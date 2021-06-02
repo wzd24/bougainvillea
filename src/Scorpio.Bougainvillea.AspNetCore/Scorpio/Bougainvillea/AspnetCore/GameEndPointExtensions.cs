@@ -20,7 +20,6 @@ namespace Scorpio.Bougainvillea.AspnetCore
     /// </summary>
     public static class GameEndPointExtensions
     {
-        private const string _endpointRouteBuilder = "__EndpointRouteBuilder";
 
         /// <summary>
         /// 

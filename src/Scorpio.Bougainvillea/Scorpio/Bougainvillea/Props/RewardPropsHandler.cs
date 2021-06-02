@@ -30,7 +30,7 @@ namespace Scorpio.Bougainvillea.Props
             {
                 return (PropsErrorCodes.NotExist, null);
             }
-            return await _rewardHandleManager.Handle(_jsonSerializer.Deserialize<int[]>(setting.Effect), context.Num,context.Reason);
+            return await _rewardHandleManager.HandleAsync(_jsonSerializer.Deserialize<int[]>(setting.Effect), context.Num,context.Reason);
         }
     }
 }

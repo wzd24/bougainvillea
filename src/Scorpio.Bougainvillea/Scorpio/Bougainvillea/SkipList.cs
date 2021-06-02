@@ -43,7 +43,7 @@ namespace Scorpio.Bougainvillea
         /// <param name="minScore"></param>
         /// <param name="maxScore"></param>
         /// <param name="maxLength"></param>
-        public SkipList(Func<TScore> minScore, Func<TScore> maxScore,int maxLength) : this(minScore,maxScore)
+        public SkipList(Func<TScore> minScore, Func<TScore> maxScore, int maxLength) : this(minScore, maxScore)
         {
             if (maxLength <= 0)
             {
@@ -74,13 +74,13 @@ namespace Scorpio.Bougainvillea
         /// </summary>
         /// <param name="key"></param>
         /// <param name="score"></param>
-        public void Set(TKey key, TScore score)
+        public int Set(TKey key, TScore score)
         {
             if (_nodes.TryGetValue(key, out var node))
             {
                 if (node.Score.CompareTo(score) == 0)
                 {
-                    return;
+                    return IndexOf(key);
                 }
                 Remove(node);
             }
@@ -90,7 +90,7 @@ namespace Scorpio.Bougainvillea
                 {
                     if (score.CompareTo(_end[0].Previous.Score) <= 0)
                     {
-                        return;
+                        return -1;
                     }
                     node = PopLastNode();
                 }
@@ -103,13 +103,22 @@ namespace Scorpio.Bougainvillea
             }
             node.Score = score;
             Insert(node);
+            return IndexOf(key);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="item"></param>
-        public void Remove(TKey item) => throw new NotImplementedException();
+        /// <param name="key"></param>
+        public void Remove(TKey key)
+        {
+            if (_nodes.TryGetValue(key, out var node))
+            {
+                Remove(node);
+                _nodes.Remove(key);
+                Length--;
+            }
+        }
 
         /// <summary>
         /// 
@@ -124,7 +133,7 @@ namespace Scorpio.Bougainvillea
                 node = node[0].Next;
             }
         }
-        
+
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
@@ -161,7 +170,31 @@ namespace Scorpio.Bougainvillea
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public int IndexOf(TKey key) => throw new NotImplementedException();
+        public int IndexOf(TKey key)
+        {
+            if (!_nodes.ContainsKey(key))
+            {
+                return -1;
+            }
+            var node = _head;
+            var rank = 0;
+            while (node != _end)
+            {
+                if (node.Key.Equals(key))
+                {
+                    break;
+                }
+                rank++;
+                node = node[0].Next;
+            }
+            if (node == _end)
+            {
+                return -1;
+            }
+            return rank;
+        }
+
+
 
         private void Insert(SkipListNode node)
         {

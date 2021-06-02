@@ -7,6 +7,7 @@ using Scorpio.Bougainvillea.Middleware;
 using Scorpio.Bougainvillea.Setting;
 using Scorpio.Bougainvillea.Storages;
 using Scorpio.Modularity;
+using Scorpio.Setting;
 
 namespace Scorpio.Bougainvillea
 {
@@ -36,6 +37,11 @@ namespace Scorpio.Bougainvillea
             context.Services.Configure<GameSettingOptions>(opts =>
             {
                 opts.SettingProviders.Add<GlobalGameSettingProvider>();
+            });
+            context.Services.Configure<SettingOptions>(opts =>
+            {
+                opts.SettingProviders.Add<GlobalSettingProvider>();
+                opts.SettingProviders.Add<ServerSettingProvider>();
             });
             context.Services.PostConfigure<MiddlewareOptions>(opt =>
             {

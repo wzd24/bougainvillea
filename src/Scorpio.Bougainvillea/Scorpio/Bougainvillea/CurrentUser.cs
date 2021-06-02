@@ -26,8 +26,19 @@ namespace Scorpio.Bougainvillea
 
         public int ServerId => User?.ServerId ?? 0;
 
-        public int Id => User.Id;
+        public int AvatarId => User.Id;
 
         public bool IsAuthentication => User != null;
+
+        public IDisposable Use(int serverId, int avatarId)
+        {
+            var current = User;
+            _accessor.GameContext.User = new User(null)
+            {
+                Id = avatarId,
+                ServerId = serverId,
+            };
+            return new DisposeAction(() => _accessor.GameContext.User = current);
+        }
     }
 }

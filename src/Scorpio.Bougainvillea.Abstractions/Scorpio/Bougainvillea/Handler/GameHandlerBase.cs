@@ -74,9 +74,15 @@ namespace Scorpio.Bougainvillea.Handler
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public virtual async Task ExecuteAsync(IGameContext context)
+        public async Task ExecuteAsync(IGameContext context)
         {
-            var result =await ExecuteCore(context);
+            var (code, data) = await PreExecuteAsync(context);
+            if (code != 0)
+            {
+                await context.Response.WriteAsync(code, null, data);
+                return;
+            }
+            var result = await ExecuteCoreAsync(context);
             if (result == null)
             {
                 await context.Response.WriteEmptyAsync();
@@ -85,6 +91,7 @@ namespace Scorpio.Bougainvillea.Handler
             {
                 await context.Response.WriteAsync(result);
             }
+            await PostExecuteAsync(context);
         }
 
         /// <summary>
@@ -92,21 +99,28 @@ namespace Scorpio.Bougainvillea.Handler
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        protected abstract Task<object> ExecuteCore(IGameContext context);
-
-        private class ResponseMessage : IResponseMessage
+        protected virtual Task<(int code, object data)> PreExecuteAsync(IGameContext context)
         {
-            public int Code { get; }
-            public string Message { get; }
-            public object Data { get; }
-
-            public ResponseMessage(int code, string message, object data)
-            {
-                Code = code;
-                Message = message;
-                Data = data;
-            }
-
+            return Task.FromResult<(int code,object data)>((0, null));
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        protected abstract Task<object> ExecuteCoreAsync(IGameContext context);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        protected virtual Task PostExecuteAsync(IGameContext context)
+        {
+            return Task.CompletedTask;
+        }
+
+       
     }
 }

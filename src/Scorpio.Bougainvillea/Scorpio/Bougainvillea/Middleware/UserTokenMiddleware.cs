@@ -38,6 +38,7 @@ namespace Scorpio.Bougainvillea.Middleware
             var cached = await _cache.GetStringAsync(token);
             if (cached != null)
             {
+
                 await _cache.RefreshAsync(token);
                 return JsonConvert.DeserializeObject<User>(await _cache.GetStringAsync(token));
             }
@@ -56,24 +57,27 @@ namespace Scorpio.Bougainvillea.Middleware
     {
         public string Token { get; }
 
-        public int UserId { get; }
+        public int UserId { get; set; }
 
-        public int Id { get; }
+        public int Id { get; set; }
 
-        public int ServerId { get; }
+        public int ServerId { get; set; }
 
         string IGameUser.Key => Token;
 
         public User(string token)
         {
             Token = token;
-            var value = Encoding.UTF8.GetString(Convert.FromBase64String(token)).Split('|');
-            var avatarId = int.Parse(value[0]);
-            var userId = int.Parse(value[1]);
-            var serverId = int.Parse(value[2]);
-            Id = avatarId;
-            UserId = userId;
-            ServerId = serverId;
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                var value = Encoding.UTF8.GetString(Convert.FromBase64String(token)).Split('|');
+                var avatarId = int.Parse(value[0]);
+                var userId = int.Parse(value[1]);
+                var serverId = int.Parse(value[2]);
+                Id = avatarId;
+                UserId = userId;
+                ServerId = serverId;
+            }
         }
     }
 }

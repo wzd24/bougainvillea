@@ -6,6 +6,7 @@ using Scorpio.Conventional;
 using System.Reflection;
 using Scorpio.Bougainvillea.Rewards;
 using Scorpio.Bougainvillea.Depletion;
+using Scorpio.Setting;
 
 namespace Scorpio.Bougainvillea
 {
@@ -21,9 +22,13 @@ namespace Scorpio.Bougainvillea
             {
                 config.Where(t => t.IsStandardType()).Where(t => t.AttributeExists<DepleteHandlerAttribute>());
             });
-            context.DoConventionalAction<ConventionalSettingDefinitionProviderRegisterAction>(config =>
+            context.DoConventionalAction<ConventionalGameSettingDefinitionProviderRegisterAction>(config =>
             {
                 config.Where(t => t.IsStandardType()).Where(t => t.IsAssignableTo<IGameSettingDefinitionProvider>());
+            });
+            context.DoConventionalAction<ConventionalSettingDefinitionProviderRegisterAction>(config =>
+            {
+                config.Where(t => t.IsStandardType()).Where(t => t.IsAssignableTo<ISettingDefinitionProvider>());
             });
             context.Services.DoConventionalAction<ConventionalHandlersRegisterAction>(context.Types, config =>
             {

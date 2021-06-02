@@ -25,7 +25,7 @@ namespace Scorpio.Bougainvillea
         /// <summary>
         /// 
         /// </summary>
-        int Id { get; }
+        int AvatarId { get; }
 
         /// <summary>
         /// 

@@ -5,13 +5,12 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 
 using Scorpio.Conventional;
-using Scorpio.Setting;
 
 namespace Scorpio.Bougainvillea.Setting
 {
-    internal class ConventionalSettingDefinitionProviderRegisterAction : ConventionalActionBase
+    internal class ConventionalGameSettingDefinitionProviderRegisterAction : ConventionalActionBase
     {
-        public ConventionalSettingDefinitionProviderRegisterAction(IConventionalConfiguration configuration) : base(configuration)
+        public ConventionalGameSettingDefinitionProviderRegisterAction(IConventionalConfiguration configuration) : base(configuration)
         {
         }
 
@@ -20,7 +19,7 @@ namespace Scorpio.Bougainvillea.Setting
             context.Types.ForEach(t =>
             {
                 context.Services.AddSingleton(t);
-                context.Services.Configure<SettingOptions>(opt => opt.DefinitionProviders.AddIfNotContains(t));
+                context.Services.Configure<GameSettingOptions>(opt => opt.DefinitionProviders.AddIfNotContains(t));
             });
         }
     }

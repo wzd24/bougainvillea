@@ -1,4 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+
+using Scorpio.Bougainvillea.Handler;
+
 using System.Threading.Tasks;
 namespace Scorpio.Bougainvillea.Middleware
 {
@@ -14,11 +17,7 @@ namespace Scorpio.Bougainvillea.Middleware
         /// <returns></returns>
         public static async Task WriteEmptyAsync(this IGameResponse response)
         {
-            var resp = new ResponseMessage
-            {
-                Code = 0,
-                Message = "Successed"
-            };
+            var resp = new ResponseMessage(0, "Successed");
 
             await WriteAsync(response, resp);
         }
@@ -40,12 +39,7 @@ namespace Scorpio.Bougainvillea.Middleware
                     await response.WriteStringAsync(value);
                     break;
                 default:
-                    var resp = new ResponseMessage
-                    {
-                        Code = 0,
-                        Message = "Successed",
-                        Data = content
-                    };
+                    var resp = new ResponseMessage(0,"Successed",content);
 
                     await WriteAsync(response, resp);
                     break;
@@ -60,12 +54,7 @@ namespace Scorpio.Bougainvillea.Middleware
         /// <returns></returns>
         public static async Task WriteStringAsync(this IGameResponse response, string content)
         {
-            var resp = new ResponseMessage
-            {
-                Code = 0,
-                Message = "Successed",
-                Data = content
-            };
+            var resp = new ResponseMessage(0, "Successed", content);
 
             await WriteAsync(response, resp);
         }
@@ -81,13 +70,7 @@ namespace Scorpio.Bougainvillea.Middleware
         /// <returns></returns>
         public static async Task WriteAsync(this IGameResponse response, int code, string message, object content)
         {
-            var resp = new ResponseMessage
-            {
-                Code = code,
-                Message = message,
-                Data = content
-            };
-
+            var resp = new ResponseMessage(code, message, content);
             await WriteAsync(response, resp);
         }
 
@@ -102,12 +85,18 @@ namespace Scorpio.Bougainvillea.Middleware
             await response.WriteAsync(response.Context.ApplicationServices.GetService<IJsonSerializer>().Serialize(message));
         }
 
-
-        class ResponseMessage : IResponseMessage
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static bool IsSuccessed(this IResponseMessage message)
         {
-            public int Code { get; set; }
-            public string Message { get; set; }
-            public object Data { get; set; }
+            if (message is ISuccessd successd)
+            {
+                return successd.IsSuccessed();
+            }
+            return message.Code == 0;
         }
     }
 }

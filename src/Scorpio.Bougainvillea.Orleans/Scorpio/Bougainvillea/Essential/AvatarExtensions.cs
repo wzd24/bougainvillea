@@ -25,7 +25,7 @@ namespace Scorpio.Bougainvillea.Essential
         public static TAvatar GetCurrentAvatar<TAvatar>(this ICurrentUser currentUser,IGrainFactory  factory)
             where TAvatar:IAvatar
         {
-           return factory.GetGrain<TAvatar>(currentUser.Id, currentUser.ServerId.ToString());
+           return factory.GetGrain<TAvatar>(currentUser.AvatarId, currentUser.ServerId.ToString());
         }
     }
 }

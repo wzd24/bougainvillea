@@ -40,13 +40,41 @@ namespace Scorpio.Bougainvillea.Handler
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task ExecuteAsync(IGameContext context)
+        async Task IGameHandler.ExecuteAsync(IGameContext context)
         {
             var ser = ServiceProvider.GetRequiredService<IJsonSerializer>();
             var request = ser.Deserialize<T>(context.Request.Content);
-            var result = await ExecuteAsync(request);
+            var result = await PreExecuteAsync(request);
+            if (result.IsSuccessed())
+            {
+                result =await ExecuteAsync(request);
+            }
             await context.Response.WriteAsync(result);
+            if (result.IsSuccessed())
+            {
+               await PostExecuteAsync(context);
+            }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        protected virtual Task<IResponseMessage> PreExecuteAsync(T request)
+        {
+            return Task.FromResult<IResponseMessage>(ResponseMessage.Sucess);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        protected virtual Task PostExecuteAsync(IGameContext context)
+        {
+            return Task.CompletedTask;
+        }
+
 
         /// <summary>
         /// 

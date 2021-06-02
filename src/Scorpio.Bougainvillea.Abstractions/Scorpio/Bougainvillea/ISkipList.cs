@@ -41,13 +41,13 @@ namespace Scorpio.Bougainvillea
         /// </summary>
         /// <param name="key"></param>
         /// <param name="score"></param>
-        void Set(TKey key,TScore score);
+        int Set(TKey key,TScore score);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="item"></param>
-        void Remove(TKey item);
+        /// <param name="key"></param>
+        void Remove(TKey key);
 
         /// <summary>
         /// 
