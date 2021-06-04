@@ -10,10 +10,9 @@ namespace Scorpio.Bougainvillea
     /// <summary>
     /// 
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TScore"></typeparam>
-    public class SkipList<TKey, TScore> : ISkipList<TKey, TScore>
-        where TScore : IComparable<TScore>
+    /// <typeparam name="T"></typeparam>
+    public class SkipList<T> : ISkipList<T>
+           where T : IComparable<T>, IEquatable<T>
     {
         /// <summary>
         /// 
@@ -22,7 +21,7 @@ namespace Scorpio.Bougainvillea
         private readonly SkipListNode _head;
         private readonly SkipListNode _end;
 
-        private readonly Dictionary<TKey, SkipListNode> _nodes = new Dictionary<TKey, SkipListNode>();
+        private readonly Dictionary<T, SkipListNode> _nodes = new Dictionary<T, SkipListNode>();
         private readonly Random _random = new Random();
 
         /// <summary>
@@ -30,10 +29,10 @@ namespace Scorpio.Bougainvillea
         /// </summary>
         /// <param name="minScore"></param>
         /// <param name="maxScore"></param>
-        public SkipList(Func<TScore> minScore, Func<TScore> maxScore)
+        public SkipList(Func<T> minScore, Func<T> maxScore)
         {
-            _head = new SkipListNode { Score = maxScore() };
-            _end = new SkipListNode { Score = minScore() };
+            _head = new SkipListNode { Data = maxScore() };
+            _end = new SkipListNode { Data = minScore() };
             _head.SetNext(_end, 0);
         }
 
@@ -43,7 +42,7 @@ namespace Scorpio.Bougainvillea
         /// <param name="minScore"></param>
         /// <param name="maxScore"></param>
         /// <param name="maxLength"></param>
-        public SkipList(Func<TScore> minScore, Func<TScore> maxScore, int maxLength) : this(minScore, maxScore)
+        public SkipList(Func<T> minScore, Func<T> maxScore, int maxLength) : this(minScore, maxScore)
         {
             if (maxLength <= 0)
             {
@@ -72,15 +71,15 @@ namespace Scorpio.Bougainvillea
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="score"></param>
-        public int Set(TKey key, TScore score)
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public int Set(T item)
         {
-            if (_nodes.TryGetValue(key, out var node))
+            if (_nodes.TryGetValue(item, out var node))
             {
-                if (node.Score.CompareTo(score) == 0)
+                if (node.Data.CompareTo(item) == 0)
                 {
-                    return IndexOf(key);
+                    return IndexOf(item);
                 }
                 Remove(node);
             }
@@ -88,7 +87,7 @@ namespace Scorpio.Bougainvillea
             {
                 if (Length >= MaxLength)
                 {
-                    if (score.CompareTo(_end[0].Previous.Score) <= 0)
+                    if (item.CompareTo(_end[0].Previous.Data) <= 0)
                     {
                         return -1;
                     }
@@ -99,23 +98,23 @@ namespace Scorpio.Bougainvillea
                     node = new SkipListNode();
                     Length++;
                 }
-                _nodes[key] = node;
+                _nodes[item] = node;
             }
-            node.Score = score;
+            node.Data = item;
             Insert(node);
-            return IndexOf(key);
+            return IndexOf(item);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="key"></param>
-        public void Remove(TKey key)
+        /// <param name="item"></param>
+        public void Remove(T item)
         {
-            if (_nodes.TryGetValue(key, out var node))
+            if (_nodes.TryGetValue(item, out var node))
             {
                 Remove(node);
-                _nodes.Remove(key);
+                _nodes.Remove(item);
                 Length--;
             }
         }
@@ -124,12 +123,12 @@ namespace Scorpio.Bougainvillea
         /// 
         /// </summary>
         /// <returns></returns>
-        public IEnumerator<TKey> GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             var node = _head[0].Next;
             while (node != _end)
             {
-                yield return node.Key;
+                yield return node.Data;
                 node = node[0].Next;
             }
         }
@@ -143,7 +142,7 @@ namespace Scorpio.Bougainvillea
         /// <param name="begin"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public IEnumerable<TKey> GetSegment(int begin, int count)
+        public IEnumerable<T> GetSegment(int begin, int count)
         {
             var node = _head[0].Next;
             for (var i = 0; i < begin; i++)
@@ -160,7 +159,7 @@ namespace Scorpio.Bougainvillea
                 {
                     yield break;
                 }
-                yield return node.Key;
+                yield return node.Data;
                 node = node[0].Next;
             }
         }
@@ -168,11 +167,11 @@ namespace Scorpio.Bougainvillea
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
-        public int IndexOf(TKey key)
+        public int IndexOf(T item)
         {
-            if (!_nodes.ContainsKey(key))
+            if (!_nodes.ContainsKey(item))
             {
                 return -1;
             }
@@ -180,7 +179,7 @@ namespace Scorpio.Bougainvillea
             var rank = 0;
             while (node != _end)
             {
-                if (node.Key.Equals(key))
+                if (node.Data.Equals(item))
                 {
                     break;
                 }
@@ -213,7 +212,7 @@ namespace Scorpio.Bougainvillea
             var before = _head;
             for (var i = MaxLevel; i >= 0; i--)
             {
-                while (before[i].Next.Score.CompareTo(node.Score) >= 0)
+                while (before[i].Next.Data.CompareTo(node.Data) >= 0)
                 {
                     before = before[i].Next;
                 }
@@ -270,18 +269,14 @@ namespace Scorpio.Bougainvillea
                 return null;
             }
             Remove(node);
-            _nodes.Remove(node.Key);
+            _nodes.Remove(node.Data);
             return node;
         }
-
-
         private class SkipListNode
         {
             private readonly List<SkipListNodePoint> _points = new List<SkipListNodePoint>() { new SkipListNodePoint() };
 
-            public TKey Key { get; set; }
-
-            public TScore Score { get; set; }
+            public T Data { get; set; }
 
             internal int MaxLevel { get; set; }
 

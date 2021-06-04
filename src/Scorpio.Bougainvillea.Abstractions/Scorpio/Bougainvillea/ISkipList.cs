@@ -9,10 +9,9 @@ namespace Scorpio.Bougainvillea
     /// <summary>
     /// 
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TScore"></typeparam>
-    public interface ISkipList<TKey,TScore> : IEnumerable<TKey>
-        where TScore:IComparable<TScore>
+    /// <typeparam name="T"></typeparam>
+    public interface ISkipList<T> : IEnumerable<T>
+        where T:IComparable<T>,IEquatable<T>
     {
         /// <summary>
         /// 
@@ -32,22 +31,22 @@ namespace Scorpio.Bougainvillea
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
-        int IndexOf(TKey  key);
+        int IndexOf(T  item);
         
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="score"></param>
-        int Set(TKey key,TScore score);
+        /// <param name="item"></param>
+        /// <returns></returns>
+        int Set(T item);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="key"></param>
-        void Remove(TKey key);
+        /// <param name="item"></param>
+        void Remove(T item);
 
         /// <summary>
         /// 
@@ -55,6 +54,6 @@ namespace Scorpio.Bougainvillea
         /// <param name="begin"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        IEnumerable<TKey> GetSegment(int begin, int count);
+        IEnumerable<T> GetSegment(int begin, int count);
     }
 }

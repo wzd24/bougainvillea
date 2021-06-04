@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using Scorpio.Bougainvillea.AdoNet;
 using Scorpio.DependencyInjection;
 
 namespace Scorpio.Bougainvillea.Setting
@@ -30,13 +31,10 @@ namespace Scorpio.Bougainvillea.Setting
             return null;
         }
 
-        private async Task<IDbConnection> CreateConnection()
+        private Task<IDbConnection> CreateConnection()
         {
-            var factory = _serviceProvider.GetService<DbProviderFactory>();
-            var conn = factory.CreateConnection();
-            conn.ConnectionString = _configuration.GetConnectionString("Game_Config");
-            await conn.OpenAsync();
-            return conn;
+            var conn = DbConnectionFactory.CreateConnection(_configuration.GetConnectionString("Game_Config"));
+            return Task.FromResult(conn);
         }
 
     }

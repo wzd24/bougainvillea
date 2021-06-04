@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Scorpio.Bougainvillea.AdoNet
@@ -92,16 +94,38 @@ namespace Scorpio.Bougainvillea.AdoNet
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="connectionString"></param>
+        /// <returns></returns>
+        public static IDbConnection CreateConnection(string connectionString)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new ArgumentException($"“{nameof(connectionString)}”不能为 null 或空白。", nameof(connectionString));
+            }
+
+            var regex = new Regex($@"invariant=(?<invariant>\S*?);", RegexOptions.IgnoreCase);
+            if (!regex.IsMatch(connectionString))
+            {
+                return CreateConnection("MySql.Data.MySqlClient", connectionString);
+            }
+            var  match = regex.Match(connectionString);
+            var invariant= match.Groups["invariant"].Value;
+            var connString = regex.Replace(connectionString, "");
+            return CreateConnection(invariant, connString);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="invariantName"></param>
         /// <param name="connectionString"></param>
         /// <returns></returns>
-        public static DbConnection CreateConnection(string invariantName, string connectionString)
+        public static IDbConnection CreateConnection(string invariantName, string connectionString)
         {
             if (string.IsNullOrWhiteSpace(invariantName))
             {
                 throw new ArgumentNullException(nameof(invariantName));
             }
-
+            DbConnectionStringBuilder builder = new DbConnectionStringBuilder();
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 throw new ArgumentNullException(nameof(connectionString));

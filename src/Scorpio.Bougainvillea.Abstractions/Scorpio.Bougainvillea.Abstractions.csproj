@@ -6,12 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Scorpio\Bougainvillea\Essential\**" />
-    <EmbeddedResource Remove="Scorpio\Bougainvillea\Essential\**" />
-    <None Remove="Scorpio\Bougainvillea\Essential\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="Scorpio\Bougainvillea\CurrentGrainExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

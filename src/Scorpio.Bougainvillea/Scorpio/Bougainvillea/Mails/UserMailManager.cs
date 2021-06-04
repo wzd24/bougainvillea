@@ -115,7 +115,7 @@ namespace Scorpio.Bougainvillea.Mails
             }
             mail.ReadState = true;
             mail.ReadTime = DateTime.Now;
-            _store.SaveAsync(mail);
+            await _store.SaveAsync(mail);
             return await _rewardHandleManager.HandleAsync(mail.Rewards, 1, $"领取邮件 {mail.Id} 的奖励");
         }
 
@@ -164,7 +164,7 @@ namespace Scorpio.Bougainvillea.Mails
                     case MailExceptionState.Forbid:
                         mail.UpdateTime = DateTime.Now;
                         mail.ExceptionState = oMail.ExceptionState;
-                        _store.SaveAsync(mail);
+                       await _store.SaveAsync(mail);
                         break;
                     case MailExceptionState.Deleted:
                         await DeleteMailAsync(mail.Id);
@@ -175,7 +175,7 @@ namespace Scorpio.Bougainvillea.Mails
                         mail.Title = oMail.Title;
                         mail.Content = oMail.Content;
                         mail.Rewards = oMail.Rewards;
-                        _store.SaveAsync(mail);
+                      await  _store.SaveAsync(mail);
                         break;
                     default:
                         break;

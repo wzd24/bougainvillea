@@ -21,6 +21,7 @@ namespace Scorpio.Bougainvillea.Mails
             _store = store;
             _logger = logger;
             _serializer = serializer;
+            _exceptions = new Dictionary<int, MailExceptionState>();
         }
 
         public async Task Add(int serverId, string title, string content, string rewards, string excludeUsers, DateTime sendTime, DateTime expireTime)
