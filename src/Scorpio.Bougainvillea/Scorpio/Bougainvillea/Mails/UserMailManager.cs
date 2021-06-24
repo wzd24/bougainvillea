@@ -43,7 +43,7 @@ namespace Scorpio.Bougainvillea.Mails
             {
                 if ((lastBuildMailTime - item.SendTime).TotalSeconds < -10)
                 {
-                    if (item.ExcludeUsers.Contains(_currentUser.AvatarId))
+                    if (!item.ExcludeUsers.Contains(_currentUser.AvatarId))
                     {
                         await SendMailAsync(UserMailType.System, item.Title, item.Content, item.ExceptionState, item.Rewards, item.ExpireTime);
                     }
