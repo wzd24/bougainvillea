@@ -9,9 +9,7 @@ using System.Text;
 
 namespace Scorpio.Bougainvillea
 {
-    [ExposeServices(typeof(IJsonSerializer), ServiceLifetime = ServiceLifetime.Singleton)]
-    [ReplaceService(ReplaceService =true)]
-    internal class JsonSerializer : IJsonSerializer
+    internal class JsonSerializer : IJsonSerializer,ISingletonDependency
     {
         private readonly JsonSerializerSettings _settings;
         public JsonSerializer()

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Scorpio.Bougainvillea.Middleware
@@ -22,7 +23,7 @@ namespace Scorpio.Bougainvillea.Middleware
         /// 
         /// </summary>
         /// <param name="value"></param>
-        Task WriteAsync(string value);
+        Task WriteAsync(ReadOnlyMemory<byte> value);
 
         /// <summary>
         /// 

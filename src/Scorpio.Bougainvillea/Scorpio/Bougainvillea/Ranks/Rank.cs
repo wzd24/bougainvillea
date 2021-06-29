@@ -27,6 +27,10 @@ namespace Scorpio.Bougainvillea.Ranks
         /// 
         /// </summary>
         protected abstract int MaxLength { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         protected Rank()
         {
             _list = new SkipList<RankItem>(Min, Max, MaxLength);

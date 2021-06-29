@@ -36,6 +36,21 @@ namespace Scorpio.Bougainvillea.Props.Settings
         public int PropType { get; set; }
 
         /// <summary>
+        /// 道具品质
+        /// </summary>
+        public int Quality { get; set; }
+
+        /// <summary>
+        /// 背包显示顺序
+        /// </summary>
+        public int Sort { get; set; }
+
+        /// <summary>
+        /// 道具价值
+        /// </summary>
+        public int Cost { get; set; }
+
+        /// <summary>
         /// 道具描述
         /// </summary>
         public string Desc { get; set; }
@@ -59,6 +74,11 @@ namespace Scorpio.Bougainvillea.Props.Settings
         /// 批量使用上限(1:不能批量使用;0:无限)
         /// </summary>
         public int BatchUseLimit { get; set; }
+
+        /// <summary>
+        /// 道具获取途径的详情说明
+        /// </summary>
+        public string GetWayDetails { get; set; }
 
     }
 

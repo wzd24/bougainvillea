@@ -35,9 +35,6 @@ namespace Scorpio.Bougainvillea.Middleware
                 case IResponseMessage message:
                     await response.WriteAsync(message);
                     break;
-                case string value:
-                    await response.WriteStringAsync(value);
-                    break;
                 default:
                     var resp = new ResponseMessage(0,"Successed",content);
 
@@ -46,18 +43,7 @@ namespace Scorpio.Bougainvillea.Middleware
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="response"></param>
-        /// <param name="content"></param>
-        /// <returns></returns>
-        public static async Task WriteStringAsync(this IGameResponse response, string content)
-        {
-            var resp = new ResponseMessage(0, "Successed", content);
-
-            await WriteAsync(response, resp);
-        }
+       
 
 
         /// <summary>
@@ -82,7 +68,7 @@ namespace Scorpio.Bougainvillea.Middleware
         /// <returns></returns>
         public static async Task WriteAsync(this IGameResponse response, IResponseMessage message)
         {
-            await response.WriteAsync(response.Context.ApplicationServices.GetService<IJsonSerializer>().Serialize(message));
+            await response.WriteAsync(response.Context.ApplicationServices.GetService<IResponseSerializer>().Serialize(message));
         }
 
         /// <summary>
