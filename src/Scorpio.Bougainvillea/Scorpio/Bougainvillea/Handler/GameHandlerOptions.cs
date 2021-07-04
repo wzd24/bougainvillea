@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Scorpio.Bougainvillea.Middleware;
@@ -358,11 +360,15 @@ namespace Scorpio.Bougainvillea.Handler
         private static object GetArgValue(JToken token, string name, Type parameterType)
         {
             var property = token.As<JObject>()?.Property(name, StringComparison.OrdinalIgnoreCase);
+            var s = Newtonsoft.Json.JsonSerializer.CreateDefault(new JsonSerializerSettings
+            {
+                ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
+            }.Action(s => s.Converters.Add(new UnixDateTimeConverter())));
             if (property != null)
             {
-                return property.Value?.ToObject(parameterType);
+                return property.Value?.ToObject(parameterType, s);
             }
-            return token?.ToObject(parameterType);
+            return token?.ToObject(parameterType, s);
         }
 
         /// <summary>
