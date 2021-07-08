@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Linq.Expressions;
 using System.Reflection;
+using Scorpio.Threading;
 
 namespace Scorpio.Bougainvillea.Handler
 {
@@ -23,7 +24,7 @@ namespace Scorpio.Bougainvillea.Handler
         /// <summary>
         /// 
         /// </summary>
-        private readonly static string MethodName = "Execute";
+        private readonly static string _methodName = "Execute";
 
         private readonly static Dictionary<Type, MethodInfo> _cachedMethods = new Dictionary<Type, MethodInfo>();
 
@@ -128,10 +129,10 @@ namespace Scorpio.Bougainvillea.Handler
         {
             return _cachedMethods.GetOrAdd(type, t =>
             {
-                var method = t.GetMethod(MethodName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                var method = t.GetMethod(_methodName, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 if (method == null)
                 {
-                    method = t.GetMethod($"{MethodName}Async", BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    method = t.GetMethod($"{_methodName}Async", BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 }
                 if (method == null)
                 {
