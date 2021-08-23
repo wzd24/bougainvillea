@@ -23,7 +23,7 @@ namespace Scorpio.Bougainvillea.Handler
         /// <summary>
         /// 
         /// </summary>
-        public ITypeList<IPropsHandlerProvider>   HandlerProviders { get; }
+        public ITypeList<IPropsHandlerProvider> HandlerProviders { get; }
 
         /// <summary>
         /// 

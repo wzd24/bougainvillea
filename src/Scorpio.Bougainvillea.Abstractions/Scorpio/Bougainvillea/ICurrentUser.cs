@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Scorpio.Bougainvillea.Middleware;
+
 namespace Scorpio.Bougainvillea
 {
     /// <summary>
@@ -36,5 +38,12 @@ namespace Scorpio.Bougainvillea
         /// 
         /// </summary>
         bool IsAuthentication { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        IDisposable Use(IGameUser user);
     }
 }

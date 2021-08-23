@@ -13,6 +13,5 @@ namespace Scorpio.Bougainvillea.Setting
 
         public IDictionary<string, object> Properties { get; }
         public GameSettingDefinition SettingDefinition { get; }
-        public int Key { get; set; }
     }
 }

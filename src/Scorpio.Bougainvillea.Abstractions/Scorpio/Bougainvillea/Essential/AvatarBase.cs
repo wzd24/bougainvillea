@@ -56,6 +56,21 @@ namespace Scorpio.Bougainvillea.Essential
         public int HeadId { get; set; }
 
         /// <summary>
+        /// 当前穿戴头像框ID
+        /// </summary>
+        public int HeadFrameId { get; set; }
+
+        /// <summary>
+        /// 当前穿戴称号ID
+        /// </summary>
+        public int TitleId { get; set; }
+
+        /// <summary>
+        /// 当前穿戴时装ID
+        /// </summary>
+        public int FashionId { get; set; }
+
+        /// <summary>
         /// 地址ID 默认配置地址取杂项配置1100000
         /// </summary>
         public int AddressId { get; set; }

@@ -4,21 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Scorpio.DependencyInjection;
-
-namespace Scorpio.Bougainvillea.Depletion
+namespace Scorpio.Bougainvillea
 {
-
     /// <summary>
     /// 
     /// </summary>
-    public interface IDepleteHandler : ITransientDependency
+    public interface IInitializable
     {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="context"></param>
         /// <returns></returns>
-        Task<int> ExecuteAsync(DepleteHandleContext context);
+        Task InitializeAsync();
     }
 }

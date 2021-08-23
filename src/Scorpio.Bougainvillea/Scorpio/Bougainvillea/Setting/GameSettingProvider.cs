@@ -51,9 +51,9 @@ namespace Scorpio.Bougainvillea.Setting
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public async Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, int key, T value) where T : GameSettingBase
+        public async Task SetAsync<T>(GameSettingDefinition<T> settingDefinition,  T value) where T : GameSettingBase
         {
-            await SetCoreAsync(settingDefinition, key, value);
+            await SetCoreAsync(settingDefinition, value);
         }
 
         /// <summary>
@@ -63,15 +63,14 @@ namespace Scorpio.Bougainvillea.Setting
         /// <param name="settingDefinition"></param>
         /// <param name="values"></param>
         /// <returns></returns>
-        public async Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, IReadOnlyDictionary<int, T> values) where T : GameSettingBase
+        public async Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, IReadOnlyCollection<T> values) where T : GameSettingBase
         {
-            await values.ForEachAsync(async v => await SetCoreAsync(settingDefinition, v.Key, v.Value));
+            await values.ForEachAsync(async v => await SetCoreAsync(settingDefinition, v));
         }
 
-        private async Task SetCoreAsync<T>(GameSettingDefinition<T> settingDefinition, int key, T value) where T : GameSettingBase
+        private async Task SetCoreAsync<T>(GameSettingDefinition<T> settingDefinition,  T value) where T : GameSettingBase
         {
             var context = CreateContext(settingDefinition);
-            context.Key = key;
             await _settingStore.SetAsync(context, value);
         }
 

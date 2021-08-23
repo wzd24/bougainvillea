@@ -43,18 +43,18 @@ namespace Scorpio.Bougainvillea.Setting
             return Task.CompletedTask;
         }
 
-        public async Task SetAsync<T>(int key, T value) where T : GameSettingBase
+        public async Task SetAsync<T>( T value) where T : GameSettingBase
         {
             var setting = _definitionManager.Get<T>();
             var providers = _providerManager.Providers.Where(p => p.Scope == setting.Scope);
-            await providers.ForEachAsync(f => f.SetAsync(setting, key, value));
+            await providers.ForEachAsync(f => f.SetAsync(setting, value));
             if (_cachedValues.ContainsKey(setting.Name))
             {
                 _cachedValues.Remove(setting.Name, out _);
             }
         }
 
-        public async Task SetAsync<T>(IReadOnlyDictionary<int, T> values) where T : GameSettingBase
+        public async Task SetAsync<T>(IReadOnlyCollection< T> values) where T : GameSettingBase
         {
             var setting = _definitionManager.Get<T>();
             var providers = _providerManager.Providers.Where(p => p.Scope == setting.Scope);

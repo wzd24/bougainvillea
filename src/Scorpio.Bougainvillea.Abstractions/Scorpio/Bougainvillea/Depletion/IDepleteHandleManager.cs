@@ -19,6 +19,6 @@ namespace Scorpio.Bougainvillea.Depletion
         /// <param name="num"></param>
         /// <param name="reson"></param>
         /// <returns></returns>
-        Task<(int code, object data)> Handle(int[] depletion,int num,string reson);
+        Task<int> Handle(int[] depletion,int num,string reson);
     }
 }

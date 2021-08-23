@@ -11,20 +11,20 @@ using Scorpio.DependencyInjection;
 
 namespace Scorpio.Bougainvillea.Setting
 {
-    internal class GlobalGameSettingDatabaseConnectionProvider : IGameSettingDatabaseConnectionProvider, ISingletonDependency
+    internal class ServerGameSettingDatabaseConnectionProvider : IGameSettingDatabaseConnectionProvider, ISingletonDependency
     {
+        private readonly ICurrentServer _currentServer;
         private readonly IDbConnectionFactory _connectionFactory;
-        private readonly IConfiguration _configuration;
 
-        public GlobalGameSettingDatabaseConnectionProvider(IDbConnectionFactory connectionFactory, IConfiguration configuration)
+        public ServerGameSettingDatabaseConnectionProvider(ICurrentServer currentServer, IDbConnectionFactory connectionFactory)
         {
 
+            _currentServer = currentServer;
             _connectionFactory = connectionFactory;
-            _configuration = configuration;
         }
         public async Task<IDbConnection> GetConnectionAsync(GameSettingDefinition settingDefinition)
         {
-            if (settingDefinition.Scope == GameSettingScope.Global)
+            if (settingDefinition.Scope == GameSettingScope.Server)
             {
                 return await CreateConnection();
             }
@@ -33,7 +33,7 @@ namespace Scorpio.Bougainvillea.Setting
 
         private async Task<IDbConnection> CreateConnection()
         {
-            var conn =await _connectionFactory.GetDbConnectionAsync(0,ConnectionStringName.GameSettingDatabaseConnectionString);
+            var conn = await _connectionFactory.GetDbConnectionAsync(_currentServer.ServerId, ConnectionStringName.GameSettingDatabaseConnectionString);
             return conn;
         }
     }

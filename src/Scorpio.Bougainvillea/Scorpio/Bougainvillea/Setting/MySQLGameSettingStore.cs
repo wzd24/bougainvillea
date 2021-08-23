@@ -60,7 +60,7 @@ namespace Scorpio.Bougainvillea.Setting
             {
                 using (var conn = await GetConnectionAsync(context, scope.ServiceProvider))
                 {
-                    await conn.InsertAsync(value, tableName: context.SettingDefinition.Name);
+                    await conn.InsertOrUpdateAsync<T>(value, tableName: context.SettingDefinition.Name);
                 }
             }
         }

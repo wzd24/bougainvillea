@@ -31,7 +31,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, int key, T value) where T : GameSettingBase;
+        Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, T value) where T : GameSettingBase;
 
         /// <summary>
         /// 
@@ -40,6 +40,6 @@ namespace Scorpio.Bougainvillea.Setting
         /// <param name="settingDefinition"></param>
         /// <param name="values"></param>
         /// <returns></returns>
-        Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, IReadOnlyDictionary<int, T> values) where T : GameSettingBase;
+        Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, IReadOnlyCollection<T> values) where T : GameSettingBase;
     }
 }

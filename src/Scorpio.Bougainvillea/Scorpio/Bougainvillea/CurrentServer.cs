@@ -11,16 +11,14 @@ namespace Scorpio.Bougainvillea
 {
     internal class CurrentServer : ICurrentServer, ISingletonDependency
     {
-        private readonly IGameContextAccessor _accessor;
+        private readonly ICurrentUser _currentUser;
 
-        public CurrentServer(IGameContextAccessor accessor)
+        public CurrentServer(ICurrentUser currentUser)
         {
-            _accessor = accessor;
+            _currentUser = currentUser;
         }
 
-        private User User => _accessor?.GameContext?.User as User;
-
-        public int ServerId => User?.ServerId ?? 0;
+        public int ServerId =>_currentUser.ServerId;
 
     }
 }

@@ -8,4 +8,7 @@
     <PackageReference Include="Scorpio" Version="$(ScorpioVersion)" />
     <PackageReference Include="Dapper" Version="2.0.78" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Scorpio.Bougainvillea.Abstractions\Scorpio.Bougainvillea.Abstractions.csproj" />
+  </ItemGroup>
 </Project>

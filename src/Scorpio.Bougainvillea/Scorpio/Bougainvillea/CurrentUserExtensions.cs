@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Scorpio.Bougainvillea.Middleware;
+
 namespace Scorpio.Bougainvillea
 {
     /// <summary>
@@ -18,9 +20,9 @@ namespace Scorpio.Bougainvillea
         /// <param name="serverId"></param>
         /// <param name="avatarId"></param>
         /// <returns></returns>
-        public static IDisposable Use(this ICurrentUser currentUser, int serverId,int avatarId)
+        public static IDisposable Use(this ICurrentUser currentUser, int serverId, int avatarId)
         {
-            return (currentUser as CurrentUser).Use(serverId, avatarId);
+            return currentUser.Use(new User { ServerId = serverId, UserId = avatarId });
         }
     }
 }

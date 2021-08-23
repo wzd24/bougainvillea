@@ -16,7 +16,7 @@ namespace Scorpio.Bougainvillea.Props
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        Task<(int code, object data)> ConsumeAsync(PropsHandleContext context);
+        Task<int> ConsumeAsync(PropsHandleContext context);
 
     }
 }

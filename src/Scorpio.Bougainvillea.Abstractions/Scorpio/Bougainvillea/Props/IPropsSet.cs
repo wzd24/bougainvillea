@@ -10,7 +10,7 @@ namespace Scorpio.Bougainvillea.Props
     /// <summary>
     /// 道具集合接口。
     /// </summary>
-    public interface IPropsSet
+    public interface IPropsSet:IInitializable
     {
         /// <summary>
         /// 从道具集合中获取指定ID的道具，道具不存在则返回 null。
@@ -25,6 +25,6 @@ namespace Scorpio.Bougainvillea.Props
         /// <param name="propsId">要添加或扣除的道具Id</param>
         /// <param name="num">要添加或扣除的道具数量</param>
         /// <returns>表示异步获取操作的任务。 其 Result 属性的值包含添加或扣除的操作状态及结果。</returns>
-        Task<(int code, object data)> AddOrSubtractAsync(int propsId, int num);
+        Task<int> AddOrSubtractAsync(int propsId, int num);
     }
 }

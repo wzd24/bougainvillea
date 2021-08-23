@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Orleans.Runtime;
+
 using Scorpio.Bougainvillea.Middleware;
 using Scorpio.DependencyInjection;
 
@@ -18,7 +20,11 @@ namespace Scorpio.Bougainvillea
             _accessor = accessor;
         }
 
-        private User User => _accessor?.GameContext?.User as User;
+        public IGameUser User
+        {
+            get => RequestContext.Get("CurrentUser") as IGameUser;
+            set => RequestContext.Set("CurrentUser", value);
+        }
 
         public string Token => User?.Token;
 
@@ -30,14 +36,10 @@ namespace Scorpio.Bougainvillea
 
         public bool IsAuthentication => User != null;
 
-        public IDisposable Use(int serverId, int avatarId)
+        public IDisposable Use(IGameUser user)
         {
             var current = User;
-            _accessor.GameContext.User = new User(null)
-            {
-                Id = avatarId,
-                ServerId = serverId,
-            };
+            _accessor.GameContext.User = user;
             return new DisposeAction(() => _accessor.GameContext.User = current);
         }
     }

@@ -17,6 +17,7 @@ namespace Scorpio.Bougainvillea.Rewards
         {
             _propsHandleManager = propsHandleManager;
         }
+
         public async Task<(int code, object data)> ExecuteAsync(RewardHandleContext context)
         {
             if (context.Rewards.Length != 3)
@@ -25,7 +26,10 @@ namespace Scorpio.Bougainvillea.Rewards
             }
             var propsId = context.Rewards[1];
             var num = context.Rewards[2];
-            return await _propsHandleManager.AddPropAsync(propsId, num * context.Num, context.Reason);
+            var code = await _propsHandleManager.AddPropAsync(propsId, num * context.Num, context.Reason);
+            var rewards = context.Rewards;
+            rewards[2] = num * context.Num;
+            return (code, rewards);
         }
     }
 }

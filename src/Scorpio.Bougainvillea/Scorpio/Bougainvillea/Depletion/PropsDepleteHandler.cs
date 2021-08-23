@@ -17,11 +17,11 @@ namespace Scorpio.Bougainvillea.Depletion
         {
             _propsHandleManager = propsHandleManager;
         }
-        public async Task<(int code, object data)> ExecuteAsync(DepleteHandleContext context)
+        public async Task<int> ExecuteAsync(DepleteHandleContext context)
         {
             if (context.Depletion.Length != 3)
             {
-                return (-1, null);
+                return -1;
             }
             var propsId = context.Depletion[1];
             var num = context.Depletion[2];

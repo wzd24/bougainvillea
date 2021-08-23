@@ -12,10 +12,6 @@ namespace Scorpio.Bougainvillea.Setting
         /// </summary>
         IDictionary<string, object> Properties { get; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        int Key { get; }
 
         /// <summary>
         /// 

@@ -15,11 +15,13 @@ namespace Scorpio.Bougainvillea.Middleware
     internal class UserTokenMiddleware
     {
         private readonly PipelineRequestDelegate<IGameContext> _next;
+        private readonly ICurrentUser _currentUser;
         private readonly IDistributedCache _cache;
 
-        public UserTokenMiddleware(PipelineRequestDelegate<IGameContext> next, IDistributedCache cache)
+        public UserTokenMiddleware(PipelineRequestDelegate<IGameContext> next, ICurrentUser currentUser, IDistributedCache cache)
         {
             _next = next;
+            _currentUser = currentUser;
             _cache = cache;
         }
 
@@ -30,20 +32,37 @@ namespace Scorpio.Bougainvillea.Middleware
             {
                 context.User = await GetOrCreateUserAsync(token);
             }
-            await _next(context);
+            using (_currentUser.Use(context.User))
+            {
+                await _next(context);
+            }
         }
 
         private async Task<User> GetOrCreateUserAsync(string token)
         {
             var cached = await _cache.GetStringAsync(token);
+            User user = null;
             if (cached != null)
             {
-
                 await _cache.RefreshAsync(token);
-                return JsonConvert.DeserializeObject<User>(await _cache.GetStringAsync(token));
+                user = JsonConvert.DeserializeObject<User>(await _cache.GetStringAsync(token));
+                if (user != null)
+                {
+                    if (user.IsValid && user.Expiration.Subtract(DateTime.Now).TotalHours < 1)
+                    {
+                        user.Expiration = DateTime.Now.AddHours(2);
+                    }
+                    else
+                    {
+                        return user;
+                    }
+                }
             }
-            var user = GenerateUser(token);
-            await _cache.SetStringAsync(token, JsonConvert.SerializeObject(user), new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(10)));
+            if (user == null)
+            {
+                user = GenerateUser(token);
+            }
+            await _cache.SetStringAsync(token, JsonConvert.SerializeObject(user), new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromHours(2)));
             return user;
         }
 
@@ -53,6 +72,7 @@ namespace Scorpio.Bougainvillea.Middleware
         }
     }
 
+    [Serializable]
     internal class User : IGameUser
     {
         public string Token { get; }
@@ -63,8 +83,16 @@ namespace Scorpio.Bougainvillea.Middleware
 
         public int ServerId { get; set; }
 
+        public DateTime Expiration { get; set; }
+
         string IGameUser.Key => Token;
 
+        public bool IsValid { get => Id != 0 && ServerId != 0 && Expiration > DateTime.Now; }
+
+        public User()
+        {
+
+        }
         public User(string token)
         {
             Token = token;
@@ -74,9 +102,11 @@ namespace Scorpio.Bougainvillea.Middleware
                 var avatarId = int.Parse(value[0]);
                 var userId = int.Parse(value[1]);
                 var serverId = int.Parse(value[2]);
+                var expiration = DateTime.Parse(value[3]);
                 Id = avatarId;
                 UserId = userId;
                 ServerId = serverId;
+                Expiration = expiration;
             }
         }
     }

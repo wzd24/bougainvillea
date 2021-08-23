@@ -31,7 +31,6 @@ namespace Scorpio.Bougainvillea.Middleware.Pipeline
         protected override PipelineRequestDelegate<IGameContext> TailDelegate => async context =>
             {
                 var serviceProvider = context.ApplicationServices;
-                var userKey = context?.User?.Key;
                 var factory = serviceProvider.GetService<IGameHandlerFactory>();
                 var handler = factory.Create(context.Request.RequestCode);
                 if (handler == null)
