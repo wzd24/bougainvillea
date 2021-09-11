@@ -8,9 +8,7 @@
     <PackageReference Include="Microsoft.Orleans.Core" Version="$(OrleansVersion)" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Scorpio.Bougainvillea\Scorpio.Bougainvillea.csproj" />
+    <ProjectReference Include="..\Scorpio.Bougainvillea.Abstractions\Scorpio.Bougainvillea.Abstractions.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Scorpio\Bougainvillea\Essential\" />
-  </ItemGroup>
+
 </Project>

@@ -13,11 +13,9 @@ namespace Scorpio.Bougainvillea
 {
     internal class CurrentUser : ICurrentUser, ISingletonDependency
     {
-        private readonly IGameContextAccessor _accessor;
 
-        public CurrentUser(IGameContextAccessor accessor)
+        public CurrentUser()
         {
-            _accessor = accessor;
         }
 
         public IGameUser User
@@ -39,8 +37,8 @@ namespace Scorpio.Bougainvillea
         public IDisposable Use(IGameUser user)
         {
             var current = User;
-            _accessor.GameContext.User = user;
-            return new DisposeAction(() => _accessor.GameContext.User = current);
+            User = user;
+            return new DisposeAction(() => User = current);
         }
     }
 }

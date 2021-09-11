@@ -2,18 +2,21 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 using Scorpio.DependencyInjection;
+using Scorpio.Initialization;
 
 namespace Scorpio.Bougainvillea.Setting
 {
-    internal class GameSettingManager : IGameSettingManager, ISingletonDependency
+    internal class GameSettingManager : IGameSettingManager, Scorpio.Initialization.IInitializable, ISingletonDependency
     {
         private readonly IGameSettingDefinitionManager _definitionManager;
         private readonly IGameSettingProviderManager _providerManager;
         private readonly ConcurrentDictionary<string, GameSettingValue> _cachedValues;
+        private static readonly MethodInfo _getAsyncMethodInfo = typeof(GameSettingManager).GetMethod(nameof(GetAsync), BindingFlags.Public | BindingFlags.Instance);
 
         public GameSettingManager(IGameSettingDefinitionManager definitionManager, IGameSettingProviderManager providerManager)
         {
@@ -37,13 +40,24 @@ namespace Scorpio.Bougainvillea.Setting
             return value.Value;
         }
 
+        public void Initialize()
+        {
+            var definitions = _definitionManager.GetAll().Where(d => d.Scope == GameSettingScope.Global);
+            definitions.ForEach(d =>
+            {
+                var method = _getAsyncMethodInfo.MakeGenericMethod(d.ValueType);
+                var task = method.Invoke(this, null) as Task;
+                task.ConfigureAwait(false).GetAwaiter().GetResult();
+            });
+        }
+
         public Task ReloadCachesAsync()
         {
             _cachedValues.Clear();
             return Task.CompletedTask;
         }
 
-        public async Task SetAsync<T>( T value) where T : GameSettingBase
+        public async Task SetAsync<T>(T value) where T : GameSettingBase
         {
             var setting = _definitionManager.Get<T>();
             var providers = _providerManager.Providers.Where(p => p.Scope == setting.Scope);
@@ -54,7 +68,7 @@ namespace Scorpio.Bougainvillea.Setting
             }
         }
 
-        public async Task SetAsync<T>(IReadOnlyCollection< T> values) where T : GameSettingBase
+        public async Task SetAsync<T>(IReadOnlyCollection<T> values) where T : GameSettingBase
         {
             var setting = _definitionManager.Get<T>();
             var providers = _providerManager.Providers.Where(p => p.Scope == setting.Scope);

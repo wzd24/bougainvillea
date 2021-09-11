@@ -9,10 +9,11 @@ using Microsoft.Extensions.Options;
 using Scorpio.Bougainvillea.Handler;
 using Scorpio.Bougainvillea.Props.Settings;
 using Scorpio.Bougainvillea.Setting;
+using Scorpio.DependencyInjection;
 
 namespace Scorpio.Bougainvillea.Props
 {
-    internal class PropsHandleManager : IPropsHandleManager
+    internal class PropsHandleManager : IPropsHandleManager,ITransientDependency
     {
         private readonly Lazy<IEnumerable<IPropsHandlerProvider>> _providers;
         private readonly PropsHandleOptions _options;

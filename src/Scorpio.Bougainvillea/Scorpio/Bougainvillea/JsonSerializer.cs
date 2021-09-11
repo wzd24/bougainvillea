@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 using Scorpio.DependencyInjection;
 using System;
@@ -16,7 +17,7 @@ namespace Scorpio.Bougainvillea
         {
             _settings = new JsonSerializerSettings
             {
-                ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver(),
+                ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() },
             };
             _settings.Converters.Add(new UnixDateTimeConverter());
         }

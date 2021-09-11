@@ -27,7 +27,7 @@ namespace Scorpio.Bougainvillea.Setting
             _scopeFactory = scopeFactory;
         }
         public async Task<GameSettingValue<T>> GetAsync<T>(IGameSettingStoreContext context)
-            where T:GameSettingBase
+            where T : GameSettingBase
         {
             using (var scope = _scopeFactory.CreateScope())
             {

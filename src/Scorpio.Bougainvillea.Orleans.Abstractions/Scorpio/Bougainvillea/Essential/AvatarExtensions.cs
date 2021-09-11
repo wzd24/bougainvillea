@@ -22,10 +22,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <param name="currentUser"></param>
         /// <param name="factory"></param>
         /// <returns></returns>
-        public static TAvatar GetCurrentAvatar<TAvatar>(this ICurrentUser currentUser,IGrainFactory  factory)
-            where TAvatar:IAvatar
-        {
-           return factory.GetGrain<TAvatar>(currentUser.AvatarId, currentUser.ServerId.ToString());
-        }
+        public static TAvatar GetCurrentAvatar<TAvatar>(this ICurrentUser currentUser, IGrainFactory factory)
+            where TAvatar : IAvatar => factory.GetGrain<TAvatar>(currentUser.AvatarId);
     }
 }

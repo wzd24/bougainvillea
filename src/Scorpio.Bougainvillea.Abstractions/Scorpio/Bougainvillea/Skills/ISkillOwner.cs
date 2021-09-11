@@ -4,16 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Scorpio.Bougainvillea.Storages
+namespace Scorpio.Bougainvillea.Skills
 {
     /// <summary>
     /// 
     /// </summary>
-    public interface IHasExtraProperties
+    public interface ISkillOwner
     {
         /// <summary>
         /// 
         /// </summary>
-        IDictionary<string, object> ExtraProperties { get; }
+        /// <returns></returns>
+        Task<ICollection<Skill>> GetSkillsAsync();
     }
 }

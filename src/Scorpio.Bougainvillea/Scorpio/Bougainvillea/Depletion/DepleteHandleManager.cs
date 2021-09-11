@@ -19,7 +19,7 @@ namespace Scorpio.Bougainvillea.Depletion
         }
 
 
-        public async Task<int> Handle(int[] depletion, int num, string reason)
+        public async Task<int> HandleAsync(int[] depletion, int num, string reason)
         {
             var handler = _providers.Reverse().Select(provider => provider.GetHandler(depletion))
                 .FirstOrDefault(h => h != null) ?? throw new NullReferenceException("未找到对应的消耗处理器");

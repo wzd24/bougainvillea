@@ -15,7 +15,6 @@ namespace Scorpio.Bougainvillea.AspnetCore
             ApplicationServices = serviceProvider;
             Request = ActivatorUtilities.CreateInstance<AspnetCoreGameRequest>(serviceProvider, this, ctx.Request);
             Response = ActivatorUtilities.CreateInstance<AspnetCoreGameResponse>(serviceProvider, this, ctx.Response);
-            User = new AspnetCoreGameUser(ctx);
             Items = new Dictionary<object, object>();
         }
 

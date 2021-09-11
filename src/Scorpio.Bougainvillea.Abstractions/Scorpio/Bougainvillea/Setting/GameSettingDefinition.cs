@@ -121,26 +121,6 @@ namespace Scorpio.Bougainvillea.Setting
     /// <summary>
     /// 
     /// </summary>
-    public class GameSettingDefaultionCustom : GameSettingDefinition
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="settingType"></param>
-        /// <param name="scope"></param>
-        /// <param name="displayName"></param>
-        /// <param name="description"></param>
-        /// <param name="defaultValue"></param>
-        public GameSettingDefaultionCustom(Type settingType, GameSettingScope scope, string displayName = null, string description = null, object defaultValue = null) 
-            : base(settingType.Name, scope, displayName, description, settingType, defaultValue)
-        {
-
-        }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
     public enum GameSettingScope
     {
         /// <summary>
