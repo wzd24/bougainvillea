@@ -8,6 +8,6 @@
 		<VersionPrefix>$(VersionMajor).$(VersionMinor).$(VersionPatch)</VersionPrefix>
 		<AssemblyVersion>$(VersionPrefix).$(VersionBuild)</AssemblyVersion>
     <ScorpioVersion>0.1.1-alpha.2-dev.295</ScorpioVersion>
-    <OrleansVersion>3.4.1</OrleansVersion>
+    <OrleansVersion>3.5.0</OrleansVersion>
   </PropertyGroup>
 </Project>
