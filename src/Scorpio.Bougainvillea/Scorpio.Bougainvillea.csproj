@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Scorpio.Bougainvillea.Abstractions\Scorpio.Bougainvillea.Abstractions.csproj" />
+    <ProjectReference Include="..\Scorpio.Bougainvillea.Entities\Scorpio.Bougainvillea.Entities.csproj" />
     <ProjectReference Include="..\Scorpio.Bougainvillea.Storages\Scorpio.Bougainvillea.Storages.csproj" />
   </ItemGroup>
   <ItemGroup>
