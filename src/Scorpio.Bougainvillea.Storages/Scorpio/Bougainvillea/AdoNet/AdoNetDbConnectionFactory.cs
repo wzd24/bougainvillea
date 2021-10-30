@@ -22,13 +22,13 @@ namespace Scorpio.Bougainvillea.AdoNet
         {
             _serviceProvider = serviceProvider;
         }
-        public async Task<IDbConnection> GetDbConnectionAsync(int serverId, string connectionName)
+        public async Task<IDbConnection> GetDbConnectionAsync(int connectionId, string connectionName)
         {
             var configuration = _serviceProvider.GetService<IConfiguration>();
-            if (serverId != 0)
+            if (connectionId != 0)
             {
                 var settings = await _serviceProvider.GetService<IGameSettingManager>().GetAsync<ConnectionStringSetting>();
-                var setting = settings.Values.FirstOrDefault(s => s.ServerId == serverId && s.ConnectionName == connectionName);
+                var setting = settings.Values.FirstOrDefault(s => s.ServerId == connectionId && s.ConnectionName == connectionName);
                 if (setting != null)
                 {
                     return DbConnectionFactory.CreateConnection(setting.ConnectionString);

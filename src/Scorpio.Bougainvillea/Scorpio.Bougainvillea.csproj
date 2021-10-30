@@ -18,5 +18,6 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="5.0.0" />
     <PackageReference Include="Scorpio.Setting" Version="$(ScorpioVersion)" />
     <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="ToolGood.Words" Version="3.0.2.8" />
   </ItemGroup>
 </Project>

@@ -13,7 +13,7 @@ namespace Scorpio.Bougainvillea.Essential
     /// <summary>
     /// 角色
     /// </summary>
-    public interface IAvatar: IGrainWithIntegerKey
+    public interface IAvatarBase: IGrainWithIntegerKey
     {
         /// <summary>
         /// 角色是否已创建
@@ -26,7 +26,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <param name="generateInfo"></param>
         /// <returns></returns>
-        Task Generate(GenerateInfo generateInfo);
+        Task<int> Generate(GenerateInfo generateInfo);
 
         /// <summary>
         /// 创建角色后操作

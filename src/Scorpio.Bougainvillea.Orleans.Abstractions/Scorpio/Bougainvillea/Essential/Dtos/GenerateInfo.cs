@@ -5,20 +5,6 @@
     /// </summary>
     public class GenerateInfo
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public long AvatarId { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public int ServerId { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public long UserId { get; set; }
 
         /// <summary>
         /// 

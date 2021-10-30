@@ -16,9 +16,9 @@ namespace Scorpio.Bougainvillea.AdoNet
         /// <summary>
         /// 根据服务器Id及连接字符串获取数据库连接。
         /// </summary>
-        /// <param name="serverId"></param>
+        /// <param name="connectionId"></param>
         /// <param name="connectionName"></param>
         /// <returns></returns>
-        Task<IDbConnection> GetDbConnectionAsync(int serverId, string connectionName);
+        Task<IDbConnection> GetDbConnectionAsync(int connectionId, string connectionName);
     }
 }

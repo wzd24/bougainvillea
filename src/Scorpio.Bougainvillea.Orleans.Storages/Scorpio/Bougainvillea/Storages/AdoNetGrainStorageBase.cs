@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 using Dapper.Extensions;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -13,6 +16,7 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Providers;
 using Orleans.Runtime;
+using Orleans.Storage;
 
 using Scorpio.Bougainvillea.AdoNet;
 
@@ -48,6 +52,10 @@ namespace Scorpio.Bougainvillea.Storages
     public abstract class AdoNetGrainStorageBase<TStorage> : GrainStorageBase<TStorage>
         where TStorage : AdoNetGrainStorageBase<TStorage>
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public IDbConnectionFactory DbConnectionFactory { get; }
 
         /// <summary>
         /// 
@@ -70,8 +78,18 @@ namespace Scorpio.Bougainvillea.Storages
                  clusterOptions,
                  name)
         {
+            DbConnectionFactory = providerRuntime.ServiceProvider.GetService<IDbConnectionFactory>();
             Options = options.Value;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="grainType"></param>
+        /// <param name="grainReference"></param>
+        /// <param name="grainState"></param>
+        /// <returns></returns>
+        protected abstract Task<(int id, string name)> GetConnectionInfo(string grainType, GrainReference grainReference, IGrainState grainState);
 
         /// <summary>
         /// 
@@ -89,7 +107,8 @@ namespace Scorpio.Bougainvillea.Storages
             }
             try
             {
-                using (var conn = DbConnectionFactory.CreateConnection(Options.Invariant, Options.ConnectionString))
+                var connectionInfo = await GetConnectionInfo(grainType, grainReference, grainState);
+                using (var conn = await DbConnectionFactory.GetDbConnectionAsync(connectionInfo.id, connectionInfo.name))
                 {
                     await ClearStateCoreAsync(grainType, grainReference, grainState, conn);
                 }
@@ -132,11 +151,12 @@ namespace Scorpio.Bougainvillea.Storages
             }
             try
             {
-                using (var conn = DbConnectionFactory.CreateConnection(Options.Invariant, Options.ConnectionString))
+                var connectionInfo = await GetConnectionInfo(grainType, grainReference, grainState);
+                using (var conn = await DbConnectionFactory.GetDbConnectionAsync(connectionInfo.id, connectionInfo.name))
                 {
                     var state = await ReadStateCoreAsync(grainType, grainReference, grainState, conn);
                     var recordExists = state != null;
-                    if (state==null)
+                    if (state == null)
                     {
                         Logger.Info((int)RelationalStorageProviderCodes.RelationalProviderNoStateFound, LogString("Null grain state read (default will be instantiated)", ServiceId, Name, grainState.ETag, baseGrainType, grainReference.ToKeyString()));
                         state = Activator.CreateInstance(grainState.Type);
@@ -165,5 +185,52 @@ namespace Scorpio.Bougainvillea.Storages
         /// <param name="conn"></param>
         /// <returns></returns>
         protected abstract Task<object> ReadStateCoreAsync(string grainType, GrainReference grainReference, IGrainState grainState, System.Data.IDbConnection conn);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="grainType"></param>
+        /// <param name="grainReference"></param>
+        /// <param name="grainState"></param>
+        /// <returns></returns>
+        public override async Task WriteStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
+        {
+            var baseGrainType = ExtractBaseClass(grainType);
+            if (Logger.IsEnabled(LogLevel.Trace))
+            {
+                Logger.Trace((int)RelationalStorageProviderCodes.RelationalProviderWriting, LogString("Writing grain state", ServiceId, Name, grainState.ETag, baseGrainType, grainReference.ToKeyString()));
+            }
+            var connectionInfo = await GetConnectionInfo(grainType, grainReference, grainState);
+            try
+            {
+                using (var conn = await DbConnectionFactory.GetDbConnectionAsync(connectionInfo.id, connectionInfo.name))
+                {
+                    await WriteStateCoreAsync(grainType, grainReference, grainState, conn);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error((int)RelationalStorageProviderCodes.RelationalProviderWriteError, LogString("Error writing grain state", ServiceId, Name, grainState.ETag, baseGrainType, grainReference.ToKeyString(), ex.Message), ex);
+                throw;
+            }
+            //No errors found, the version of the state held by the grain can be updated.
+            grainState.RecordExists = true;
+
+            if (Logger.IsEnabled(LogLevel.Trace))
+            {
+                Logger.Trace((int)RelationalStorageProviderCodes.RelationalProviderWrote, LogString("Wrote grain state", ServiceId, Name, grainState.ETag, baseGrainType, grainReference.ToKeyString()));
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="grainType"></param>
+        /// <param name="grainReference"></param>
+        /// <param name="grainState"></param>
+        /// <param name="conn"></param>
+        /// <returns></returns>
+        protected abstract Task WriteStateCoreAsync(string grainType, GrainReference grainReference, IGrainState grainState, System.Data.IDbConnection conn);
+
     }
 }
