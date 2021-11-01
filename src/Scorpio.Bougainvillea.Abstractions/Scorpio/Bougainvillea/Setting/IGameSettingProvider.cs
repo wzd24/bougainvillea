@@ -21,7 +21,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// <typeparam name="T"></typeparam>
         /// <param name="settingDefinition"></param>
         /// <returns></returns>
-        Task<GameSettingValue<T>> GetAsync<T>(GameSettingDefinition<T> settingDefinition) where T : GameSettingBase;
+        Task<GameSettingValue> GetAsync(GameSettingDefinition settingDefinition);
 
         /// <summary>
         /// 

@@ -5,108 +5,80 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
-
+using Orleans;
 using Orleans.Runtime;
-using Orleans.Storage;
 
 using Scorpio.Bougainvillea.Essential.Dtos;
-using Scorpio.Bougainvillea.Setting;
-using Scorpio.Setting;
 
 namespace Scorpio.Bougainvillea.Essential
 {
     /// <summary>
     /// 
     /// </summary>
-    /// <typeparam name="TAvatar"></typeparam>
-    /// <typeparam name="TAvatarState"></typeparam>
-    public abstract class AvatarBase<TAvatar, TAvatarState> : GrainBase<TAvatar>, IAvatarBase
-        where TAvatar : AvatarBase<TAvatar, TAvatarState>
-        where TAvatarState : AvatarEntityBase
+    /// <typeparam name="TServer"></typeparam>
+    public abstract class ServerBase<TServer>:GrainBase<TServer>, IServerBase
+        where TServer:ServerBase<TServer>
     {
         /// <summary>
         /// 
         /// </summary>
-        public const string AvatarBaseStateStorage = "AvatarBaseStateStorage";
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public const string AvatarBaseState = "AvatarBaseState";
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected ICurrentUser CurrentUser { get; }
-        /// <summary>
-        /// 
-        /// </summary>
-        [PropertyPersistentState(AvatarBaseState, AvatarBaseStateStorage)]
-        protected IPersistentState<TAvatarState> AvatarState { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected AvatarBase()
-        {
-            CurrentUser = ServiceProvider.GetService<ICurrentUser>();
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="generateInfo"></param>
-        /// <returns></returns>
-        public async virtual Task<int> Generate(GenerateInfo generateInfo)
-        {
-        }
+        [PropertyPersistentState("AvatarListState", "AvatarListStateStorage")]
+        public IPersistentState<AvatarListState> AvatarList { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="generateInfo"></param>
         /// <returns></returns>
-        protected virtual Task<int> GenerateCore(GenerateInfo generateInfo)
+        public virtual async Task<int> GenerateAvatar(GenerateInfo generateInfo)
         {
-            return Task.FromResult(0);
-        }
+            var code = await CheckWords(generateInfo.Name);
+            if (code != ErrorCode.None)
+            {
+                return (int)code;
+            }
+            if (AvatarList.State.Any(a=>a.Name.Equals(generateInfo.Name)))
+            {
+                return (int)ErrorCode.NicknamesAlreadyExist;
+            }
+            return 0;
 
-        private async Task InitAvatarBaseInfo(GenerateInfo generateInfo, int headFrameId)
-        {
-            AvatarState.State.Id = CurrentUser.AvatarId;
-            AvatarState.State.UserId = CurrentUser.UserId;
-            AvatarState.State.ServerId = CurrentUser.ServerId;
-            AvatarState.State.NickName = generateInfo.Name;
-            AvatarState.State.Image = generateInfo.Image;
-            AvatarState.State.Level = 1;
-            AvatarState.State.CreateDate = DateTime.Now;
-            AvatarState.State.Sex = generateInfo.Sex;
-            AvatarState.State.HeadId = generateInfo.HeadId;
-            AvatarState.State.HeadFrameId = headFrameId;
-            await AvatarState.WriteStateAsync();
         }
-
 
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="avatarId"></param>
         /// <returns></returns>
-        public Task<bool> IsGenerated()
+        public async virtual Task<bool> IsGenerated(long avatarId)
         {
-            return Task.FromResult(AvatarState.RecordExists);
+            return false;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public Task PostGenerate()
+        private async Task<ErrorCode> CheckWords(string text)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(text))
+            {
+                return ErrorCode.InputCharactersAreDisallowedToBeNull;
+            }
+            var check = ServiceProvider.GetService<IWordsCheck>();
+            if (check.HasIllegalWords(text))
+            {
+                return ErrorCode.ContainsMaskingCharacters;
+            }
+            var length = check.GetWordsLength(text);
+            if (length > 20)
+            {
+                return ErrorCode.NameLengthGreaterMax;
+            }
+            if (length < 4)
+            {
+                return ErrorCode.NameLengthLessMin;
+            }
+            return ErrorCode.None;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         private enum ErrorCode
         {
             /// <summary>
@@ -193,5 +165,47 @@ namespace Scorpio.Bougainvillea.Essential
             #endregion
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public class AvatarListState:SortedSet<AvatarInfo>
+        {
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public class AvatarInfo: IEqualityComparer<AvatarInfo>,IComparable<AvatarInfo>
+        {
+            /// <summary>
+            /// 
+            /// </summary>
+            public long AvatarId { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public string Name { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public long UserId { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public string AccountId { get; set; }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <returns></returns>
+            public override int GetHashCode() => HashCode.Combine(AvatarId);
+            int IComparable<AvatarInfo>.CompareTo(AvatarInfo other) => AvatarId.CompareTo(other.AvatarId);
+            bool IEqualityComparer<AvatarInfo>.Equals(AvatarInfo x, AvatarInfo y) => x.AvatarId.Equals(y.AvatarId);
+            int IEqualityComparer<AvatarInfo>.GetHashCode(AvatarInfo obj) => obj.GetHashCode();
+        }
     }
 }

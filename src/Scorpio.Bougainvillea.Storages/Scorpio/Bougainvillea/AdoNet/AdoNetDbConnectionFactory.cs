@@ -28,7 +28,7 @@ namespace Scorpio.Bougainvillea.AdoNet
             if (connectionId != 0)
             {
                 var settings = await _serviceProvider.GetService<IGameSettingManager>().GetAsync<ConnectionStringSetting>();
-                var setting = settings.Values.FirstOrDefault(s => s.ServerId == connectionId && s.ConnectionName == connectionName);
+                var setting = settings.FirstOrDefault(s => s.ConnectionId == connectionId && s.ConnectionName == connectionName);
                 if (setting != null)
                 {
                     return DbConnectionFactory.CreateConnection(setting.ConnectionString);

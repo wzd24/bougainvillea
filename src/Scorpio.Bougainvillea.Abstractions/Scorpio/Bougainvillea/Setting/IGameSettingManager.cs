@@ -15,7 +15,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<IReadOnlyDictionary<int, T>> GetAsync<T>() where T : GameSettingBase;
+        Task<IReadOnlyCollection<T>> GetAsync<T>() where T : GameSettingBase;
 
         /// <summary>
         /// 

@@ -27,7 +27,7 @@ namespace Scorpio.Bougainvillea.Setting
             var settings = await _gameSettingManager.GetAsync<GameSetting>();
             var key = int.Parse(context.Properties["ProviderKey"].ToString());
             var name = context.SettingDefinition.Name;
-            var result = settings.Values.FirstOrDefault(s => s.ServerId == key && s.Name == name);
+            var result = settings.FirstOrDefault(s => s.ServerId == key && s.Name == name);
             return new SettingValue<T> { Definition = context.SettingDefinition, Value = _jsonSerializer.Deserialize<T>(result.Value) };
         }
 
@@ -36,7 +36,7 @@ namespace Scorpio.Bougainvillea.Setting
             var settings = await _gameSettingManager.GetAsync<GameSetting>();
             var key = int.Parse(context.Properties["ProviderKey"].ToString());
             var name = context.SettingDefinition.Name;
-            var result = settings.Values.FirstOrDefault(s => s.ServerId == key && s.Name == name);
+            var result = settings.FirstOrDefault(s => s.ServerId == key && s.Name == name);
             if (result == null)
             {
                 result = new GameSetting { ServerId = key, Name = name, DisplayName = context.SettingDefinition.DisplayName };

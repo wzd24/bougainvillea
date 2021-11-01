@@ -24,7 +24,24 @@ namespace Scorpio.Bougainvillea.Setting
             _providerManager = providerManager;
             _cachedValues = new ConcurrentDictionary<string, GameSettingValue>();
         }
-        public async Task<IReadOnlyDictionary<int, T>> GetAsync<T>() where T : GameSettingBase
+
+        public async Task<IReadOnlyCollection<T>> GetAsync<T>(string name) where T : GameSettingBase
+        {
+            var setting = _definitionManager.Get(name);
+            if (!(_cachedValues.GetOrDefault(setting.Name) is GameSettingValue<T> value))
+            {
+                var providers = _providerManager.Providers.Where(p => p.Scope == setting.Scope || p.Scope == GameSettingScope.Default).Reverse();
+                value = await GetValueFromProvidersAsync(providers, setting);
+                if (value == null)
+                {
+                    return null;
+                }
+                _cachedValues.TryAdd(setting.Name, value);
+            }
+            return value.Value;
+        }
+
+        public async Task<IReadOnlyCollection<T>> GetAsync<T>() where T : GameSettingBase
         {
             var setting = _definitionManager.Get<T>();
             if (!(_cachedValues.GetOrDefault(setting.Name) is GameSettingValue<T> value))
@@ -79,9 +96,9 @@ namespace Scorpio.Bougainvillea.Setting
             }
         }
 
-        protected virtual async Task<GameSettingValue<T>> GetValueFromProvidersAsync<T>(
+        protected virtual async Task<GameSettingValue> GetValueFromProvidersAsync<T>(
          IEnumerable<IGameSettingProvider> providers,
-         GameSettingDefinition<T> setting) where T : GameSettingBase
+         GameSettingDefinition setting)
         {
             foreach (var provider in providers)
             {

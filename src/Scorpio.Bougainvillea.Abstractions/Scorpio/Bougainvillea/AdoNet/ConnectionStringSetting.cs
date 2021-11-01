@@ -16,7 +16,7 @@ namespace Scorpio.Bougainvillea.AdoNet
         /// <summary>
         /// 
         /// </summary>
-        public int ServerId { get; set; }
+        public int ConnectionId { get; set; }
 
 
         /// <summary>

@@ -15,7 +15,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        Task<GameSettingValue<T>> GetAsync<T>(IGameSettingStoreContext context) where T : GameSettingBase;
+        Task<GameSettingValue> GetAsync(IGameSettingStoreContext context) ;
 
         /// <summary>
         /// 

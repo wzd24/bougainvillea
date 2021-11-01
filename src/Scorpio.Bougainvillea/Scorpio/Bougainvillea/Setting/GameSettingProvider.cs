@@ -35,11 +35,10 @@ namespace Scorpio.Bougainvillea.Setting
         /// <typeparam name="T"></typeparam>
         /// <param name="settingDefinition"></param>
         /// <returns></returns>
-        public async Task<GameSettingValue<T>> GetAsync<T>(GameSettingDefinition<T> settingDefinition)
-            where T : GameSettingBase
+        public async Task<GameSettingValue> GetAsync(GameSettingDefinition settingDefinition)
         {
             var context = CreateContext(settingDefinition);
-            var value = await _settingStore.GetAsync<T>(context);
+            var value = await _settingStore.GetAsync(context);
             return value;
         }
 
@@ -74,7 +73,7 @@ namespace Scorpio.Bougainvillea.Setting
             await _settingStore.SetAsync(context, value);
         }
 
-        private GameSettingStoreContext CreateContext<T>(GameSettingDefinition<T> settingDefinition) where T : GameSettingBase
+        private GameSettingStoreContext CreateContext(GameSettingDefinition settingDefinition)
         {
             var context = new GameSettingStoreContext(settingDefinition);
             ConfigContext(context);

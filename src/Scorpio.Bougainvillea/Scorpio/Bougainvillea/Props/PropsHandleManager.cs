@@ -49,7 +49,7 @@ namespace Scorpio.Bougainvillea.Props
             var (handled, code, _) = await Handle<IPropsAddHandler>(propId, num, null, async (h, c) => (await h.AddPropAsync(c), null));
             if (!handled)
             {
-                var setting = (await _settingManager.GetAsync<PropsSetting>()).GetOrDefault(propId);
+                var setting = (await _settingManager.GetAsync<PropsSetting>()).FirstOrDefault(p=>p.Id==propId);
                 if (setting == null)
                 {
                     code = PropsErrorCodes.NotExist;
@@ -75,7 +75,7 @@ namespace Scorpio.Bougainvillea.Props
             {
                 return cd;
             }
-            var setting = (await _settingManager.GetAsync<PropsSetting>()).GetOrDefault(propId);
+            var setting = (await _settingManager.GetAsync<PropsSetting>()).FirstOrDefault(p => p.Id == propId);
             if (setting.UseType == UseType.CanNotBeUsedDirectly || setting.UseType == UseType.CanNotUse)
             {
                 return PropsErrorCodes.NotCanUse;
@@ -115,7 +115,7 @@ namespace Scorpio.Bougainvillea.Props
             {
                 return code;
             }
-            var setting = (await _settingManager.GetAsync<PropsSetting>()).GetOrDefault(propId);
+            var setting = (await _settingManager.GetAsync<PropsSetting>()).FirstOrDefault(p => p.Id == propId);
             if (setting == null)
             {
                 return PropsErrorCodes.NotExist;
