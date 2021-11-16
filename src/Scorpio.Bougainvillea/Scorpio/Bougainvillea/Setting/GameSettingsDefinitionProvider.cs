@@ -8,6 +8,7 @@ using Scorpio.Setting;
 using Scorpio.Bougainvillea.Setting;
 using Scorpio.Bougainvillea.AdoNet;
 using Scorpio.Bougainvillea.Props.Settings;
+using Scorpio.Bougainvillea.Essential;
 
 namespace Scorpio.Bougainvillea.Setting
 {
@@ -18,6 +19,7 @@ namespace Scorpio.Bougainvillea.Setting
         public void Define(IGameSettingDefinitionContext context) 
             => context.Add<GameSetting>(GameSettingScope.Global)
                       .Add<ConnectionStringSetting>(GameSettingScope.Global)
-                      .Add<PropsSetting>(GameSettingScope.Global);
+                      .Add<PropsSetting>(GameSettingScope.Global)
+                      .Add<RoleSetting>(GameSettingScope.Global);
     }
 }

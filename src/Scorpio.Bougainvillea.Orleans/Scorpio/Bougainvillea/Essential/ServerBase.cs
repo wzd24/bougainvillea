@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
+
 using Orleans;
 using Orleans.Runtime;
 
@@ -16,9 +17,17 @@ namespace Scorpio.Bougainvillea.Essential
     /// 
     /// </summary>
     /// <typeparam name="TServer"></typeparam>
-    public abstract class ServerBase<TServer>:GrainBase<TServer>, IServerBase
-        where TServer:ServerBase<TServer>
+    public abstract class ServerBase<TServer> : GrainBase<TServer>, IServerBase
+        where TServer : ServerBase<TServer>
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        protected ServerBase(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -33,17 +42,29 @@ namespace Scorpio.Bougainvillea.Essential
         /// <returns></returns>
         public virtual async Task<int> GenerateAvatar(GenerateInfo generateInfo)
         {
+
             var code = await CheckWords(generateInfo.Name);
             if (code != ErrorCode.None)
             {
                 return (int)code;
             }
-            if (AvatarList.State.Any(a=>a.Name.Equals(generateInfo.Name)))
+            if (AvatarList.State.Any(a => a.Name.Equals(generateInfo.Name)))
             {
                 return (int)ErrorCode.NicknamesAlreadyExist;
             }
-            return 0;
-
+            var roleSettings = await GameSettingManager.GetAsync<RoleSetting>();
+            if (!roleSettings.Any(r => r.Sex == generateInfo.Sex))
+            {
+                return (int)ErrorCode.GenerateAvatarLose;
+            }
+            var roleSetting = roleSettings.FirstOrDefault(r => r.Sex == generateInfo.Sex);
+            if (!roleSetting.Heads.Contains(generateInfo.HeadId) || roleSetting.Image != generateInfo.Image)
+            {
+                return (int)ErrorCode.GenerateAvatarLoseHeadDoNotChoose;
+            }
+            var current = ServiceProvider.GetService<ICurrentUser>();
+            await this.GetStreamAsync<GenerateInfo>(0, current.AvatarId, "Avatar.Generate").OnNextAsync(generateInfo);
+            return (int)ErrorCode.None;
         }
 
         /// <summary>
@@ -51,9 +72,9 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <param name="avatarId"></param>
         /// <returns></returns>
-        public async virtual Task<bool> IsGenerated(long avatarId)
+        public virtual Task<bool> IsGenerated(long avatarId)
         {
-            return false;
+            return Task.FromResult(AvatarList.State.Any(a => a.AvatarId == avatarId));
         }
 
         private async Task<ErrorCode> CheckWords(string text)
@@ -168,7 +189,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        public class AvatarListState:SortedSet<AvatarInfo>
+        public class AvatarListState : SortedSet<AvatarInfo>
         {
 
         }
@@ -176,7 +197,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        public class AvatarInfo: IEqualityComparer<AvatarInfo>,IComparable<AvatarInfo>
+        public class AvatarInfo : IEqualityComparer<AvatarInfo>, IComparable<AvatarInfo>
         {
             /// <summary>
             /// 

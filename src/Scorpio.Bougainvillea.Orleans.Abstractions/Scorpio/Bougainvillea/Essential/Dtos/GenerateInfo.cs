@@ -19,7 +19,7 @@
         /// <summary>
         /// 
         /// </summary>
-        public int Sex { get; set; }
+        public Sex Sex { get; set; }
 
         /// <summary>
         /// 

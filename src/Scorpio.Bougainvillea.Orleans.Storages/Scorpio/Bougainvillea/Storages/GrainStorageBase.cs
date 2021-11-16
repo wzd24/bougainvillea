@@ -24,7 +24,6 @@ namespace Scorpio.Bougainvillea.Storages
     public abstract class GrainStorageBase<TStorage> : IGrainStorage, ILifecycleParticipant<ISiloLifecycle>
            where TStorage : GrainStorageBase<TStorage>
     {
-
         /// <summary>
         /// These chars are delimiters when used to extract a class base type from a class
         /// that is either <see cref="Type.AssemblyQualifiedName"/> or <see cref="Type.FullName"/>.

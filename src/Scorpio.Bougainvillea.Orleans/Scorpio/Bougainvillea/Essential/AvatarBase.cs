@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using Orleans;
+using Orleans.CodeGeneration;
 using Orleans.Runtime;
 using Orleans.Storage;
+using Orleans.Streams;
+using Orleans.Streams.Core;
 
 using Scorpio.Bougainvillea.Essential.Dtos;
 using Scorpio.Bougainvillea.Setting;
@@ -20,9 +24,10 @@ namespace Scorpio.Bougainvillea.Essential
     /// </summary>
     /// <typeparam name="TAvatar"></typeparam>
     /// <typeparam name="TAvatarState"></typeparam>
+    [ImplicitStreamSubscription("Avatar.Generate")]
     public abstract class AvatarBase<TAvatar, TAvatarState> : GrainBase<TAvatar>, IAvatarBase
-        where TAvatar : AvatarBase<TAvatar, TAvatarState>
-        where TAvatarState : AvatarEntityBase
+         where TAvatar : AvatarBase<TAvatar, TAvatarState>
+         where TAvatarState : AvatarEntityBase
     {
         /// <summary>
         /// 
@@ -34,10 +39,12 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         public const string AvatarBaseState = "AvatarBaseState";
 
+        private StreamSubscriptionHandle<GenerateInfo> _handler;
+
         /// <summary>
         /// 
         /// </summary>
-        protected ICurrentUser CurrentUser { get; }
+        protected ICurrentUser CurrentUser { get; private set; }
         /// <summary>
         /// 
         /// </summary>
@@ -47,17 +54,40 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        protected AvatarBase()
+        /// <param name="serviceProvider"></param>
+        protected AvatarBase(IServiceProvider serviceProvider) 
+            : base(serviceProvider)
         {
-            CurrentUser = ServiceProvider.GetService<ICurrentUser>();
+            CurrentUser = serviceProvider.GetService<ICurrentUser>();
         }
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="generateInfo"></param>
         /// <returns></returns>
-        public async virtual Task<int> Generate(GenerateInfo generateInfo)
+        public override async Task OnActivateAsync()
         {
+            _handler = await this.GetStreamAsync<GenerateInfo>(this.GetPrimaryKey(), "Avatar.Generate").SubscribeAsync(async (d, t) => await GenerateAsync(d));
+            await base.OnActivateAsync();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public virtual Task ReloadAsync()
+        {
+            DeactivateOnIdle();
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override async Task OnDeactivateAsync()
+        {
+            await _handler?.UnsubscribeAsync();
+            await base.OnDeactivateAsync();
         }
 
         /// <summary>
@@ -65,12 +95,30 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <param name="generateInfo"></param>
         /// <returns></returns>
-        protected virtual Task<int> GenerateCore(GenerateInfo generateInfo)
+        public async virtual Task<int> GenerateAsync(GenerateInfo generateInfo)
+        {
+            await InitAvatarBaseInfoAsync(generateInfo, 0);
+            await GenerateCoreAsync(generateInfo);
+            return (int)ErrorCode.None;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="generateInfo"></param>
+        /// <returns></returns>
+        protected virtual Task<int> GenerateCoreAsync(GenerateInfo generateInfo)
         {
             return Task.FromResult(0);
         }
 
-        private async Task InitAvatarBaseInfo(GenerateInfo generateInfo, int headFrameId)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="generateInfo"></param>
+        /// <param name="headFrameId"></param>
+        /// <returns></returns>
+        protected virtual async Task InitAvatarBaseInfoAsync(GenerateInfo generateInfo, int headFrameId)
         {
             AvatarState.State.Id = CurrentUser.AvatarId;
             AvatarState.State.UserId = CurrentUser.UserId;
@@ -85,24 +133,16 @@ namespace Scorpio.Bougainvillea.Essential
             await AvatarState.WriteStateAsync();
         }
 
-
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public Task<bool> IsGenerated()
+        public virtual Task PostGenerate()
         {
-            return Task.FromResult(AvatarState.RecordExists);
+            return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public Task PostGenerate()
-        {
-            throw new NotImplementedException();
-        }
+
 
         /// <summary>
         /// 
