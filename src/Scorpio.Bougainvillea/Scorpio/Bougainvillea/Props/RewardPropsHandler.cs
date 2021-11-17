@@ -25,12 +25,12 @@ namespace Scorpio.Bougainvillea.Props
 
         public async Task<(int code, object data)> UseAsync(PropsHandleContext context)
         {
-            var setting = (await _gameSettingManager.GetAsync<PropsSetting>()).GetOrDefault(context.PropId);
+            var setting = (await _gameSettingManager.GetAsync<PropsSetting>()).FirstOrDefault(p => p.Id == context.PropId);
             if (setting == null)
             {
                 return (PropsErrorCodes.NotExist, null);
             }
-            return await _rewardHandleManager.HandleAsync(_jsonSerializer.Deserialize<int[]>(setting.Effect), context.Num,context.Reason);
+            return await _rewardHandleManager.HandleAsync(_jsonSerializer.Deserialize<int[]>(setting.Effect), context.Num, context.Reason);
         }
     }
 }

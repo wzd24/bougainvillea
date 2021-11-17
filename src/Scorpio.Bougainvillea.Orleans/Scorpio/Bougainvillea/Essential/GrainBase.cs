@@ -15,6 +15,7 @@ using Orleans.Streams;
 
 using Scorpio.Bougainvillea.Essential.Dtos;
 using Scorpio.Bougainvillea.Setting;
+using Scorpio.Setting;
 
 namespace Scorpio.Bougainvillea.Essential
 {
@@ -30,6 +31,11 @@ namespace Scorpio.Bougainvillea.Essential
         /// 
         /// </summary>
         protected IGameSettingManager GameSettingManager { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected ISettingManager SettingManager { get; }
         /// <summary>
         /// 
         /// </summary>
@@ -37,6 +43,7 @@ namespace Scorpio.Bougainvillea.Essential
         {
             InitPersistentStates();
             GameSettingManager = ServiceProvider.GetService<IGameSettingManager>();
+            SettingManager=ServiceProvider.GetService<ISettingManager>();
         }
 
         /// <summary>
@@ -73,5 +80,7 @@ namespace Scorpio.Bougainvillea.Essential
         {
             return base.GetStreamProvider(name);
         }
+
+
     }
 }

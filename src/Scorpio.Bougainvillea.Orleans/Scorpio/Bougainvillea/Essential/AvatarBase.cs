@@ -27,12 +27,12 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        public const string AvatarBaseStateStorage = "AvatarBaseStateStorage";
+        public const string AvatarBaseStateStorageName = "AvatarBaseStateStorage";
 
         /// <summary>
         /// 
         /// </summary>
-        public const string AvatarBaseState = "AvatarBaseState";
+        public const string AvatarBaseStateName = "AvatarBaseState";
 
         /// <summary>
         /// 
@@ -41,7 +41,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        [PropertyPersistentState(AvatarBaseState, AvatarBaseStateStorage)]
+        [PropertyPersistentState(AvatarBaseStateName, AvatarBaseStateStorageName)]
         protected IPersistentState<TAvatarState> AvatarState { get; set; }
 
         /// <summary>
@@ -58,6 +58,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <returns></returns>
         public async virtual Task<int> Generate(GenerateInfo generateInfo)
         {
+            return 0;
         }
 
         /// <summary>

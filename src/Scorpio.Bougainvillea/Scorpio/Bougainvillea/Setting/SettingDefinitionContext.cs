@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Scorpio.Setting;
 
-namespace Scorpio.Bougainvillea.Setting
+namespace Scorpio.Bougainvillea
 {
     /// <summary>
     /// 

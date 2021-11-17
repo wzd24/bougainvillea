@@ -11,7 +11,7 @@ using Scorpio.Initialization;
 
 namespace Scorpio.Bougainvillea.Setting
 {
-    internal class GameSettingManager : IGameSettingManager, Scorpio.Initialization.IInitializable, ISingletonDependency
+    internal class GameSettingManager : IGameSettingManager, Initialization.IInitializable, ISingletonDependency
     {
         private readonly IGameSettingDefinitionManager _definitionManager;
         private readonly IGameSettingProviderManager _providerManager;
@@ -28,33 +28,33 @@ namespace Scorpio.Bougainvillea.Setting
         public async Task<IReadOnlyCollection<T>> GetAsync<T>(string name) where T : GameSettingBase
         {
             var setting = _definitionManager.Get(name);
-            if (!(_cachedValues.GetOrDefault(setting.Name) is GameSettingValue<T> value))
+            if (!(_cachedValues.GetOrDefault(setting.Name) is GameSettingValue value))
             {
                 var providers = _providerManager.Providers.Where(p => p.Scope == setting.Scope || p.Scope == GameSettingScope.Default).Reverse();
-                value = await GetValueFromProvidersAsync(providers, setting);
+                value = await GetValueFromProvidersAsync<T>(providers, setting);
                 if (value == null)
                 {
                     return null;
                 }
                 _cachedValues.TryAdd(setting.Name, value);
             }
-            return value.Value;
+            return value.Value as IReadOnlyCollection<T>;
         }
 
         public async Task<IReadOnlyCollection<T>> GetAsync<T>() where T : GameSettingBase
         {
             var setting = _definitionManager.Get<T>();
-            if (!(_cachedValues.GetOrDefault(setting.Name) is GameSettingValue<T> value))
+            if (!(_cachedValues.GetOrDefault(setting.Name) is GameSettingValue value))
             {
                 var providers = _providerManager.Providers.Where(p => p.Scope == setting.Scope || p.Scope == GameSettingScope.Default).Reverse();
-                value = await GetValueFromProvidersAsync(providers, setting);
+                value = await GetValueFromProvidersAsync<T>(providers, setting);
                 if (value == null)
                 {
                     return null;
                 }
                 _cachedValues.TryAdd(setting.Name, value);
             }
-            return value.Value;
+            return value.Value as IReadOnlyCollection<T>;
         }
 
         public void Initialize()

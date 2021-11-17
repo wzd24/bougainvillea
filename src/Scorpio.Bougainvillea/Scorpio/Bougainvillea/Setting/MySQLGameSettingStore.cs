@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,18 +22,31 @@ namespace Scorpio.Bougainvillea.Setting
     internal class MySQLGameSettingStore : IGameSettingStore, ISingletonDependency
     {
         private readonly IServiceScopeFactory _scopeFactory;
-
+        private readonly MethodInfo _getMethod = typeof(MySQLGameSettingStore).GetMethod(nameof(Invoke));
         public MySQLGameSettingStore(IServiceScopeFactory scopeFactory)
         {
             _scopeFactory = scopeFactory;
         }
         public async Task<GameSettingValue> GetAsync(IGameSettingStoreContext context)
         {
+            var method=_getMethod.MakeGenericMethod(context.SettingDefinition.ValueType);
+            var result=method.Invoke(this, new object[] {context}) as Task<GameSettingValue>;
+            return await result;
+        }
+        public async Task<GameSettingValue> Invoke<T>(IGameSettingStoreContext ctx)
+         where T : GameSettingBase
+        {
+            return await GetAsync<T>(ctx);
+        }
+
+        public async Task<GameSettingValue<T>> GetAsync<T>(IGameSettingStoreContext context)
+            where T : GameSettingBase
+        {
             using (var scope = _scopeFactory.CreateScope())
             {
                 using (var conn = await GetConnectionAsync(context, scope.ServiceProvider))
                 {
-                    var result = await conn.GetAllAsync(context.SettingDefinition.ValueType, tableName: context.SettingDefinition.Name);
+                    var result = await conn.GetAllAsync<T>(tableName: context.SettingDefinition.Name);
                     return new GameSettingValue<T>(result.ToHashSet()) { Definition = context.SettingDefinition };
                 }
             }

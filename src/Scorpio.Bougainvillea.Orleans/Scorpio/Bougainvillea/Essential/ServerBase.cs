@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
+
 using Orleans;
 using Orleans.Runtime;
 
 using Scorpio.Bougainvillea.Essential.Dtos;
+using Scorpio.Setting;
 
 namespace Scorpio.Bougainvillea.Essential
 {
@@ -16,14 +18,29 @@ namespace Scorpio.Bougainvillea.Essential
     /// 
     /// </summary>
     /// <typeparam name="TServer"></typeparam>
-    public abstract class ServerBase<TServer>:GrainBase<TServer>, IServerBase
-        where TServer:ServerBase<TServer>
+    public abstract class ServerBase<TServer> : GrainBase<TServer>, IServerBase
+        where TServer : ServerBase<TServer>
     {
+
+
         /// <summary>
         /// 
         /// </summary>
 
-        [PropertyPersistentState("AvatarListState", "AvatarListStateStorage")]
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string AvatarListStateStorageName = "AvatarListStateStorage";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string AvatarListStateName = "AvatarListState";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [PropertyPersistentState(AvatarListStateName, AvatarListStateStorageName)]
         public IPersistentState<AvatarListState> AvatarList { get; set; }
 
         /// <summary>
@@ -38,10 +55,11 @@ namespace Scorpio.Bougainvillea.Essential
             {
                 return (int)code;
             }
-            if (AvatarList.State.Any(a=>a.Name.Equals(generateInfo.Name)))
+            if (AvatarList.State.Any(a => a.Name.Equals(generateInfo.Name)))
             {
                 return (int)ErrorCode.NicknamesAlreadyExist;
             }
+
             return 0;
 
         }
@@ -51,9 +69,9 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <param name="avatarId"></param>
         /// <returns></returns>
-        public async virtual Task<bool> IsGenerated(long avatarId)
+        public virtual Task<bool> IsGenerated(long avatarId)
         {
-            return false;
+            return Task.FromResult(AvatarList.State.Any(a => a.AvatarId == avatarId));
         }
 
         private async Task<ErrorCode> CheckWords(string text)
@@ -68,11 +86,13 @@ namespace Scorpio.Bougainvillea.Essential
                 return ErrorCode.ContainsMaskingCharacters;
             }
             var length = check.GetWordsLength(text);
-            if (length > 20)
+            var minMaxLength = await ServiceProvider.GetService<ISettingManager>()
+                .GetAsync<List<int>>(AvatarSettingDefinitionConsts.NickNameMinMaxLength);
+            if (length > minMaxLength[1])
             {
                 return ErrorCode.NameLengthGreaterMax;
             }
-            if (length < 4)
+            if (length < minMaxLength[0])
             {
                 return ErrorCode.NameLengthLessMin;
             }
@@ -168,7 +188,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        public class AvatarListState:SortedSet<AvatarInfo>
+        public class AvatarListState : SortedSet<AvatarInfo>
         {
 
         }
@@ -176,7 +196,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        public class AvatarInfo: IEqualityComparer<AvatarInfo>,IComparable<AvatarInfo>
+        public class AvatarInfo : IEqualityComparer<AvatarInfo>, IComparable<AvatarInfo>
         {
             /// <summary>
             /// 

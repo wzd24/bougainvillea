@@ -32,7 +32,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// 
         /// </summary>
         /// <param name="value"></param>
-        internal GameSettingValue(IReadOnlyCollection<T> value)
+        public GameSettingValue(IReadOnlyCollection<T> value)
         {
             Value = value;
         }
