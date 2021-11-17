@@ -65,13 +65,12 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        protected GrainBase()
         protected GrainBase(IServiceProvider serviceProvider)
             : base(serviceProvider)
         {
-            InitPersistentStates();
-            GameSettingManager = ServiceProvider.GetService<IGameSettingManager>();
-            SettingManager=ServiceProvider.GetService<ISettingManager>();
+            InitPersistentStates(serviceProvider);
+            GameSettingManager = serviceProvider.GetService<IGameSettingManager>();
+            SettingManager= serviceProvider.GetService<ISettingManager>();
         }
 
 
