@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 using Orleans;
 using Orleans.Core;
@@ -22,16 +23,41 @@ namespace Scorpio.Bougainvillea.Essential
     /// <summary>
     /// 
     /// </summary>
-    public abstract class GrainBase<TGrain> : Grain
-        where TGrain:GrainBase<TGrain>
+    public abstract class GrainBase : Grain
+    {
+        private readonly StreamOptions _options;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        protected GrainBase(IServiceProvider serviceProvider)
+        {
+            _options = serviceProvider.GetRequiredService<IOptions<StreamOptions>>().Value;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        internal new IStreamProvider GetStreamProvider(string name)
+        {
+            return base.GetStreamProvider(name ?? _options.StreamName);
+        }
+
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    public abstract class GrainBase<TGrain> : GrainBase
+        where TGrain : GrainBase<TGrain>
     {
         private static readonly MethodInfo _getPersistentState = typeof(GrainBase<>).GetMethod(nameof(GetPersistentState), BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
         /// 
         /// </summary>
-        protected IGameSettingManager GameSettingManager { get; }
-
+        protected IGameSettingManager GameSettingManager { get; private set; }
         /// <summary>
         /// 
         /// </summary>
@@ -40,19 +66,22 @@ namespace Scorpio.Bougainvillea.Essential
         /// 
         /// </summary>
         protected GrainBase()
+        protected GrainBase(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
             InitPersistentStates();
             GameSettingManager = ServiceProvider.GetService<IGameSettingManager>();
             SettingManager=ServiceProvider.GetService<ISettingManager>();
         }
 
+
         /// <summary>
         /// 
         /// </summary>
-        protected virtual void InitPersistentStates()
+        protected virtual void InitPersistentStates(IServiceProvider serviceProvider)
         {
-            var context = ServiceProvider.GetService<IGrainActivationContext>();
-            var factory = ServiceProvider.GetService<IPersistentStateFactory>();
+            var context = serviceProvider.GetService<IGrainActivationContext>();
+            var factory = serviceProvider.GetService<IPersistentStateFactory>();
             var grainType = typeof(TGrain);
             var properties = grainType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             var stateProperties = properties.Where(p => p.AttributeExists<PropertyPersistentStateAttribute>(true) && p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(IPersistentState<>)).ToList();
@@ -67,7 +96,6 @@ namespace Scorpio.Bougainvillea.Essential
 
         private static IPersistentState<TState> GetPersistentState<TState>(IGrainActivationContext context, IPersistentStateFactory factory, IPersistentStateConfiguration configuration)
         {
-            
             return factory.Create<TState>(context, configuration);
         }
 

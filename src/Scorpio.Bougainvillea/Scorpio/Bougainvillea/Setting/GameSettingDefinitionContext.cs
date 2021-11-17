@@ -17,10 +17,9 @@ namespace Scorpio.Bougainvillea.Setting
             {
                 return;
             }
-
             foreach (var definition in settingDefinitions)
             {
-                _settingDefinitions[definition.Name] = definition;
+                _settingDefinitions.AddOrUpdate(definition.Name,_=>definition);
             }
         }
         public virtual IReadOnlyList<GameSettingDefinition> GetAll() => _settingDefinitions.Values.ToImmutableList();

@@ -42,7 +42,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 角色性别
         /// </summary>
-        public int Sex { get; set; }
+        public Sex Sex { get; set; }
 
         /// <summary>
         /// 角色等级

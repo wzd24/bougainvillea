@@ -21,7 +21,13 @@ namespace Scorpio.Bougainvillea.Essential
     public abstract class ServerBase<TServer> : GrainBase<TServer>, IServerBase
         where TServer : ServerBase<TServer>
     {
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        protected ServerBase(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
 
         /// <summary>
         /// 
@@ -50,6 +56,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <returns></returns>
         public virtual async Task<int> GenerateAvatar(GenerateInfo generateInfo)
         {
+
             var code = await CheckWords(generateInfo.Name);
             if (code != ErrorCode.None)
             {
@@ -59,9 +66,19 @@ namespace Scorpio.Bougainvillea.Essential
             {
                 return (int)ErrorCode.NicknamesAlreadyExist;
             }
-
-            return 0;
-
+            var roleSettings = await GameSettingManager.GetAsync<RoleSetting>();
+            if (!roleSettings.Any(r => r.Sex == generateInfo.Sex))
+            {
+                return (int)ErrorCode.GenerateAvatarLose;
+            }
+            var roleSetting = roleSettings.FirstOrDefault(r => r.Sex == generateInfo.Sex);
+            if (!roleSetting.Heads.Contains(generateInfo.HeadId) || roleSetting.Image != generateInfo.Image)
+            {
+                return (int)ErrorCode.GenerateAvatarLoseHeadDoNotChoose;
+            }
+            var current = ServiceProvider.GetService<ICurrentUser>();
+            await this.GetStreamAsync<GenerateInfo>(0, current.AvatarId, "Avatar.Generate").OnNextAsync(generateInfo);
+            return (int)ErrorCode.None;
         }
 
         /// <summary>

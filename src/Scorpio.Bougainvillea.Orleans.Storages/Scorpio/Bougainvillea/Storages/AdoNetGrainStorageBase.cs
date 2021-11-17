@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
+using Dapper;
 using Dapper.Extensions;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -112,7 +113,6 @@ namespace Scorpio.Bougainvillea.Storages
                 {
                     await ClearStateCoreAsync(grainType, grainReference, grainState, conn);
                 }
-
             }
             catch (Exception ex)
             {
