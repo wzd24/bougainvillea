@@ -11,7 +11,7 @@ namespace Scorpio.Bougainvillea.Essential
     /// <summary>
     /// 
     /// </summary>
-    public interface IServerBase:IGrainWithIntegerKey
+    public interface IServerBase:IGrainWithIntegerKey, IGrainBase
     {
 
     }

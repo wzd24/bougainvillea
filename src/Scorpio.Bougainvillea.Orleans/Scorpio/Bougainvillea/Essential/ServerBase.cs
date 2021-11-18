@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Orleans;
 using Orleans.Runtime;
+using Orleans.Streams;
 
 using Scorpio.Bougainvillea.Essential.Dtos;
 using Scorpio.Setting;
@@ -18,8 +20,9 @@ namespace Scorpio.Bougainvillea.Essential
     /// 
     /// </summary>
     /// <typeparam name="TServer"></typeparam>
+    [ImplicitStreamSubscription(ServerBase.StreamSubscription)]
     public abstract class ServerBase<TServer> : GrainBase<TServer>, IServerBase
-        where TServer : ServerBase<TServer>
+         where TServer : ServerBase<TServer>
     {
         /// <summary>
         /// 
@@ -46,9 +49,62 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string ServerInfoStateStorageName = "ServerInfoStateStorage";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string ServerInfoStateName = "ServerInfoState";
+
+
+        private StreamSubscriptionHandle<ServerInfo> _handler;
+
+        /// <summary>
+        /// 
+        /// </summary>
         [PropertyPersistentState(AvatarListStateName, AvatarListStateStorageName)]
         public IPersistentState<AvatarListState> AvatarList { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        [PropertyPersistentState(ServerInfoStateName, ServerInfoStateStorageName)]
+        public IPersistentState<ServerInfo> ServerInfo { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override async Task OnActivateAsync()
+        {
+            _handler = await this.GetStreamAsync<ServerInfo>(this.GetPrimaryKey(), ServerBase.StreamSubscription)
+                .SubscribeAsync(async (s, t) => await GenerateAsync(s));
+            await base.OnActivateAsync();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override async Task OnDeactivateAsync()
+        {
+            await _handler?.UnsubscribeAsync();
+            await base.OnDeactivateAsync();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        protected virtual async Task GenerateAsync(ServerInfo info)
+        {
+            ServerInfo.State = info;
+            await ServerInfo.WriteStateAsync();
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -77,7 +133,7 @@ namespace Scorpio.Bougainvillea.Essential
                 return (int)ErrorCode.GenerateAvatarLoseHeadDoNotChoose;
             }
             var current = ServiceProvider.GetService<ICurrentUser>();
-            await this.GetStreamAsync<GenerateInfo>(0, current.AvatarId, "Avatar.Generate").OnNextAsync(generateInfo);
+            await this.GetStreamAsync<GenerateInfo>(0, current.AvatarId, AvatarBase.StreamSubscription).OnNextAsync(generateInfo);
             return (int)ErrorCode.None;
         }
 
@@ -244,5 +300,17 @@ namespace Scorpio.Bougainvillea.Essential
             bool IEqualityComparer<AvatarInfo>.Equals(AvatarInfo x, AvatarInfo y) => x.AvatarId.Equals(y.AvatarId);
             int IEqualityComparer<AvatarInfo>.GetHashCode(AvatarInfo obj) => obj.GetHashCode();
         }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class ServerBase
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string StreamSubscription = "Server.Generate";
+
     }
 }

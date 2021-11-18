@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,8 @@ using System.Threading.Tasks;
 using Scorpio.DependencyInjection;
 using Scorpio.Initialization;
 
+using static Dapper.SqlMapper;
+
 namespace Scorpio.Bougainvillea.Setting
 {
     internal class GameSettingManager : IGameSettingManager, Initialization.IInitializable, ISingletonDependency
@@ -16,7 +19,6 @@ namespace Scorpio.Bougainvillea.Setting
         private readonly IGameSettingDefinitionManager _definitionManager;
         private readonly IGameSettingProviderManager _providerManager;
         private readonly ConcurrentDictionary<string, GameSettingValue> _cachedValues;
-        private static readonly MethodInfo _getAsyncMethodInfo = typeof(GameSettingManager).GetMethod(nameof(GetAsync), BindingFlags.Public | BindingFlags.Instance);
 
         public GameSettingManager(IGameSettingDefinitionManager definitionManager, IGameSettingProviderManager providerManager)
         {
@@ -25,36 +27,33 @@ namespace Scorpio.Bougainvillea.Setting
             _cachedValues = new ConcurrentDictionary<string, GameSettingValue>();
         }
 
-        public async Task<IReadOnlyCollection<T>> GetAsync<T>(string name) where T : GameSettingBase
+        public async Task<IEnumerable> GetAsync(string name)
         {
             var setting = _definitionManager.Get(name);
-            if (!(_cachedValues.GetOrDefault(setting.Name) is GameSettingValue value))
-            {
-                var providers = _providerManager.Providers.Where(p => p.Scope == setting.Scope || p.Scope == GameSettingScope.Default).Reverse();
-                value = await GetValueFromProvidersAsync<T>(providers, setting);
-                if (value == null)
-                {
-                    return null;
-                }
-                _cachedValues.TryAdd(setting.Name, value);
-            }
-            return value.Value as IReadOnlyCollection<T>;
+            var value=await GetGameSettingValueAsync(setting);
+            return value.Value;
         }
 
         public async Task<IReadOnlyCollection<T>> GetAsync<T>() where T : GameSettingBase
         {
             var setting = _definitionManager.Get<T>();
+            var value = (await GetGameSettingValueAsync(setting)) as GameSettingValue<T>;
+            return value.Value;
+        }
+
+        protected async Task<GameSettingValue> GetGameSettingValueAsync(GameSettingDefinition setting)
+{
             if (!(_cachedValues.GetOrDefault(setting.Name) is GameSettingValue value))
-            {
+{
                 var providers = _providerManager.Providers.Where(p => p.Scope == setting.Scope || p.Scope == GameSettingScope.Default).Reverse();
-                value = await GetValueFromProvidersAsync<T>(providers, setting);
+                value = await GetValueFromProvidersAsync(providers, setting);
                 if (value == null)
                 {
                     return null;
-                }
+}
                 _cachedValues.TryAdd(setting.Name, value);
             }
-            return value.Value as IReadOnlyCollection<T>;
+            return value;
         }
 
         public void Initialize()
@@ -62,9 +61,7 @@ namespace Scorpio.Bougainvillea.Setting
             var definitions = _definitionManager.GetAll().Where(d => d.Scope == GameSettingScope.Global);
             definitions.ForEach(d =>
             {
-                var method = _getAsyncMethodInfo.MakeGenericMethod(d.ValueType);
-                var task = method.Invoke(this, null) as Task;
-                task.ConfigureAwait(false).GetAwaiter().GetResult();
+                _ = GetGameSettingValueAsync(d).ConfigureAwait(false).GetAwaiter().GetResult();
             });
         }
 
@@ -96,7 +93,7 @@ namespace Scorpio.Bougainvillea.Setting
             }
         }
 
-        protected virtual async Task<GameSettingValue> GetValueFromProvidersAsync<T>(
+        protected virtual async Task<GameSettingValue> GetValueFromProvidersAsync(
          IEnumerable<IGameSettingProvider> providers,
          GameSettingDefinition setting)
         {

@@ -98,7 +98,7 @@ namespace Scorpio.Bougainvillea.Handler
                 await context.Response.WriteAsync(result);
                 return;
             }
-            var type = this.GetType();
+            var type = GetType();
             var method = GetMethod(type);
             var addMethod = method.ReturnType.UnwrapTask() == typeof(void) ? _addMethodMethodVoid.MakeGenericMethod(type) : _addMethodMethod.MakeGenericMethod(type, method.ReturnType.UnwrapTask());
             await (addMethod.Invoke(null, new object[] { this, method, context }) as Task);

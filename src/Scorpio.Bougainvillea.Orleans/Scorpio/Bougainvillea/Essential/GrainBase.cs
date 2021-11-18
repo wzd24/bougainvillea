@@ -23,7 +23,7 @@ namespace Scorpio.Bougainvillea.Essential
     /// <summary>
     /// 
     /// </summary>
-    public abstract class GrainBase : Grain
+    public abstract class GrainBase : Grain, IGrainBase
     {
         private readonly StreamOptions _options;
 
@@ -34,6 +34,16 @@ namespace Scorpio.Bougainvillea.Essential
         protected GrainBase(IServiceProvider serviceProvider)
         {
             _options = serviceProvider.GetRequiredService<IOptions<StreamOptions>>().Value;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public virtual Task ReloadAsync()
+        {
+            DeactivateOnIdle();
+            return Task.CompletedTask;
         }
         /// <summary>
         /// 
@@ -52,7 +62,7 @@ namespace Scorpio.Bougainvillea.Essential
     public abstract class GrainBase<TGrain> : GrainBase
         where TGrain : GrainBase<TGrain>
     {
-        private static readonly MethodInfo _getPersistentState = typeof(GrainBase<>).GetMethod(nameof(GetPersistentState), BindingFlags.NonPublic | BindingFlags.Static);
+        private static readonly MethodInfo _getPersistentState = typeof(GrainBase<TGrain>).GetMethod(nameof(GetPersistentState), BindingFlags.NonPublic | BindingFlags.Static);
 
         /// <summary>
         /// 

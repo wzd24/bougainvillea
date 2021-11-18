@@ -13,7 +13,7 @@ namespace Scorpio.Bougainvillea.Essential
     /// <summary>
     /// 角色
     /// </summary>
-    public interface IAvatarBase: IGrainWithIntegerKey
+    public interface IAvatarBase: IGrainWithIntegerKey,IGrainBase
     {
     }
 }

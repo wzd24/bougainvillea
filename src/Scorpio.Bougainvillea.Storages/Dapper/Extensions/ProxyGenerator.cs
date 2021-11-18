@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace Dapper.Extensions
 {

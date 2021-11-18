@@ -262,7 +262,7 @@ namespace Dapper.Extensions
             else if (type.IsGenericType)
             {
                 var typeInfo = type.GetTypeInfo();
-                bool implementsGenericIEnumerableOrIsGenericIEnumerable =
+                var implementsGenericIEnumerableOrIsGenericIEnumerable =
                     typeInfo.ImplementedInterfaces.Any(ti => ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ||
                     typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>);
 
@@ -457,7 +457,7 @@ namespace Dapper.Extensions
             else if (type.IsGenericType)
             {
                 var typeInfo = type.GetTypeInfo();
-                bool implementsGenericIEnumerableOrIsGenericIEnumerable =
+                var implementsGenericIEnumerableOrIsGenericIEnumerable =
                     typeInfo.ImplementedInterfaces.Any(ti => ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ||
                     typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>);
 

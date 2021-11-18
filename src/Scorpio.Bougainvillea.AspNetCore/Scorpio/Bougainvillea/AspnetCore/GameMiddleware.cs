@@ -31,9 +31,10 @@ namespace Scorpio.Bougainvillea.AspnetCore
         {
             var path = httpContext.Request.Path.Value!;
 
-            if (!path.Equals(_options.GameUrlPath))
+            if (!path.Equals(_options.GameUrlPath) || httpContext.Request.Method.Equals("get",System.StringComparison.InvariantCultureIgnoreCase))
             {
                 await _next(httpContext);
+                return;
             }
             var gameContext = ActivatorUtilities.CreateInstance<AspnetCoreGameContext>(httpContext.RequestServices, httpContext);
             _gameContextAccessor.GameContext = gameContext;

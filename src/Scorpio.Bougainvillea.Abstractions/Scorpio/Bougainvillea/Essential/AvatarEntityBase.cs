@@ -11,7 +11,7 @@ namespace Scorpio.Bougainvillea.Essential
     /// <summary>
     /// 角色基础信息
     /// </summary>
-    public class AvatarEntityBase
+    public abstract class AvatarEntityBase
     {
 
         /// <summary>
@@ -99,5 +99,17 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         public DateTime LastLoginTime { get; set; }
 
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TEntityBase"></typeparam>
+    public abstract class AvatarStateBase<TEntityBase> where TEntityBase : AvatarEntityBase
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public TEntityBase  Base { get; set; }
     }
 }

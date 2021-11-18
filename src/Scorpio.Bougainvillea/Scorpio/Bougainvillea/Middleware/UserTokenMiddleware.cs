@@ -16,13 +16,11 @@ namespace Scorpio.Bougainvillea.Middleware
     {
         private readonly PipelineRequestDelegate<IGameContext> _next;
         private readonly ICurrentUser _currentUser;
-        private readonly IDistributedCache _cache;
 
-        public UserTokenMiddleware(PipelineRequestDelegate<IGameContext> next, ICurrentUser currentUser, IDistributedCache cache)
+        public UserTokenMiddleware(PipelineRequestDelegate<IGameContext> next, ICurrentUser currentUser)
         {
             _next = next;
             _currentUser = currentUser;
-            _cache = cache;
         }
 
         public async Task InvokeAsync(IGameContext context)
@@ -38,32 +36,31 @@ namespace Scorpio.Bougainvillea.Middleware
             }
         }
 
-        private async Task<User> GetOrCreateUserAsync(string token)
+        private Task<User> GetOrCreateUserAsync(string token)
         {
-            var cached = await _cache.GetStringAsync(token);
             User user = null;
-            if (cached != null)
-            {
-                await _cache.RefreshAsync(token);
-                user = JsonConvert.DeserializeObject<User>(await _cache.GetStringAsync(token));
-                if (user != null)
-                {
-                    if (user.IsValid && user.Expiration.Subtract(DateTime.Now).TotalHours < 1)
-                    {
-                        user.Expiration = DateTime.Now.AddHours(2);
-                    }
-                    else
-                    {
-                        return user;
-                    }
-                }
-            }
+            //if (cached != null)
+            //{
+            //    await _cache.RefreshAsync(token);
+            //    user = JsonConvert.DeserializeObject<User>(await _cache.GetStringAsync(token));
+            //    if (user != null)
+            //    {
+            //        if (user.IsValid && user.Expiration.Subtract(DateTime.Now).TotalHours < 1)
+            //        {
+            //            user.Expiration = DateTime.Now.AddHours(2);
+            //        }
+            //        else
+            //        {
+            //            return user;
+            //        }
+            //    }
+            //}
             if (user == null)
             {
                 user = GenerateUser(token);
             }
-            await _cache.SetStringAsync(token, JsonConvert.SerializeObject(user), new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromHours(2)));
-            return user;
+            //await _cache.SetStringAsync(token, JsonConvert.SerializeObject(user), new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromHours(2)));
+            return Task.FromResult(user);
         }
 
         private User GenerateUser(string token)

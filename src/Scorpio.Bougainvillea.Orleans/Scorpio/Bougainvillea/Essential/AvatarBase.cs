@@ -19,15 +19,18 @@ using Scorpio.Setting;
 
 namespace Scorpio.Bougainvillea.Essential
 {
+
     /// <summary>
     /// 
     /// </summary>
     /// <typeparam name="TAvatar"></typeparam>
     /// <typeparam name="TAvatarState"></typeparam>
-    [ImplicitStreamSubscription("Avatar.Generate")]
-    public abstract class AvatarBase<TAvatar, TAvatarState> : GrainBase<TAvatar>, IAvatarBase
-         where TAvatar : AvatarBase<TAvatar, TAvatarState>
-         where TAvatarState : AvatarEntityBase
+    /// <typeparam name="TEntityBase"></typeparam>
+    [ImplicitStreamSubscription(AvatarBase.StreamSubscription)]
+    public abstract class AvatarBase<TAvatar, TAvatarState, TEntityBase> : GrainBase<TAvatar>, IAvatarBase
+         where TAvatar : AvatarBase<TAvatar, TAvatarState, TEntityBase>
+         where TAvatarState : AvatarStateBase<TEntityBase>
+        where TEntityBase:AvatarEntityBase
     {
         /// <summary>
         /// 
@@ -66,19 +69,11 @@ namespace Scorpio.Bougainvillea.Essential
         /// <returns></returns>
         public override async Task OnActivateAsync()
         {
-            _handler = await this.GetStreamAsync<GenerateInfo>(this.GetPrimaryKey(), "Avatar.Generate").SubscribeAsync(async (d, t) => await GenerateAsync(d));
+            _handler = await this.GetStreamAsync<GenerateInfo>(this.GetPrimaryKey(), AvatarBase.StreamSubscription).SubscribeAsync(async (d, t) => await GenerateAsync(d));
             await base.OnActivateAsync();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public virtual Task ReloadAsync()
-        {
-            DeactivateOnIdle();
-            return Task.CompletedTask;
-        }
+        
 
         /// <summary>
         /// 
@@ -120,16 +115,16 @@ namespace Scorpio.Bougainvillea.Essential
         /// <returns></returns>
         protected virtual async Task InitAvatarBaseInfoAsync(GenerateInfo generateInfo, int headFrameId)
         {
-            AvatarState.State.Id = CurrentUser.AvatarId;
-            AvatarState.State.UserId = CurrentUser.UserId;
-            AvatarState.State.ServerId = CurrentUser.ServerId;
-            AvatarState.State.NickName = generateInfo.Name;
-            AvatarState.State.Image = generateInfo.Image;
-            AvatarState.State.Level = 1;
-            AvatarState.State.CreateDate = DateTime.Now;
-            AvatarState.State.Sex = generateInfo.Sex;
-            AvatarState.State.HeadId = generateInfo.HeadId;
-            AvatarState.State.HeadFrameId = headFrameId;
+            AvatarState.State.Base.Id = CurrentUser.AvatarId;
+            AvatarState.State.Base.UserId = CurrentUser.UserId;
+            AvatarState.State.Base.ServerId = CurrentUser.ServerId;
+            AvatarState.State.Base.NickName = generateInfo.Name;
+            AvatarState.State.Base.Image = generateInfo.Image;
+            AvatarState.State.Base.Level = 1;
+            AvatarState.State.Base.CreateDate = DateTime.Now;
+            AvatarState.State.Base.Sex = generateInfo.Sex;
+            AvatarState.State.Base.HeadId = generateInfo.HeadId;
+            AvatarState.State.Base.HeadFrameId = headFrameId;
             await AvatarState.WriteStateAsync();
         }
 
@@ -233,5 +228,16 @@ namespace Scorpio.Bougainvillea.Essential
             #endregion
         }
 
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class AvatarBase
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string StreamSubscription = "Avatar.Generate";
     }
 }

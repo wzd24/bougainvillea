@@ -8,6 +8,6 @@
         /// <summary>
         /// 
         /// </summary>
-        public string StreamName { get; set; }
+        public string StreamName { get; set; } = "SMSProvider";
     }
 }

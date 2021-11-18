@@ -1,7 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\src\Scorpio.Bougainvillea.Orleans\Scorpio.Bougainvillea.Orleans.csproj" />
+    <ProjectReference Include="..\Sailina.Tang.Essential\Sailina.Tang.Essential.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

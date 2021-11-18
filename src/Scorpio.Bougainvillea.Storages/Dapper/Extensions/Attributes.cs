@@ -27,13 +27,6 @@ namespace Dapper.Extensions
         public string Name { get; set; }
     }
 
-    /// <summary>
-    /// Specifies that this field is a primary key in the database
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
-    public class KeyAttribute : Attribute
-    {
-    }
 
     /// <summary>
     /// Specifies that this field is an explicitly set primary key in the database
