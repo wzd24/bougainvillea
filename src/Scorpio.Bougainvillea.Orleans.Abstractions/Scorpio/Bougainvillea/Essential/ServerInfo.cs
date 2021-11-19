@@ -22,12 +22,12 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        public bool IsVisiable { get; set; }
+        public bool IsVisiable { get; set; } = false;
 
         /// <summary>
         /// 
         /// </summary>
-        public bool CanRegister { get; set; }
+        public bool CanRegister { get; set; } = true;
 
         /// <summary>
         /// 
@@ -37,7 +37,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        public ServerTag Tags { get; set; }
+        public ServerTag Tags { get; set; } = ServerTag.Noarmal;
 
         /// <summary>
         /// 
@@ -47,17 +47,17 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        public DateTime CreateDate { get; set; }
+        public DateTime CreateDate { get; set; } = DateTime.Now;
 
         /// <summary>
         /// 
         /// </summary>
-        public DateTime OpenTime { get; set; }
+        public DateTime OpenTime { get; set; } = DateTime.Now.AddDays(7);
 
         /// <summary>
         /// 
         /// </summary>
-        public DateTime LastMaintenanceDate { get; set; }
+        public DateTime? LastMaintenanceDate { get; set; }
 
         /// <summary>
         /// 

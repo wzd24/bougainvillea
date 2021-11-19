@@ -63,6 +63,8 @@ namespace Scorpio.Bougainvillea.Essential
 
         private StreamSubscriptionHandle<ServerInfo> _handler;
 
+        private ServerState _serverState;
+
         /// <summary>
         /// 
         /// </summary>
@@ -82,6 +84,7 @@ namespace Scorpio.Bougainvillea.Essential
         {
             _handler = await this.GetStreamAsync<ServerInfo>(this.GetPrimaryKey(), ServerBase.StreamSubscription)
                 .SubscribeAsync(async (s, t) => await GenerateAsync(s));
+            _serverState = ServerState.GetServerState(this, ServerInfo.State.Status);
             await base.OnActivateAsync();
         }
 
@@ -171,6 +174,40 @@ namespace Scorpio.Bougainvillea.Essential
             }
             return ErrorCode.None;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public virtual async ValueTask<ServerStatus> OpenAsync()
+        {
+            await _serverState.OpenAsync();
+            return ServerInfo.State.Status;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public virtual async ValueTask<ServerStatus> MaintenanceAsync()
+        {
+            await _serverState.MaintenanceAsync();
+            return ServerInfo.State.Status;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public virtual async ValueTask<ServerStatus> CloseAsync()
+        {
+            await _serverState.CloseAsync();
+            return ServerInfo.State.Status;
+        }
+
 
         private enum ErrorCode
         {
@@ -266,39 +303,62 @@ namespace Scorpio.Bougainvillea.Essential
 
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public class AvatarInfo : IEqualityComparer<AvatarInfo>, IComparable<AvatarInfo>
+        private class ServerState
         {
-            /// <summary>
-            /// 
-            /// </summary>
-            public long AvatarId { get; set; }
+            public ServerBase<TServer> Server { get; init; }
+            public virtual ValueTask OpenAsync()
+            {
+                Server.ServerInfo.State.Status = ServerStatus.Normal;
+                Server._serverState = new ServerNormalState { Server = Server };
+                return ValueTask.CompletedTask;
+            }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            public string Name { get; set; }
+            public virtual ValueTask MaintenanceAsync()
+            {
+                Server.ServerInfo.State.Status = ServerStatus.Maintenance;
+                Server._serverState = new ServerMaintenancedState { Server = Server };
+                return ValueTask.CompletedTask;
+            }
+            public virtual ValueTask CloseAsync()
+            {
+                Server.ServerInfo.State.Status = ServerStatus.Closed;
+                Server._serverState = new ServerClosedState { Server = Server };
+                return ValueTask.CompletedTask;
 
-            /// <summary>
-            /// 
-            /// </summary>
-            public long UserId { get; set; }
+            }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            public string AccountId { get; set; }
+            public static ServerState GetServerState(ServerBase<TServer> server, ServerStatus status)
+            {
+                return status switch
+                {
+                    ServerStatus.Normal => new ServerNormalState { Server = server },
+                    ServerStatus.AwaitOpen => new ServerAwaitOpenState { Server = server },
+                    ServerStatus.Maintenance => new ServerMaintenancedState { Server = server },
+                    ServerStatus.Closed => new ServerClosedState { Server = server },
+                    _ => throw new NotImplementedException(),
+                };
+            }
+        }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <returns></returns>
-            public override int GetHashCode() => HashCode.Combine(AvatarId);
-            int IComparable<AvatarInfo>.CompareTo(AvatarInfo other) => AvatarId.CompareTo(other.AvatarId);
-            bool IEqualityComparer<AvatarInfo>.Equals(AvatarInfo x, AvatarInfo y) => x.AvatarId.Equals(y.AvatarId);
-            int IEqualityComparer<AvatarInfo>.GetHashCode(AvatarInfo obj) => obj.GetHashCode();
+        private class ServerNormalState : ServerState
+        {
+            public override ValueTask OpenAsync() => ValueTask.CompletedTask;
+        }
+        private class ServerClosedState : ServerState
+        {
+            public override ValueTask CloseAsync() => ValueTask.CompletedTask;
+        }
+
+        private class ServerMaintenancedState : ServerState
+        {
+            public override ValueTask MaintenanceAsync() => ValueTask.CompletedTask;
+        }
+
+        private class ServerAwaitOpenState : ServerState
+        {
+            public override ValueTask MaintenanceAsync() => ValueTask.CompletedTask;
+
+            public override ValueTask CloseAsync() => ValueTask.CompletedTask;
         }
     }
 

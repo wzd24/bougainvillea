@@ -11,27 +11,49 @@ namespace Scorpio.Bougainvillea.Essential
     /// <summary>
     /// 
     /// </summary>
-    public interface IGameBase:IGrainBase
+    public interface IGameBase : IGrainBase
     {
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        ValueTask<IReadOnlyCollection<ServerInfo>> GetServers();
+        ValueTask<IReadOnlyCollection<ServerInfo>> GetServersAsync();
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="serverId"></param>
         /// <returns></returns>
-        ValueTask<ServerInfo> GetServer(int serverId);
+        ValueTask<ServerInfo> GetServerAsync(int serverId);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="serverInfo"></param>
         /// <returns></returns>
-        ValueTask<GenerateServerErrorCode> GenerateServer(ServerInfo serverInfo);
+        ValueTask<GenerateServerErrorCode> GenerateServerAsync(ServerInfo serverInfo);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serverId"></param>
+        /// <returns></returns>
+        ValueTask OpenServerAsync(int serverId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serverId"></param>
+        /// <returns></returns>
+        ValueTask CloseServerAsync(int serverId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serverId"></param>
+        /// <returns></returns>
+        ValueTask MaintenanceServerAsync(int serverId);
+
     }
 
     /// <summary>
@@ -56,6 +78,11 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        ServerNameAlreadyExists = 3
+        ServerNameAlreadyExists = 3,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        InvalidStatus = 4
     }
 }

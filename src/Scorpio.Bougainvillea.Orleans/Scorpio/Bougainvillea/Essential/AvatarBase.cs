@@ -73,8 +73,6 @@ namespace Scorpio.Bougainvillea.Essential
             await base.OnActivateAsync();
         }
 
-        
-
         /// <summary>
         /// 
         /// </summary>

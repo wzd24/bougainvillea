@@ -11,8 +11,24 @@ namespace Scorpio.Bougainvillea.Essential
     /// <summary>
     /// 
     /// </summary>
-    public interface IServerBase:IGrainWithIntegerKey, IGrainBase
+    public interface IServerBase : IGrainWithIntegerKey, IGrainBase
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        ValueTask<ServerStatus> CloseAsync();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        ValueTask<ServerStatus> MaintenanceAsync();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        ValueTask<ServerStatus> OpenAsync();
     }
 }

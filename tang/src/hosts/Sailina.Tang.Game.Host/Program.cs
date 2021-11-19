@@ -8,6 +8,8 @@ using Orleans.Hosting;
 
 using Sailina.Tang.Essential;
 
+using Scorpio.Bougainvillea.Essential;
+
 internal static class Program
 {
     private static async Task Main(string[] args)

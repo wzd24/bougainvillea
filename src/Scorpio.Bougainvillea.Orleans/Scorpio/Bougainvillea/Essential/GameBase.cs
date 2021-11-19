@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Orleans.Hosting;
 using Orleans.Runtime;
 
 using Scorpio.Bougainvillea.Essential.Dtos;
@@ -51,7 +52,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public ValueTask<IReadOnlyCollection<ServerInfo>> GetServers()
+        public ValueTask<IReadOnlyCollection<ServerInfo>> GetServersAsync()
         {
             return ValueTask.FromResult<IReadOnlyCollection<ServerInfo>>(ServerList.State);
         }
@@ -62,7 +63,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <param name="serverId"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public ValueTask<ServerInfo> GetServer(int serverId)
+        public ValueTask<ServerInfo> GetServerAsync(int serverId)
         {
             return ValueTask.FromResult(ServerList.State.SingleOrDefault(s => s.ServerId == serverId));
         }
@@ -72,10 +73,14 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <param name="serverInfo"></param>
         /// <returns></returns>
-        public async ValueTask<GenerateServerErrorCode> GenerateServer(ServerInfo serverInfo)
+        public async ValueTask<GenerateServerErrorCode> GenerateServerAsync(ServerInfo serverInfo)
         {
             if (serverInfo == null)
                 return GenerateServerErrorCode.ArgumentNull;
+            if (serverInfo.Status!= ServerStatus.AwaitOpen)
+            {
+                return GenerateServerErrorCode.InvalidStatus;
+            }
             if (ServerList.State.Any(s => s.ServerId == serverInfo.ServerId))
             {
                 return GenerateServerErrorCode.ServerAlreadyExists;
@@ -86,11 +91,49 @@ namespace Scorpio.Bougainvillea.Essential
             }
             ServerList.State.AddIfNotContains(serverInfo);
             await this.GetStreamAsync<ServerInfo>(0, serverInfo.ServerId, ServerBase.StreamSubscription).OnNextAsync(serverInfo);
-            return  GenerateServerErrorCode.Success;
+            return GenerateServerErrorCode.Success;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serverId"></param>
+        /// <returns></returns>
+        async ValueTask IGameBase.OpenServerAsync(int serverId)
+        {
+            var info = ServerList.State.SingleOrDefault(s => s.ServerId == serverId);
+            if (info == null)
+            {
+                return;
+            }
+            var server = GrainFactory.GetGrain<IServerBase>(info.ServerId);
+            info.Status = await server.OpenAsync();
+        }
+
+        async ValueTask IGameBase.CloseServerAsync(int serverId)
+        {
+            var info = ServerList.State.SingleOrDefault(s => s.ServerId == serverId);
+            if (info == null)
+            {
+                return;
+            }
+            var server = GrainFactory.GetGrain<IServerBase>(info.ServerId);
+            info.Status = await server.CloseAsync();
+        }
+
+        async ValueTask IGameBase.MaintenanceServerAsync(int serverId)
+        {
+            var info = ServerList.State.SingleOrDefault(s => s.ServerId == serverId);
+            if (info == null)
+            {
+                return;
+            }
+            var server = GrainFactory.GetGrain<IServerBase>(info.ServerId);
+            info.Status = await server.MaintenanceAsync();
         }
     }
 
-    
+
 
     /// <summary>
     /// 
@@ -99,6 +142,4 @@ namespace Scorpio.Bougainvillea.Essential
     {
 
     }
-
-
 }
