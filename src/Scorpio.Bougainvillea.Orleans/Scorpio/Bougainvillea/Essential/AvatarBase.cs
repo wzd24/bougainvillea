@@ -90,7 +90,12 @@ namespace Scorpio.Bougainvillea.Essential
         /// <returns></returns>
         public async virtual Task<int> GenerateAsync(GenerateInfo generateInfo)
         {
-            await InitAvatarBaseInfoAsync(generateInfo, 0);
+            var roleSetting=(await GameSettingManager.GetAsync<RoleSetting>()).FirstOrDefault(r=>r.Sex==generateInfo.Sex);
+            if (roleSetting==null)
+            {
+                return (int)ErrorCode.ConfigurationDoesNotExist;
+            }
+            await InitAvatarBaseInfoAsync(generateInfo, roleSetting.HeadFrameId);
             await GenerateCoreAsync(generateInfo);
             return (int)ErrorCode.None;
         }

@@ -49,6 +49,8 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         public int Level { get; set; }
 
+
+
         /// <summary>
         /// 当前穿戴头像ID
         /// </summary>
