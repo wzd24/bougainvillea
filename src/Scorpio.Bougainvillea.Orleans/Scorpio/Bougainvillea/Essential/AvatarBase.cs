@@ -135,7 +135,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// 
         /// </summary>
         /// <returns></returns>
-        public virtual Task PostGenerate()
+        public virtual Task PostGenerateAsync()
         {
             return Task.CompletedTask;
         }
