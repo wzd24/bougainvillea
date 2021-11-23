@@ -34,10 +34,6 @@ namespace Scorpio.Bougainvillea
         /// <param name="context"></param>
         public override void ConfigureServices(ConfigureServicesContext context)
         {
-            context.Services.Configure<GameSettingOptions>(opts =>
-            {
-                opts.SettingProviders.Add<GlobalGameSettingProvider>();
-            });
             context.Services.Configure<SettingOptions>(opts =>
             {
                 opts.SettingProviders.Add<GlobalSettingProvider>();

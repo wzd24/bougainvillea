@@ -5,8 +5,8 @@ namespace Sailina.Tang.Essential;
 /// <summary>
 /// 
 /// </summary>
-[DependsOn(typeof(BougainvileaOrleansModule), typeof(EssentialModule))]
-public class EssentialImplementModule:ScorpioModule
+[DependsOn(typeof(EssentialModule))]
+public class EssentialHandlersModule:ScorpioModule
 {
 
 }

@@ -6,7 +6,8 @@ namespace Sailina.Tang.Essential
     /// <summary>
     /// 
     /// </summary>
-    public partial class AvatarState:AvatarStateBase<AvatarEntity>
+    [Serializable]
+    public partial class AvatarState:AvatarStateBase<AvatarBase>
     {
 
     }
@@ -15,8 +16,24 @@ namespace Sailina.Tang.Essential
     /// <summary>
     /// 
     /// </summary>
-    public class AvatarEntity : AvatarEntityBase
+    [Serializable]
+    public class AvatarBase : AvatarBaseEntityBase
     {
+        /// <summary>
+        /// 当前穿戴称号ID
+        /// </summary>
+        public int TitleId { get; set; }
+
+        /// <summary>
+        /// 当前穿戴时装ID
+        /// </summary>
+        public int FashionId { get; set; }
+
+        /// <summary>
+        /// 地址ID 默认配置地址取杂项配置1100000
+        /// </summary>
+        public int AddressId { get; set; }
+
         /// <summary>
         /// 剧情关卡
         /// </summary>

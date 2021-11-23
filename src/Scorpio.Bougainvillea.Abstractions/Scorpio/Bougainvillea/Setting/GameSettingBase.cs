@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Dapper.Extensions;
+
 namespace Scorpio.Bougainvillea.Setting
 {
 
@@ -16,7 +18,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// <summary>
         /// 序号（根据策划配置）
         /// </summary>
-        [Key]
+        [ExplicitKey]
         public int Id { get; set; }
 
     }

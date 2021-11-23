@@ -208,6 +208,25 @@ namespace Scorpio.Bougainvillea.Essential
             return ServerInfo.State.Status;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ValueTask<DateTimeOffset> GetServerTimeAsync()
+        {
+            return ValueTask.FromResult(DateTimeOffset.Now.Add(ServerInfo.State.ServerTimeOffset));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serverTimeOffset"></param>
+        /// <returns></returns>
+        public async ValueTask SetServerTimeOffset(TimeSpan serverTimeOffset)
+        {
+            ServerInfo.State.ServerTimeOffset = serverTimeOffset;
+            await ServerInfo.WriteStateAsync();
+        }
 
         private enum ErrorCode
         {

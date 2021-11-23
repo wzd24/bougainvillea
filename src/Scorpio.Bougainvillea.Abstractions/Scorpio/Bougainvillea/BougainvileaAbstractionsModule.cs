@@ -9,5 +9,6 @@ namespace Scorpio.Bougainvillea
     /// </summary>
     public class BougainvilleaAbstractionsModule:ScorpioModule
     {
+      
     }
 }

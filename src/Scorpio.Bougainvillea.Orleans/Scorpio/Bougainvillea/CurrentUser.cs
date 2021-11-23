@@ -32,7 +32,7 @@ namespace Scorpio.Bougainvillea
 
         public int AvatarId => User.Id;
 
-        public bool IsAuthentication => User != null;
+        public bool IsAuthentication => User?.IsValid ?? false;
 
         public IDisposable Use(IGameUser user)
         {

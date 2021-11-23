@@ -62,6 +62,11 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
+        public TimeSpan  ServerTimeOffset { get; set; }=TimeSpan.Zero;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         public override int GetHashCode() => HashCode.Combine(ServerId);
         int IComparable<ServerInfo>.CompareTo(ServerInfo other) => ServerId.CompareTo(other.ServerId);

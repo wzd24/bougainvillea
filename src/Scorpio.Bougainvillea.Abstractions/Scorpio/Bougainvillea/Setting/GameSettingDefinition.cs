@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Scorpio.Bougainvillea.Setting
 {
@@ -40,7 +42,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// <summary>
         /// Default value of the setting.
         /// </summary>
-        public object Default { get; }
+        public IEnumerable Default { get; }
 
         /// <summary>
         /// 
@@ -51,7 +53,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// <param name="description"></param>
         /// <param name="valueType"></param>
         /// <param name="defaultValue"></param>
-        protected GameSettingDefinition(string name,GameSettingScope scope, string displayName, string description, Type valueType, object defaultValue)
+        protected GameSettingDefinition(string name, GameSettingScope scope, string displayName, string description, Type valueType, IEnumerable defaultValue)
         {
             Name = name;
             Scope = scope;
@@ -72,7 +74,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// <summary>
         /// 
         /// </summary>
-        public GameSettingDefinition(GameSettingScope scope, T defaultValue = default) : this(typeof(T).Name,scope, null, defaultValue: defaultValue)
+        public GameSettingDefinition(GameSettingScope scope, IEnumerable<T> defaultValue = default) : this(typeof(T).Name, scope, null, defaultValue: defaultValue)
         {
 
         }
@@ -83,7 +85,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// <param name="name"></param>
         /// <param name="scope"></param>
         /// <param name="defaultValue"></param>
-        public GameSettingDefinition(string name, GameSettingScope scope, T defaultValue = default) : this(name,scope, null, defaultValue: defaultValue)
+        public GameSettingDefinition(string name, GameSettingScope scope, IEnumerable<T> defaultValue = default) : this(name, scope, null, defaultValue: defaultValue)
         {
 
         }
@@ -94,7 +96,7 @@ namespace Scorpio.Bougainvillea.Setting
         /// <param name="scope"></param>
         /// <param name="displayName"></param>
         /// <param name="defaultValue"></param>
-        public GameSettingDefinition(string name, GameSettingScope scope, string displayName, T defaultValue = default) : this(name,scope, displayName, null, defaultValue)
+        public GameSettingDefinition(string name, GameSettingScope scope, string displayName, IEnumerable<T> defaultValue = default) : this(name, scope, displayName, null, defaultValue)
         {
 
         }
@@ -106,15 +108,15 @@ namespace Scorpio.Bougainvillea.Setting
         /// <param name="displayName"></param>
         /// <param name="description"></param>
         /// <param name="defaultValue"></param>
-        public GameSettingDefinition(string name, GameSettingScope scope, string displayName, string description, T defaultValue = default)
-            : base(name,scope, displayName, description, typeof(T), defaultValue)
+        public GameSettingDefinition(string name, GameSettingScope scope, string displayName, string description, IEnumerable<T> defaultValue = default)
+            : base(name, scope, displayName, description, typeof(T), defaultValue)
         {
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public new T Default => (T)base.Default;
+        public new IEnumerable<T> Default => (IEnumerable<T>)base.Default;
 
     }
 

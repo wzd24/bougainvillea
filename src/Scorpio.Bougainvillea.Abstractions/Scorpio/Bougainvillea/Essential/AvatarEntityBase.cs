@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
+using Dapper.Extensions;
 
 namespace Scorpio.Bougainvillea.Essential
 {
@@ -11,12 +14,12 @@ namespace Scorpio.Bougainvillea.Essential
     /// <summary>
     /// 角色基础信息
     /// </summary>
-    public abstract class AvatarEntityBase
+    public abstract class AvatarBaseEntityBase
     {
-
         /// <summary>
         /// 角色Id
         /// </summary>
+        [ExplicitKey]
         public int Id { get; set; }
 
         /// <summary>
@@ -32,7 +35,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 玩家GUID，用于关联用户中心账号的标识
         /// </summary>
-        public string Guid { get; set; }
+        public string AccountId { get; set; }
 
         /// <summary>
         /// 角色昵称
@@ -50,7 +53,6 @@ namespace Scorpio.Bougainvillea.Essential
         public int Level { get; set; }
 
 
-
         /// <summary>
         /// 当前穿戴头像ID
         /// </summary>
@@ -66,20 +68,6 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         public int Image { get; set; }
 
-        /// <summary>
-        /// 当前穿戴称号ID
-        /// </summary>
-        public int TitleId { get; set; }
-
-        /// <summary>
-        /// 当前穿戴时装ID
-        /// </summary>
-        public int FashionId { get; set; }
-
-        /// <summary>
-        /// 地址ID 默认配置地址取杂项配置1100000
-        /// </summary>
-        public int AddressId { get; set; }
 
         /// <summary>
         /// 角色VIP等级
@@ -107,11 +95,11 @@ namespace Scorpio.Bougainvillea.Essential
     /// 
     /// </summary>
     /// <typeparam name="TEntityBase"></typeparam>
-    public abstract class AvatarStateBase<TEntityBase> where TEntityBase : AvatarEntityBase
+    public abstract class AvatarStateBase<TEntityBase> where TEntityBase : AvatarBaseEntityBase,new()
     {
         /// <summary>
         /// 
         /// </summary>
-        public TEntityBase  Base { get; set; }
+        public TEntityBase Base { get; set; }=new TEntityBase();
     }
 }

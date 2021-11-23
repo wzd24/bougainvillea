@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Orleans.Runtime;
+
 using Scorpio.Bougainvillea.Essential;
 
 namespace Sailina.Tang.Essential
@@ -11,7 +13,7 @@ namespace Sailina.Tang.Essential
     /// <summary>
     /// 
     /// </summary>
-    public partial class Avatar : AvatarBase<Avatar, AvatarState,AvatarEntity>, IAvatar
+    internal partial class Avatar : AvatarBase<Avatar, AvatarState,AvatarBase>, IAvatar
     {
         /// <summary>
         /// 
@@ -22,11 +24,15 @@ namespace Sailina.Tang.Essential
             
         }
 
+
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public Task<string> GetAvatarNameAsync() => Task.FromResult("Test");
+        public Task<string> GetAvatarNameAsync()
+        {
+            return Task.FromResult(State.Base.NickName);
+        }
     }
 
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Scorpio.Bougainvillea.Setting
@@ -6,6 +7,7 @@ namespace Scorpio.Bougainvillea.Setting
     /// <summary>
     /// 
     /// </summary>
+    [Serializable]
     public abstract class GameSettingValue
     {
         /// <summary>
@@ -26,7 +28,8 @@ namespace Scorpio.Bougainvillea.Setting
     /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public sealed class GameSettingValue<T>: GameSettingValue where T : GameSettingBase
+    [Serializable]
+    public sealed class GameSettingValue<T> : GameSettingValue where T : GameSettingBase
     {
         /// <summary>
         /// 
@@ -40,6 +43,6 @@ namespace Scorpio.Bougainvillea.Setting
         /// <summary>
         /// 
         /// </summary>
-        public override IReadOnlyCollection<T> Value { get;  }
+        public override IReadOnlyCollection<T> Value { get; }
     }
 }

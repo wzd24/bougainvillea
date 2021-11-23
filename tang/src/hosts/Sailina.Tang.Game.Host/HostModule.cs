@@ -4,12 +4,11 @@ using Orleans;
 using Orleans.Runtime;
 
 using Sailina.Tang.Essential;
-using Sailina.Tang.Essential.Implement;
 
 using Scorpio.Bougainvillea.AspnetCore;
 using Scorpio.Modularity;
 
-[DependsOn(typeof(AspnetCoreHostingModule), typeof(EssentialImplementModule))]
+[DependsOn(typeof(AspnetCoreHostingModule), typeof(EssentialBootstrapModule))]
 internal class HostModule : ScorpioModule
 {
 }

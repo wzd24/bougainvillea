@@ -78,7 +78,6 @@ namespace Dapper.Extensions
         {
             var attributes = pi.GetCustomAttributes(typeof(WriteAttribute), false).AsList();
             if (attributes.Count != 1) return true;
-
             var writeAttribute = (WriteAttribute)attributes[0];
             return writeAttribute.Write;
         }
@@ -99,8 +98,8 @@ namespace Dapper.Extensions
             else
             {
                 name = type.Name + "s";
-                if (type.IsInterface && name.StartsWith("I"))
-                    name = name.Substring(1);
+                if (type.IsInterface)
+                    name = name.RemovePreFix("I");
             }
             _typeTableName[type.TypeHandle] = name;
             return name;
@@ -116,9 +115,9 @@ namespace Dapper.Extensions
         }
 
 
-        private static async Task<IEnumerable<object>> GetAllAsyncImpl(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string sql, Type type)
+        private static async Task<IEnumerable<object>> GetAllAsyncImpl(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string sql, Type type, object parameters = null)
         {
-            var result = await connection.QueryAsync(sql, transaction: transaction, commandTimeout: commandTimeout).ConfigureAwait(false);
+            var result = await connection.QueryAsync(sql, param: parameters, transaction: transaction, commandTimeout: commandTimeout).ConfigureAwait(false);
             var list = new List<object>();
             foreach (IDictionary<string, object> res in result)
             {
@@ -143,7 +142,7 @@ namespace Dapper.Extensions
             return list;
         }
 
-        private static bool IsDefaultValue(Type t,object value)
+        private static bool IsDefaultValue(Type t, object value)
         {
             var @default = GetDefaultValue(t);
             return value.Equals(@default);

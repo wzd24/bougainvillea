@@ -2,12 +2,16 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
+
+using Microsoft.Extensions.Logging;
 
 namespace Dapper.Extensions
 {
@@ -58,7 +62,6 @@ namespace Dapper.Extensions
             var dynParams = ids.Zip(keys, (value, key) => new { value, key }).Aggregate(new DynamicParameters(), (p, k) => p.Add($"@{k.key.Name}", k.value));
             if (!type.IsInterface)
                 return (await connection.QueryAsync(type, sql, dynParams, transaction, commandTimeout).ConfigureAwait(false)).FirstOrDefault();
-
             if (!((await connection.QueryAsync<dynamic>(sql, dynParams).ConfigureAwait(false)).FirstOrDefault() is IDictionary<string, object> res))
             {
                 return null;
@@ -134,6 +137,79 @@ namespace Dapper.Extensions
             return GetAllAsyncImpl(connection, transaction, commandTimeout, sql, type);
         }
 
+        /// <summary>
+        /// Returns a list of entities from table "Ts".  
+        /// Id of T must be marked with [Key] attribute.
+        /// Entities created from interfaces are tracked/intercepted for changes and used by the Update() extension
+        /// for optimal performance. 
+        /// </summary>
+        /// <typeparam name="T">Interface or type to create and populate</typeparam>
+        /// <param name="connection">Open SqlConnection</param>
+        /// <param name="parameters"></param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction">The transaction to run under, null (the default) if none</param>
+        /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
+        /// <returns>Entity of T</returns>
+        public static async Task<IEnumerable<T>> GetAllAsync<T>(this IDbConnection connection,object parameters, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            return (await GetAllAsync(connection, typeof(T),parameters, tableName, transaction, commandTimeout)).OfType<T>();
+        }
+
+        /// <summary>
+        /// Returns a list of entities from table "Ts".  
+        /// Id of T must be marked with [Key] attribute.
+        /// Entities created from interfaces are tracked/intercepted for changes and used by the Update() extension
+        /// for optimal performance. 
+        /// </summary>
+        /// <param name="type">Interface or type to create and populate</param>
+        /// <param name="parameters"></param>
+        /// <param name="tableName"></param>
+        /// <param name="connection">Open SqlConnection</param>
+        /// <param name="transaction">The transaction to run under, null (the default) if none</param>
+        /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
+        /// <returns>Entity of T</returns>
+        public static Task<IEnumerable<object>> GetAllAsync(this IDbConnection connection, Type type, object parameters, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            var name = tableName ?? GetTableName(type);
+            var sb = new StringBuilder();
+            sb.AppendFormat("SELECT * FROM `{0}` ", name);
+            var writeWhere = true;
+            var properties = parameters.GetType().GetProperties();
+            for (var i = 0; i < properties.Length; i++)
+            {
+                var property = properties[i];
+                if (property.GetValue(parameters) == null)
+                {
+                    continue;
+                }
+                if (writeWhere)
+                {
+                    sb.Append(" WHERE ");
+                    writeWhere = false;
+                }
+                else
+                {
+                    sb.Append(" AND ");
+                }
+                if (property.PropertyType.IsEnum && property.PropertyType.AttributeExists<FlagsAttribute>())
+                {
+                    sb.AppendFormat("`{0}`&@{1}>0", property.Name, property.Name);
+
+                }
+                else
+                {
+                    sb.AppendFormat("`{0}` = @{1}", property.Name, property.Name);
+                }
+            }
+            var sql = sb.ToString();
+            if (!type.IsInterface)
+            {
+                var result = connection.QueryAsync(type, sql, parameters, transaction, commandTimeout);
+                return result;
+            }
+            return GetAllAsyncImpl(connection, transaction, commandTimeout, sql, type, parameters);
+        }
+
 
         /// <summary>
         /// Inserts an entity into table "Ts" asynchronously using Task and returns identity id.
@@ -162,7 +238,6 @@ namespace Dapper.Extensions
         /// <returns>Identity of inserted entity</returns>
         public static async Task<int> InsertAsync(this IDbConnection connection, Type type, object entityToInsert, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null)
         {
-
             var isList = false;
             if (type.IsArray)
             {

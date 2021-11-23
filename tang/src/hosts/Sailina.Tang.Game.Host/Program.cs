@@ -8,6 +8,7 @@ using Orleans.Hosting;
 
 using Sailina.Tang.Essential;
 
+using Scorpio.Bougainvillea;
 using Scorpio.Bougainvillea.Essential;
 
 internal static class Program
@@ -32,9 +33,7 @@ internal static class Program
             })
             .AddStartupTask(async (sp, ctx) =>
             {
-                var str= await sp.GetRequiredService<IGrainFactory>().GetGrain<IAvatar>(1).GetAvatarNameAsync();
-                Console.WriteLine(str);
-
+                 await sp.GetRequiredService<IGrainInitializableManager>().InitializeAsync();
             })
             .AddMemoryGrainStorageAsDefault()
             .AddMemoryGrainStorage("AvatarBaseStateStorage")

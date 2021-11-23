@@ -30,5 +30,18 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <returns></returns>
         ValueTask<ServerStatus> OpenAsync();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        ValueTask<DateTimeOffset> GetServerTimeAsync();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serverTimeOffset"></param>
+        /// <returns></returns>
+        ValueTask SetServerTimeOffset(TimeSpan serverTimeOffset);
     }
 }

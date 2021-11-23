@@ -29,8 +29,8 @@ namespace Scorpio.Bougainvillea.Essential
     [ImplicitStreamSubscription(AvatarBase.StreamSubscription)]
     public abstract class AvatarBase<TAvatar, TAvatarState, TEntityBase> : GrainBase<TAvatar>, IAvatarBase
          where TAvatar : AvatarBase<TAvatar, TAvatarState, TEntityBase>
-         where TAvatarState : AvatarStateBase<TEntityBase>
-        where TEntityBase:AvatarEntityBase
+         where TAvatarState : AvatarStateBase<TEntityBase>, new()
+        where TEntityBase:AvatarBaseEntityBase, new()
     {
         /// <summary>
         /// 
@@ -54,6 +54,10 @@ namespace Scorpio.Bougainvillea.Essential
         [PropertyPersistentState(AvatarBaseStateName, AvatarBaseStateStorageName)]
         protected IPersistentState<TAvatarState> AvatarState { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        protected TAvatarState State => AvatarState.State;
         /// <summary>
         /// 
         /// </summary>

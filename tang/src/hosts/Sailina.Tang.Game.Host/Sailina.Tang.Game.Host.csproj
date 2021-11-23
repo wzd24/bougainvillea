@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Scorpio.Bougainvillea.AspNetCore\Scorpio.Bougainvillea.AspNetCore.csproj" />
-    <ProjectReference Include="..\..\modules\essential\Sailina.Tang.Essential.Implement\Sailina.Tang.Essential.Implement.csproj" />
+    <ProjectReference Include="..\..\modules\essential\Sailina.Tang.Essential.Bootstrap\Sailina.Tang.Essential.Bootstrap.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Scorpio.Hosting" Version="$(ScorpioVersion)" />

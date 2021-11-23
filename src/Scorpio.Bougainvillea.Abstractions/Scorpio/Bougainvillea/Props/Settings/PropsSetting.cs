@@ -41,11 +41,6 @@ namespace Scorpio.Bougainvillea.Props.Settings
         public int Quality { get; set; }
 
         /// <summary>
-        /// 背包显示顺序
-        /// </summary>
-        public int Sort { get; set; }
-
-        /// <summary>
         /// 道具价值
         /// </summary>
         public int Cost { get; set; }
@@ -64,6 +59,11 @@ namespace Scorpio.Bougainvillea.Props.Settings
         /// 使用效果，效果参数配置 如: { }
         /// </summary>
         public string Effect { get; set; }
+
+        /// <summary>
+        /// 背包格叠加数量
+        /// </summary>
+        public int Overlay { get; set; }
 
         /// <summary>
         /// 道具过期时长，-1为永不过期。
