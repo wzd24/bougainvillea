@@ -72,6 +72,16 @@ namespace Scorpio.Bougainvillea.Essential
         /// 
         /// </summary>
         protected ISettingManager SettingManager { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected ICurrentUser CurrentUser { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected ICurrentServer CurrentServer { get; private set; }
         /// <summary>
         /// 
         /// </summary>
@@ -81,6 +91,8 @@ namespace Scorpio.Bougainvillea.Essential
             InitPersistentStates(serviceProvider);
             GameSettingManager = serviceProvider.GetService<IGameSettingManager>();
             SettingManager= serviceProvider.GetService<ISettingManager>();
+            CurrentUser = serviceProvider.GetService<ICurrentUser>();
+            CurrentServer = serviceProvider.GetService<ICurrentServer>();
         }
 
 

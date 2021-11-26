@@ -14,36 +14,18 @@ namespace Scorpio.Bougainvillea
     public interface ICurrentUser
     {
 
-        /// <summary>
-        /// 
-        /// </summary>
-        string Token { get; }
+
 
         /// <summary>
         /// 
         /// </summary>
-        int UserId { get; }
+        long AvatarId { get; }
 
         /// <summary>
         /// 
         /// </summary>
-        int AvatarId { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        int ServerId { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        bool IsAuthentication { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="user"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        IDisposable Use(IGameUser user);
+        IDisposable Use(long id);
     }
 }

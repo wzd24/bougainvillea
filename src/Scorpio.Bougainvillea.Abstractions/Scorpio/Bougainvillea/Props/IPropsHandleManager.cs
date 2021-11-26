@@ -11,7 +11,7 @@ namespace Scorpio.Bougainvillea.Props
     /// <summary>
     /// 
     /// </summary>
-    public interface IPropsHandleManager:IInitializable
+    public interface IPropsHandleManager
     {
 
         /// <summary>

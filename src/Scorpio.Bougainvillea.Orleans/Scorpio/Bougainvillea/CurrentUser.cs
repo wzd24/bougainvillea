@@ -18,27 +18,18 @@ namespace Scorpio.Bougainvillea
         {
         }
 
-        public IGameUser User
+        public long AvatarId
         {
-            get => RequestContext.Get("CurrentUser") as IGameUser;
+            get => RequestContext.Get("CurrentUser")?.To<long>()??0;
             set => RequestContext.Set("CurrentUser", value);
         }
 
-        public string Token => User?.Token;
-
-        public int UserId => User?.UserId ?? 0;
-
-        public int ServerId => User?.ServerId ?? 0;
-
-        public int AvatarId => User.Id;
-
-        public bool IsAuthentication => User?.IsValid ?? false;
-
-        public IDisposable Use(IGameUser user)
+   
+        public IDisposable Use(long avatarId)
         {
-            var current = User;
-            User = user;
-            return new DisposeAction(() => User = current);
+            var current = AvatarId;
+            AvatarId = avatarId;
+            return new DisposeAction(() => AvatarId = current);
         }
     }
 }

@@ -4,17 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Scorpio.Bougainvillea
+namespace Scorpio.Bougainvillea.Data
 {
     /// <summary>
     /// 
     /// </summary>
-    public interface IInitializable
+    public interface IModifiable
     {
         /// <summary>
         /// 
         /// </summary>
-        /// <returns></returns>
-        Task InitializeAsync();
+        bool Modified { get;}
+
+        /// <summary>
+        /// 
+        /// </summary>
+        void ResetModifyState();
     }
 }

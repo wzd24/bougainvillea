@@ -35,7 +35,7 @@ namespace Scorpio.Bougainvillea.Mails
             {
                 Id = id,
                 Content = content,
-                ExcludeUsers = _serializer.Deserialize<int[]>(excludeUsers),
+                ExcludeUsers = _serializer.Deserialize<long[]>(excludeUsers),
                 ExpireTime = expireTime,
                 Rewards = rewards,
                 SendTime = sendTime,

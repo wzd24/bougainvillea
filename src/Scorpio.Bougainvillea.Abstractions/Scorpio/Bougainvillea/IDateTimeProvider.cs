@@ -14,7 +14,6 @@ namespace Scorpio.Bougainvillea
         /// <summary>
         /// 
         /// </summary>
-        DateTimeOffset Now { get;}
-
+        ValueTask<DateTimeOffset> GetNowAsync();
     }
 }

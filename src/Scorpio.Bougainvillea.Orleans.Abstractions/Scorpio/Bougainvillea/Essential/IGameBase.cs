@@ -11,13 +11,19 @@ namespace Scorpio.Bougainvillea.Essential
     /// <summary>
     /// 
     /// </summary>
-    public interface IGameBase : IGrainBase
+    public interface IGameBase : IGrainWithGuidKey,IGrainBase
     {
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
         ValueTask<IReadOnlyCollection<ServerInfo>> GetServersAsync();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        ValueTask BeginInitializeAsync();
 
         /// <summary>
         /// 

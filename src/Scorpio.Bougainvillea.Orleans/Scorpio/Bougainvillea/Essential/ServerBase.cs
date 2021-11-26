@@ -2,16 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
 
 using Orleans;
+using Orleans.Concurrency;
 using Orleans.Runtime;
 using Orleans.Streams;
 
+using Sailina.Tang.Essential.Dtos;
+using Sailina.Tang.Essential.StreamDatas;
+
 using Scorpio.Bougainvillea.Essential.Dtos;
+using Scorpio.Bougainvillea.Essential.Dtos.Servers;
+using Scorpio.Bougainvillea.Tokens;
 using Scorpio.Setting;
 
 namespace Scorpio.Bougainvillea.Essential
@@ -21,60 +28,35 @@ namespace Scorpio.Bougainvillea.Essential
     /// </summary>
     /// <typeparam name="TServer"></typeparam>
     [ImplicitStreamSubscription(ServerBase.StreamSubscription)]
-    public abstract class ServerBase<TServer> : GrainBase<TServer>, IServerBase
+    public abstract class ServerBase<TServer> : GrainBase<TServer>, IServerBase, IIncomingGrainCallFilter
          where TServer : ServerBase<TServer>
     {
+        private StreamSubscriptionHandle<LoginStatusNotify> _streamSubscriptionHandle;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="serviceProvider"></param>
-        protected ServerBase(IServiceProvider serviceProvider) : base(serviceProvider)
+        /// <param name="dateTimeProvider"></param>
+        protected ServerBase(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider) : base(serviceProvider)
         {
+            _dateTimeProvider = dateTimeProvider;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public const string AvatarListStateStorageName = "AvatarListStateStorage";
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public const string AvatarListStateName = "AvatarListState";
-
-        /// <summary>
-        /// 
-        /// </summary>
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public const string ServerInfoStateStorageName = "ServerInfoStateStorage";
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public const string ServerInfoStateName = "ServerInfoState";
-
 
         private StreamSubscriptionHandle<ServerInfo> _handler;
 
         private ServerState _serverState;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
         /// <summary>
         /// 
         /// </summary>
-        [PropertyPersistentState(AvatarListStateName, AvatarListStateStorageName)]
+        [PropertyPersistentState(ServerBase.AvatarListStateName, ServerBase.AvatarListStateStorageName)]
         public IPersistentState<AvatarListState> AvatarList { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        [PropertyPersistentState(ServerInfoStateName, ServerInfoStateStorageName)]
+        [PropertyPersistentState(ServerBase.ServerInfoStateName, ServerBase.ServerInfoStateStorageName)]
         public IPersistentState<ServerInfo> ServerInfo { get; set; }
         /// <summary>
         /// 
@@ -84,6 +66,12 @@ namespace Scorpio.Bougainvillea.Essential
         {
             _handler = await this.GetStreamAsync<ServerInfo>(this.GetPrimaryKey(), ServerBase.StreamSubscription)
                 .SubscribeAsync(async (s, t) => await GenerateAsync(s));
+            _streamSubscriptionHandle = await this.GetStreamAsync<LoginStatusNotify>(this.GetPrimaryKey(), AvatarBase.LoginResultStreamSubscription).SubscribeAsync((result, token) =>
+            {
+                var ava = AvatarList.State.FirstOrDefault(s => s.AvatarId == result.AvatarId);
+                ava.Status = result.Status;
+                return Task.CompletedTask;
+            });
             _serverState = ServerState.GetServerState(this, ServerInfo.State.Status);
             await base.OnActivateAsync();
         }
@@ -95,6 +83,7 @@ namespace Scorpio.Bougainvillea.Essential
         public override async Task OnDeactivateAsync()
         {
             await _handler?.UnsubscribeAsync();
+            await _streamSubscriptionHandle?.UnsubscribeAsync();
             await base.OnDeactivateAsync();
         }
 
@@ -113,7 +102,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <param name="generateInfo"></param>
         /// <returns></returns>
-        public virtual async Task<int> GenerateAvatar(GenerateInfo generateInfo)
+        public virtual async Task<int> GenerateAvatarAsync(GenerateInfo generateInfo)
         {
 
             var code = await CheckWords(generateInfo.Name);
@@ -136,7 +125,7 @@ namespace Scorpio.Bougainvillea.Essential
                 return (int)ErrorCode.GenerateAvatarLoseHeadDoNotChoose;
             }
             var current = ServiceProvider.GetService<ICurrentUser>();
-            await this.GetStreamAsync<GenerateInfo>(0, current.AvatarId, AvatarBase.StreamSubscription).OnNextAsync(generateInfo);
+            await this.GetStreamAsync<GenerateInfo>(0, current.AvatarId, AvatarBase.GenerateStreamSubscription).OnNextAsync(generateInfo);
             return (int)ErrorCode.None;
         }
 
@@ -200,6 +189,14 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="avatarId"></param>
+        /// <returns></returns>
+        public ValueTask<AvatarInfo> GetAvatarAsync(int avatarId) => ValueTask.FromResult(AvatarList.State.FirstOrDefault(a => a.AvatarId == avatarId));
+
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         public virtual async ValueTask<ServerStatus> CloseAsync()
@@ -226,6 +223,69 @@ namespace Scorpio.Bougainvillea.Essential
         {
             ServerInfo.State.ServerTimeOffset = serverTimeOffset;
             await ServerInfo.WriteStateAsync();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public virtual ValueTask BeginInitializeAsync() => ValueTask.CompletedTask;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userData"></param>
+        /// <returns></returns>
+        public async ValueTask<EnterResult> CheckUserAsync(UserData userData)
+        {
+            var user = AvatarList.State.FirstOrDefault(u => u.UserId == userData.UserId);
+            if (user == null)
+            {
+                return new EnterResult
+                {
+                    AvatarId = 0,
+                    CanRegister = ServerInfo.State.CanRegister,
+                    Exists = false,
+                    ServerId = (int)this.GetPrimaryKeyLong(),
+                    ServerTime = DateTimeOffset.Now.Add(ServerInfo.State.ServerTimeOffset)
+                };
+            }
+            else
+            {
+                return new EnterResult
+                {
+                    AvatarId = user.AvatarId,
+                    CanRegister = ServerInfo.State.CanRegister,
+                    CanLogin = user.ForbidExpired < await _dateTimeProvider.GetNowAsync(),
+                    Exists = true,
+                    ServerId = (int)this.GetPrimaryKeyLong(),
+                    ServerTime = DateTimeOffset.Now.Add(ServerInfo.State.ServerTimeOffset)
+                };
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [OneWay]
+        public async ValueTask BeginLoginAsync(LoginData request)
+        {
+            var ava = AvatarList.State.FirstOrDefault(a => a.AvatarId == request.AvatarId);
+            if (ava != null && ava.Status != AvatarInfoStatus.OnLoging)
+            {
+                ava.Status = AvatarInfoStatus.OnLoging;
+                await this.GetStreamAsync<LoginData>(0, request.AvatarId, AvatarBase.GenerateStreamSubscription).OnNextAsync(request);
+            }
+        }
+
+        async Task IIncomingGrainCallFilter.Invoke(IIncomingGrainCallContext context)
+        {
+            using (CurrentServer.Use((int)context.Grain.GetPrimaryKeyLong()))
+            {
+                await context.Invoke();
+            }
         }
 
         private enum ErrorCode
@@ -314,13 +374,6 @@ namespace Scorpio.Bougainvillea.Essential
             #endregion
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public class AvatarListState : SortedSet<AvatarInfo>
-        {
-
-        }
 
         private class ServerState
         {
@@ -384,12 +437,84 @@ namespace Scorpio.Bougainvillea.Essential
     /// <summary>
     /// 
     /// </summary>
+    public class AvatarListState : SortedSet<AvatarInfo>
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public AvatarListState()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="comparer"></param>
+        public AvatarListState(IComparer<AvatarInfo> comparer) : base(comparer)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="collection"></param>
+        public AvatarListState(IEnumerable<AvatarInfo> collection) : base(collection)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="comparer"></param>
+        public AvatarListState(IEnumerable<AvatarInfo> collection, IComparer<AvatarInfo> comparer) : base(collection, comparer)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="context"></param>
+        protected AvatarListState(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
     public static class ServerBase
     {
         /// <summary>
         /// 
         /// </summary>
         public const string StreamSubscription = "Server.Generate";
+
+        /// <summary>
+        /// 
+        /// </summary>
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string AvatarListStateStorageName = "AvatarListStateStorage";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string AvatarListStateName = "AvatarListState";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string ServerInfoStateStorageName = "ServerInfoStateStorage";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string ServerInfoStateName = "ServerInfoState";
 
     }
 }

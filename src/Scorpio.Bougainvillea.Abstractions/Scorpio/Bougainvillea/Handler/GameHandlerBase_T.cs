@@ -82,5 +82,39 @@ namespace Scorpio.Bougainvillea.Handler
         /// <param name="request"></param>
         /// <returns></returns>
         protected abstract Task<IResponseMessage> ExecuteAsync(T request);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="message"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        protected IResponseMessage Response(int code, string message = null, object data = null)
+        {
+            return new ResponseMessage(code, message, data);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="message"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        protected IResponseMessage Error(int code, string message = null, object data = null)
+        {
+            return Response(code, message, data);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        protected IResponseMessage Success(object data)
+        {
+            return Response(0, data: data);
+        }
     }
 }

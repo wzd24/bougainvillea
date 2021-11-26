@@ -13,6 +13,9 @@ using Orleans.Storage;
 using Orleans.Streams;
 using Orleans.Streams.Core;
 
+using Sailina.Tang.Essential.Dtos;
+using Sailina.Tang.Essential.StreamDatas;
+
 using Scorpio.Bougainvillea.Essential.Dtos;
 using Scorpio.Bougainvillea.Setting;
 using Scorpio.Setting;
@@ -26,32 +29,22 @@ namespace Scorpio.Bougainvillea.Essential
     /// <typeparam name="TAvatar"></typeparam>
     /// <typeparam name="TAvatarState"></typeparam>
     /// <typeparam name="TEntityBase"></typeparam>
-    [ImplicitStreamSubscription(AvatarBase.StreamSubscription)]
-    public abstract class AvatarBase<TAvatar, TAvatarState, TEntityBase> : GrainBase<TAvatar>, IAvatarBase
+    [ImplicitStreamSubscription(AvatarBase.GenerateStreamSubscription)]
+    [ImplicitStreamSubscription(AvatarBase.LoginStreamSubscription)]
+    public abstract class AvatarBase<TAvatar, TAvatarState, TEntityBase> : GrainBase<TAvatar>, IAvatarBase, IIncomingGrainCallFilter
          where TAvatar : AvatarBase<TAvatar, TAvatarState, TEntityBase>
          where TAvatarState : AvatarStateBase<TEntityBase>, new()
-        where TEntityBase:AvatarBaseEntityBase, new()
+        where TEntityBase : AvatarBaseEntityBase, new()
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public const string AvatarBaseStateStorageName = "AvatarBaseStateStorage";
+
+        private StreamSubscriptionHandle<GenerateInfo> _generateHandler;
+        private StreamSubscriptionHandle<LoginData> _loginHandler;
+
 
         /// <summary>
         /// 
         /// </summary>
-        public const string AvatarBaseStateName = "AvatarBaseState";
-
-        private StreamSubscriptionHandle<GenerateInfo> _handler;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected ICurrentUser CurrentUser { get; private set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        [PropertyPersistentState(AvatarBaseStateName, AvatarBaseStateStorageName)]
+        [PropertyPersistentState(AvatarBase.AvatarStateName, AvatarBase.AvatarStateStorageName)]
         protected IPersistentState<TAvatarState> AvatarState { get; set; }
 
         /// <summary>
@@ -62,10 +55,9 @@ namespace Scorpio.Bougainvillea.Essential
         /// 
         /// </summary>
         /// <param name="serviceProvider"></param>
-        protected AvatarBase(IServiceProvider serviceProvider) 
+        protected AvatarBase(IServiceProvider serviceProvider)
             : base(serviceProvider)
         {
-            CurrentUser = serviceProvider.GetService<ICurrentUser>();
         }
         /// <summary>
         /// 
@@ -73,9 +65,32 @@ namespace Scorpio.Bougainvillea.Essential
         /// <returns></returns>
         public override async Task OnActivateAsync()
         {
-            _handler = await this.GetStreamAsync<GenerateInfo>(this.GetPrimaryKey(), AvatarBase.StreamSubscription).SubscribeAsync(async (d, t) => await GenerateAsync(d));
+            _generateHandler = await this.GetStreamAsync<GenerateInfo>(this.GetPrimaryKey(), AvatarBase.GenerateStreamSubscription).SubscribeAsync(async (d, t) => await GenerateAsync(d));
+            _loginHandler = await this.GetStreamAsync<LoginData>(this.GetPrimaryKey(), AvatarBase.LoginStreamSubscription).SubscribeAsync(async (d, t) =>
+            {
+                await LoginAsync(d);
+            });
             await base.OnActivateAsync();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        protected virtual async ValueTask LoginAsync(LoginData d)
+        {
+            DailyReset();
+            await this.GetStreamAsync<LoginStatusNotify>(0, State.Base.ServerId, AvatarBase.LoginResultStreamSubscription).OnNextAsync(new LoginStatusNotify { AvatarId = d.AvatarId, Status = AvatarInfoStatus.OnLine });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected virtual void DailyReset()
+        {
+        }
+
 
         /// <summary>
         /// 
@@ -83,7 +98,8 @@ namespace Scorpio.Bougainvillea.Essential
         /// <returns></returns>
         public override async Task OnDeactivateAsync()
         {
-            await _handler?.UnsubscribeAsync();
+            await _generateHandler?.UnsubscribeAsync();
+            await _loginHandler?.UnsubscribeAsync();
             await base.OnDeactivateAsync();
         }
 
@@ -92,10 +108,10 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <param name="generateInfo"></param>
         /// <returns></returns>
-        public async virtual Task<int> GenerateAsync(GenerateInfo generateInfo)
+        public async virtual ValueTask<int> GenerateAsync(GenerateInfo generateInfo)
         {
-            var roleSetting=(await GameSettingManager.GetAsync<RoleSetting>()).FirstOrDefault(r=>r.Sex==generateInfo.Sex);
-            if (roleSetting==null)
+            var roleSetting = (await GameSettingManager.GetAsync<RoleSetting>()).FirstOrDefault(r => r.Sex == generateInfo.Sex);
+            if (roleSetting == null)
             {
                 return (int)ErrorCode.ConfigurationDoesNotExist;
             }
@@ -123,8 +139,8 @@ namespace Scorpio.Bougainvillea.Essential
         protected virtual async Task InitAvatarBaseInfoAsync(GenerateInfo generateInfo, int headFrameId)
         {
             AvatarState.State.Base.Id = CurrentUser.AvatarId;
-            AvatarState.State.Base.UserId = CurrentUser.UserId;
-            AvatarState.State.Base.ServerId = CurrentUser.ServerId;
+            AvatarState.State.Base.UserId = generateInfo.UserId;
+            AvatarState.State.Base.ServerId = CurrentServer.ServerId;
             AvatarState.State.Base.NickName = generateInfo.Name;
             AvatarState.State.Base.Image = generateInfo.Image;
             AvatarState.State.Base.Level = 1;
@@ -142,6 +158,15 @@ namespace Scorpio.Bougainvillea.Essential
         public virtual Task PostGenerateAsync()
         {
             return Task.CompletedTask;
+        }
+
+        async Task IIncomingGrainCallFilter.Invoke(IIncomingGrainCallContext context)
+        {
+            using (CurrentUser.Use(context.Grain.GetPrimaryKeyLong()))
+            {
+                await context.Invoke();
+            }
+
         }
 
 
@@ -245,6 +270,26 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        public const string StreamSubscription = "Avatar.Generate";
+        public const string GenerateStreamSubscription = "Avatar.Generate";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string LoginStreamSubscription = "Avatar.Login";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string AvatarStateStorageName = "AvatarStateStorage";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string AvatarStateName = "AvatarState";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string LoginResultStreamSubscription = "Avatar.Login.Result";
     }
 }

@@ -11,8 +11,11 @@ namespace Scorpio.Bougainvillea
     /// <summary>
     /// 
     /// </summary>
-    [DependsOn(typeof(BougainvilleaModule))]
-    public class BougainvileaOrleansModule:ScorpioModule
+    [DependsOn(
+        typeof(BougainvilleaModule),
+        typeof(BougainvileaOrleansAbstractionsModule), 
+        typeof(BougainvileaOrleansStoragesModule))]
+    public class BougainvileaOrleansModule : ScorpioModule
     {
         /// <summary>
         /// 

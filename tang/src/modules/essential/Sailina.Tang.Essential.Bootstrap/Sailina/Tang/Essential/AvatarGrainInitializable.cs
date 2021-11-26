@@ -17,19 +17,21 @@ namespace Sailina.Tang.Essential
     {
         private readonly IGrainFactory _grainFactory;
         private readonly IGameSettingManager _gameSettingManager;
+        private readonly IJsonSerializer _jsonSerializer;
 
-        public AvatarGrainInitializable(IGrainFactory grainFactory,IGameSettingManager gameSettingManager)
+        public AvatarGrainInitializable(IGrainFactory grainFactory,IGameSettingManager gameSettingManager,IJsonSerializer jsonSerializer)
         {
             _grainFactory = grainFactory;
             _gameSettingManager = gameSettingManager;
+            _jsonSerializer = jsonSerializer;
         }
         public async ValueTask InitializeAsync()
         {
-            var ava =  _grainFactory.GetGrain<IAvatar>(1);
-            var str = await ava.GetAvatarNameAsync();
-            Console.WriteLine(str);
-            var setting =await _gameSettingManager.GetAsync<PropsSetting>();
-            Console.WriteLine(setting.Count);
+            var server =  _grainFactory.GetGrain<IServer>(1);
+            var ava = await server.GetAvatarAsync(1000001);
+            Console.WriteLine(_jsonSerializer.Serialize(ava));
+            var avatar = _grainFactory.GetGrain<IAvatar>(1);
+            Console.WriteLine(await avatar.GetAvatarNameAsync());
         }
     }
 }

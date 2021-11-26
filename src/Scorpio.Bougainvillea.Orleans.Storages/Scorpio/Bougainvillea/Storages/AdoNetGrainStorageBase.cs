@@ -24,7 +24,7 @@ using Scorpio.Bougainvillea.AdoNet;
 namespace Scorpio.Bougainvillea.Storages
 {
     /// <summary>
-    /// Logging codes used by <see cref="Orleans.Storage.AdoNetGrainStorage"/>.
+    /// Logging codes used by <see cref="AdoNetGrainStorageBase{TStorage}"/>.
     /// </summary>
     /// <remarks> These are taken from <em>Orleans.Providers.ProviderErrorCode</em> and <em>Orleans.Providers.AzureProviderErrorCode</em>.</remarks>
     internal enum RelationalStorageProviderCodes
@@ -90,8 +90,13 @@ namespace Scorpio.Bougainvillea.Storages
         /// <param name="grainReference"></param>
         /// <param name="grainState"></param>
         /// <returns></returns>
-        protected abstract Task<(int id, string name)> GetConnectionInfo(string grainType, GrainReference grainReference, IGrainState grainState);
+        protected abstract ValueTask<(int id, string name)> GetConnectionInfo(string grainType, GrainReference grainReference, IGrainState grainState);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected override int GetSubscribeStage() => Options.InitStage;
         /// <summary>
         /// 
         /// </summary>
@@ -133,7 +138,7 @@ namespace Scorpio.Bougainvillea.Storages
         /// <param name="grainState"></param>
         /// <param name="conn"></param>
         /// <returns></returns>
-        protected abstract Task ClearStateCoreAsync(string grainType, GrainReference grainReference, IGrainState grainState, System.Data.IDbConnection conn);
+        protected abstract ValueTask ClearStateCoreAsync(string grainType, GrainReference grainReference, IGrainState grainState, System.Data.IDbConnection conn);
 
         /// <summary>
         /// 
@@ -184,7 +189,7 @@ namespace Scorpio.Bougainvillea.Storages
         /// <param name="grainState"></param>
         /// <param name="conn"></param>
         /// <returns></returns>
-        protected abstract Task<object> ReadStateCoreAsync(string grainType, GrainReference grainReference, IGrainState grainState, System.Data.IDbConnection conn);
+        protected abstract ValueTask<object> ReadStateCoreAsync(string grainType, GrainReference grainReference, IGrainState grainState, System.Data.IDbConnection conn);
 
         /// <summary>
         /// 
@@ -230,7 +235,7 @@ namespace Scorpio.Bougainvillea.Storages
         /// <param name="grainState"></param>
         /// <param name="conn"></param>
         /// <returns></returns>
-        protected abstract Task WriteStateCoreAsync(string grainType, GrainReference grainReference, IGrainState grainState, System.Data.IDbConnection conn);
+        protected abstract ValueTask WriteStateCoreAsync(string grainType, GrainReference grainReference, IGrainState grainState, System.Data.IDbConnection conn);
 
     }
 }

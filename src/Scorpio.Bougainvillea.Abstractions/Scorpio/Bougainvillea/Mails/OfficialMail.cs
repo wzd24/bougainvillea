@@ -40,7 +40,7 @@ namespace Scorpio.Bougainvillea.Mails
         /// <summary>
         /// 发送排除玩家列表
         /// </summary>
-        public int[] ExcludeUsers { get; set; }
+        public long[] ExcludeUsers { get; set; }
 
 
         /// <summary>

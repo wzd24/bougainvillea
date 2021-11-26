@@ -16,5 +16,11 @@ namespace Scorpio.Bougainvillea
         /// </summary>
         int ServerId { get; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serverId"></param>
+        /// <returns></returns>
+        IDisposable Use(int serverId);
     }
 }

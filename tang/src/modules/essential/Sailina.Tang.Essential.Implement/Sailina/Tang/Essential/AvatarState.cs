@@ -7,7 +7,7 @@ namespace Sailina.Tang.Essential
     /// 
     /// </summary>
     [Serializable]
-    public partial class AvatarState:AvatarStateBase<AvatarBase>
+    internal partial class AvatarState:AvatarStateBase<AvatarBaseInfo>
     {
 
     }
@@ -17,7 +17,7 @@ namespace Sailina.Tang.Essential
     /// 
     /// </summary>
     [Serializable]
-    public class AvatarBase : AvatarBaseEntityBase
+    internal class AvatarBaseInfo : AvatarBaseEntityBase
     {
         /// <summary>
         /// 当前穿戴称号ID

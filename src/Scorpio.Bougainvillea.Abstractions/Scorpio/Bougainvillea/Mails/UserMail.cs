@@ -24,7 +24,7 @@ namespace Scorpio.Bougainvillea.Mails
         /// <summary>
         /// 
         /// </summary>
-        public int AvatarId { get; set; }
+        public long AvatarId { get; set; }
 
         /// <summary>
         /// 邮件区服Id

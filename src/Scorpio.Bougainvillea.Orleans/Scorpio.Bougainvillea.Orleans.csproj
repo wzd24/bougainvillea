@@ -11,6 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Scorpio.Bougainvillea.Orleans.Abstractions\Scorpio.Bougainvillea.Orleans.Abstractions.csproj" />
+    <ProjectReference Include="..\Scorpio.Bougainvillea.Orleans.Storages\Scorpio.Bougainvillea.Orleans.Storages.csproj" />
     <ProjectReference Include="..\Scorpio.Bougainvillea\Scorpio.Bougainvillea.csproj" />
   </ItemGroup>
   <ItemGroup>
@@ -18,5 +19,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scorpio\Bougainvillea\Storages\" />
   </ItemGroup>
 </Project>

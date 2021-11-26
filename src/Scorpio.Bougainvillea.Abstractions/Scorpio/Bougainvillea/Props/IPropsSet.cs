@@ -10,7 +10,7 @@ namespace Scorpio.Bougainvillea.Props
     /// <summary>
     /// 道具集合接口。
     /// </summary>
-    public interface IPropsSet:IInitializable
+    public interface IPropsSet
     {
         /// <summary>
         /// 从道具集合中获取指定ID的道具，道具不存在则返回 null。

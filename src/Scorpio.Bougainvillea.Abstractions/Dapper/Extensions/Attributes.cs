@@ -64,4 +64,13 @@ namespace Dapper.Extensions
     public class ComputedAttribute : Attribute
     {
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public class IgnoreAttribute : Attribute
+    {
+
+    }
 }

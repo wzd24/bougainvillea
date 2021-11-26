@@ -5,7 +5,15 @@
     /// </summary>
     public class GenerateInfo
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public int ServerId { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public int UserId { get; set; }
         /// <summary>
         /// 
         /// </summary>

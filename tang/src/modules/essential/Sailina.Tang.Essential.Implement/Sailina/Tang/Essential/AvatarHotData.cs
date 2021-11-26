@@ -32,11 +32,11 @@ namespace Sailina.Tang.Essential
         /// <summary>
         /// 上一次登录时间
         /// </summary>
-        public DateTime LastLoginTime { get; set; }
+        public DateTimeOffset LastLoginTime { get; set; }
         /// <summary>
         /// 最后离线时间
         /// </summary>
-        public DateTime LastOfflineTime { get; set; }
+        public DateTimeOffset LastOfflineTime { get; set; }
         /// <summary>
         /// 每日奖励领取状态
         /// </summary>
@@ -44,15 +44,15 @@ namespace Sailina.Tang.Essential
         /// <summary>
         /// 每日数据重置时间
         /// </summary>
-        public DateTime ResetTime { get; set; }
+        public DateTimeOffset ResetTime { get; set; }
         /// <summary>
         /// 当前赚速
         /// </summary>
-        public BigInteger EarnSpeed { get; set; }
+        public double EarnSpeed { get; set; }
         /// <summary>
         /// 历史最高赚速
         /// </summary>
-        public BigInteger TotalEarnSpeed { get; set; }
+        public double TotalEarnSpeed { get; set; }
         /// <summary>
         /// 财神送财今日次数
         /// </summary>

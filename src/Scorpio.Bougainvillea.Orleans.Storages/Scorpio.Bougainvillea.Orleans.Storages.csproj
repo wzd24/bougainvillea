@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Scorpio.Bougainvillea.Orleans\Scorpio.Bougainvillea.Orleans.csproj" />
     <ProjectReference Include="..\Scorpio.Bougainvillea.Storages\Scorpio.Bougainvillea.Storages.csproj" />
   </ItemGroup>
   <ItemGroup>

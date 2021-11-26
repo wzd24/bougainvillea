@@ -15,10 +15,10 @@ internal static class Program
 {
     private static async Task Main(string[] args)
     {
-       await Host.CreateDefaultBuilder(args).AddScorpio<HostModule>().UseOrleans().ConfigureWebHostDefaults(builder =>
-        {
-            builder.UseKestrel().UseStartup<Startup>();
-        }).RunConsoleAsync();
+        await Host.CreateDefaultBuilder(args).AddScorpio<HostModule>().UseOrleans().ConfigureWebHostDefaults(builder =>
+         {
+             builder.UseKestrel().UseStartup<Startup>();
+         }).RunConsoleAsync();
     }
     private static IHostBuilder UseOrleans(this IHostBuilder builder)
     {
@@ -33,10 +33,10 @@ internal static class Program
             })
             .AddStartupTask(async (sp, ctx) =>
             {
-                 await sp.GetRequiredService<IGrainInitializableManager>().InitializeAsync();
+                await sp.GetRequiredService<IGrainInitializableManager>().InitializeAsync();
             })
             .AddMemoryGrainStorageAsDefault()
-            .AddMemoryGrainStorage("AvatarBaseStateStorage")
+            .AddMemoryGrainStorage(AvatarBase.AvatarStateStorageName)
             .AddSimpleMessageStreamProvider("SMSProvider")
             .AddMemoryGrainStorage("PubSubStore")
             .ConfigureApplicationParts(c => c.AddFromDependencyContext().WithReferences());

@@ -6,7 +6,7 @@ namespace Sailina.Tang.Essential;
 /// <summary>
 /// 
 /// </summary>
-[DependsOn(typeof(EssentialImplementModule))]
+[DependsOn(typeof(EssentialImplementModule),typeof(EssentialHandlersModule))]
 public class EssentialBootstrapModule : ScorpioModule
 {
 

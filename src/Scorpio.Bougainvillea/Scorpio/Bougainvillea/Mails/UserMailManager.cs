@@ -16,6 +16,7 @@ namespace Scorpio.Bougainvillea.Mails
         private readonly IUserMailStore _store;
         private readonly ISettingManager _settingManager;
         private readonly ICurrentUser _currentUser;
+        private readonly ICurrentServer _currentServer;
         private readonly IRewardHandleManager _rewardHandleManager;
         private readonly IUserLastBuildMailTimeProvider _lastBuildMailTimeProvider;
 
@@ -23,6 +24,7 @@ namespace Scorpio.Bougainvillea.Mails
                                IUserMailStore store,
                                ISettingManager settingManager,
                                ICurrentUser currentUser,
+                               ICurrentServer currentServer,
                                IRewardHandleManager rewardHandleManager,
                                IUserLastBuildMailTimeProvider lastBuildMailTimeProvider)
         {
@@ -30,6 +32,7 @@ namespace Scorpio.Bougainvillea.Mails
             _store = store;
             _settingManager = settingManager;
             _currentUser = currentUser;
+            _currentServer = currentServer;
             _rewardHandleManager = rewardHandleManager;
             _lastBuildMailTimeProvider = lastBuildMailTimeProvider;
         }
@@ -137,7 +140,7 @@ namespace Scorpio.Bougainvillea.Mails
                 Rewards = rewards,
                 Title = title,
                 Type = type,
-                ServerId = _currentUser.ServerId,
+                ServerId = _currentServer.ServerId,
                 ResourceId = resourceId,
             };
             await _store.SaveAsync(mail);

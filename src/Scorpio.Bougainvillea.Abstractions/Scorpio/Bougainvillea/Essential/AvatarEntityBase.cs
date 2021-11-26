@@ -20,7 +20,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// 角色Id
         /// </summary>
         [ExplicitKey]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         /// <summary>
         /// 玩家Id

@@ -16,11 +16,13 @@ namespace Scorpio.Bougainvillea.Middleware
     {
         private readonly PipelineRequestDelegate<IGameContext> _next;
         private readonly ICurrentUser _currentUser;
+        private readonly ICurrentServer _currentServer;
 
-        public UserTokenMiddleware(PipelineRequestDelegate<IGameContext> next, ICurrentUser currentUser)
+        public UserTokenMiddleware(PipelineRequestDelegate<IGameContext> next, ICurrentUser currentUser, ICurrentServer currentServer)
         {
             _next = next;
             _currentUser = currentUser;
+            _currentServer = currentServer;
         }
 
         public async Task InvokeAsync(IGameContext context)
@@ -29,8 +31,16 @@ namespace Scorpio.Bougainvillea.Middleware
             if (!token.IsNullOrWhiteSpace())
             {
                 context.User = await GetOrCreateUserAsync(token);
+                using (_currentUser.Use(context.User.Id))
+                {
+                    using (_currentServer.Use(context.User.ServerId))
+                    {
+                        await _next(context);
+
+                    }
+                }
             }
-            using (_currentUser.Use(context.User))
+            else
             {
                 await _next(context);
             }

@@ -15,5 +15,11 @@ namespace Scorpio.Bougainvillea.Essential
     /// </summary>
     public interface IAvatarBase : IGrainWithIntegerKey, IGrainBase
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="generateInfo"></param>
+        /// <returns></returns>
+        ValueTask<int> GenerateAsync(GenerateInfo generateInfo);
     }
 }

@@ -12,7 +12,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        public int ServerId { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// 
@@ -68,9 +68,9 @@ namespace Scorpio.Bougainvillea.Essential
         /// 
         /// </summary>
         /// <returns></returns>
-        public override int GetHashCode() => HashCode.Combine(ServerId);
-        int IComparable<ServerInfo>.CompareTo(ServerInfo other) => ServerId.CompareTo(other.ServerId);
-        bool IEqualityComparer<ServerInfo>.Equals(ServerInfo x, ServerInfo y) => x.ServerId.Equals(y.ServerId);
+        public override int GetHashCode() => HashCode.Combine(Id);
+        int IComparable<ServerInfo>.CompareTo(ServerInfo other) => Id.CompareTo(other.Id);
+        bool IEqualityComparer<ServerInfo>.Equals(ServerInfo x, ServerInfo y) => x.Id.Equals(y.Id);
         int IEqualityComparer<ServerInfo>.GetHashCode(ServerInfo obj) => obj.GetHashCode();
     }
 
