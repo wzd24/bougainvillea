@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Dapper.Extensions;
+
 namespace Sailina.Tang.Essential
 {
-    partial class AvatarState
+    internal partial class AvatarState
     {
         /// <summary>
         /// 
@@ -23,11 +25,8 @@ namespace Sailina.Tang.Essential
         /// <summary>
         /// 玩家角色编号
         /// </summary>
+        [ExplicitKey]
         public long AvatarId { get; set; }
-        /// <summary>
-        /// 所属服务器Id
-        /// </summary>
-        public int ServerId { get; set; }
         /// <summary>
         /// 等待处理的奖励
         /// </summary>
@@ -43,6 +42,11 @@ namespace Sailina.Tang.Essential
         /// 商会ID
         /// </summary>
         public long GuildId { set; get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string GuildName { get; set; }
         /// <summary>
         /// 商会的公告时间
         /// </summary>

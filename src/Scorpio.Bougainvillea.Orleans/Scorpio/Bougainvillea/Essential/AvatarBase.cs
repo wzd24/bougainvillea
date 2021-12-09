@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 using Orleans;
 using Orleans.CodeGeneration;
@@ -18,6 +20,7 @@ using Sailina.Tang.Essential.StreamDatas;
 
 using Scorpio.Bougainvillea.Essential.Dtos;
 using Scorpio.Bougainvillea.Setting;
+using Scorpio.EventBus;
 using Scorpio.Setting;
 
 namespace Scorpio.Bougainvillea.Essential
@@ -40,7 +43,6 @@ namespace Scorpio.Bougainvillea.Essential
         private StreamSubscriptionHandle<GenerateInfo> _generateHandler;
         private StreamSubscriptionHandle<LoginData> _loginHandler;
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -50,15 +52,72 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        protected TAvatarState State => AvatarState.State;
+        public IEventBus EventBus { get;}
+        /// <summary>
+        /// 
+        /// </summary>
+        public TAvatarState State => AvatarState.State;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected AvatarOptions Options { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected Dictionary<string, ISubSystem> SubSystems { get; }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="serviceProvider"></param>
-        protected AvatarBase(IServiceProvider serviceProvider)
+        /// <param name="options"></param>
+        protected AvatarBase(IServiceProvider serviceProvider, IOptions<AvatarOptions> options)
             : base(serviceProvider)
         {
+            SubSystems = new Dictionary<string, ISubSystem>();
+            Options = options.Value;
+            EventBus = serviceProvider.GetService<IEventBus>();
+            InitSubSystems(serviceProvider);
+
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lifecycle"></param>
+        public override void Participate(IGrainLifecycle lifecycle)
+        {
+            lifecycle.Subscribe<TAvatar>(GrainLifecycleStage.SetupState + 100, OnSubSystemSetup);
+            base.Participate(lifecycle);
+        }
+
+        private async Task OnSubSystemSetup(CancellationToken arg)
+        {
+            await SubSystems.Values.ForEachAsync(async s =>
+             {
+                 await s.OnSetupAsync(this);
+             });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        private void InitSubSystems(IServiceProvider serviceProvider)
+        {
+            Options.SubSystems.ForEach(s =>
+            {
+                SubSystems.AddOrUpdate(s.Name, _ =>
+                {
+                    var sub = ActivatorUtilities.CreateInstance(serviceProvider, s) as ISubSystem;
+
+                    return sub;
+                });
+            });
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -69,6 +128,10 @@ namespace Scorpio.Bougainvillea.Essential
             _loginHandler = await this.GetStreamAsync<LoginData>(this.GetPrimaryKey(), AvatarBase.LoginStreamSubscription).SubscribeAsync(async (d, t) =>
             {
                 await LoginAsync(d);
+            });
+            await SubSystems.Values.ForEachAsync(async s =>
+            {
+                await s.InitializeAsync();
             });
             await base.OnActivateAsync();
         }
@@ -81,15 +144,37 @@ namespace Scorpio.Bougainvillea.Essential
         protected virtual async ValueTask LoginAsync(LoginData d)
         {
             DailyReset();
+            await LoginCoreAsync(d);
             await this.GetStreamAsync<LoginStatusNotify>(0, State.Base.ServerId, AvatarBase.LoginResultStreamSubscription).OnNextAsync(new LoginStatusNotify { AvatarId = d.AvatarId, Status = AvatarInfoStatus.OnLine });
         }
 
         /// <summary>
         /// 
         /// </summary>
-        protected virtual void DailyReset()
+        /// <param name="d"></param>
+        /// <returns></returns>
+        protected virtual ValueTask LoginCoreAsync(LoginData d)
         {
+            return ValueTask.CompletedTask;
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected virtual async void DailyReset()
+        {
+            if (await NeedDailyReset())
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected abstract ValueTask<bool> NeedDailyReset();
 
 
         /// <summary>
@@ -117,6 +202,8 @@ namespace Scorpio.Bougainvillea.Essential
             }
             await InitAvatarBaseInfoAsync(generateInfo, roleSetting.HeadFrameId);
             await GenerateCoreAsync(generateInfo);
+            await this.GetStreamAsync<LoginStatusNotify>(0, State.Base.ServerId, AvatarBase.LoginResultStreamSubscription).OnNextAsync(new LoginStatusNotify { AvatarId = this.GetPrimaryKeyLong(), Status = AvatarInfoStatus.OnLine });
+            await PostGenerateAsync();
             return (int)ErrorCode.None;
         }
 
@@ -125,9 +212,9 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <param name="generateInfo"></param>
         /// <returns></returns>
-        protected virtual Task<int> GenerateCoreAsync(GenerateInfo generateInfo)
+        protected virtual ValueTask<int> GenerateCoreAsync(GenerateInfo generateInfo)
         {
-            return Task.FromResult(0);
+            return ValueTask.FromResult(0);
         }
 
         /// <summary>
@@ -136,7 +223,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <param name="generateInfo"></param>
         /// <param name="headFrameId"></param>
         /// <returns></returns>
-        protected virtual async Task InitAvatarBaseInfoAsync(GenerateInfo generateInfo, int headFrameId)
+        protected virtual async ValueTask InitAvatarBaseInfoAsync(GenerateInfo generateInfo, int headFrameId)
         {
             AvatarState.State.Base.Id = CurrentUser.AvatarId;
             AvatarState.State.Base.UserId = generateInfo.UserId;
@@ -155,9 +242,9 @@ namespace Scorpio.Bougainvillea.Essential
         /// 
         /// </summary>
         /// <returns></returns>
-        public virtual Task PostGenerateAsync()
+        public virtual ValueTask PostGenerateAsync()
         {
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
         async Task IIncomingGrainCallFilter.Invoke(IIncomingGrainCallContext context)
@@ -166,9 +253,13 @@ namespace Scorpio.Bougainvillea.Essential
             {
                 await context.Invoke();
             }
-
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public abstract ValueTask<IDictionary<string, object>> GetLoginInfoAsync();
 
 
         /// <summary>

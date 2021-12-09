@@ -9,7 +9,7 @@ using Scorpio.DependencyInjection;
 
 namespace Scorpio.Bougainvillea.Depletion
 {
-    internal class DepleteHandleManager : IDepleteHandleManager, ISingletonDependency
+    internal class DepleteHandleManager : IDepleteHandleManager, IScopedDependency
     {
         private readonly IEnumerable<IDepleteHandlerProvider> _providers;
 

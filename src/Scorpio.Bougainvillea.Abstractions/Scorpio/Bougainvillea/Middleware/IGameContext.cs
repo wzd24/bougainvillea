@@ -33,5 +33,9 @@ namespace Scorpio.Bougainvillea.Middleware
         /// </summary>
         IDictionary<object, object> Items { get; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        ConnectionInfo ConnectionInfo { get;  }
     }
 }

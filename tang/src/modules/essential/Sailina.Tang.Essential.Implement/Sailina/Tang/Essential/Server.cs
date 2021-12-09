@@ -21,8 +21,7 @@ namespace Sailina.Tang.Essential
 {
     internal class Server : ServerBase<Server>, IServer
     {
-
-        public Server(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider) : base(serviceProvider,dateTimeProvider)
+        public Server(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider, IUserTokenProvider userTokenProvider) : base(serviceProvider, dateTimeProvider, userTokenProvider)
         {
         }
 

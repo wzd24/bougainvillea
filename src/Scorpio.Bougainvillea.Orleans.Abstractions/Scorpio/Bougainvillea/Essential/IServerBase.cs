@@ -9,6 +9,7 @@ using Orleans.Concurrency;
 
 using Sailina.Tang.Essential.Dtos;
 
+using Scorpio.Bougainvillea.Essential.Dtos;
 using Scorpio.Bougainvillea.Essential.Dtos.Servers;
 using Scorpio.Bougainvillea.Tokens;
 
@@ -77,5 +78,25 @@ namespace Scorpio.Bougainvillea.Essential
         /// <param name="userData"></param>
         /// <returns></returns>
         ValueTask<EnterResult> CheckUserAsync(UserData userData);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="generateInfo"></param>
+        /// <returns></returns>
+        ValueTask<int> GenerateAvatarAsync(RegisterData generateInfo);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        ValueTask<(int code, AvatarInfo result)> EndGenerateAvatarAsync(long userId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="avatarId"></param>
+        /// <returns></returns>
+        ValueTask<bool> IsGeneratedAsync(long avatarId);
     }
 }

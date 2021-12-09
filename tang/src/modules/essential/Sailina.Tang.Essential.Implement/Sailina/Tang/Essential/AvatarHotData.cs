@@ -5,9 +5,11 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
+using Dapper.Extensions;
+
 namespace Sailina.Tang.Essential
 {
-    partial class AvatarState
+    internal partial class AvatarState
     {
         /// <summary>
         /// 
@@ -24,7 +26,8 @@ namespace Sailina.Tang.Essential
         /// <summary>
         /// 玩家角色编号
         /// </summary>
-        public long Id { get; set; }
+        [ExplicitKey]
+        public long AvatarId { get; set; }
         /// <summary>
         /// 玩家登录状态
         /// </summary>

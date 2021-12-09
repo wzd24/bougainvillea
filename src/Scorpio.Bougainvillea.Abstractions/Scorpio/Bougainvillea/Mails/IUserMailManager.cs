@@ -11,7 +11,7 @@ namespace Scorpio.Bougainvillea.Mails
     /// <summary>
     /// 
     /// </summary>
-    public interface IUserMailManager:ITransientDependency
+    public interface IUserMailManager: IScopedDependency
     {
 
         /// <summary>

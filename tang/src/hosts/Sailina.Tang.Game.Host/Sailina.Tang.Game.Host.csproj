@@ -9,7 +9,8 @@
     <PackageReference Include="Microsoft.Orleans.Server" Version="$(OrleansVersion)" />
     <PackageReference Include="Microsoft.Orleans.Hosting.Kubernetes" Version="$(OrleansVersion)" />
     <PackageReference Include="Microsoft.Orleans.Clustering.AdoNet" Version="$(OrleansVersion)" />
-    <PackageReference Include="MySql.Data" Version="8.0.23" />
+    <PackageReference Include="MySql.Data" Version="8.0.27" />
+    <PackageReference Include="OrleansDashboard" Version="3.6.1" />
 
   </ItemGroup>
   <PropertyGroup>

@@ -12,7 +12,7 @@ using Scorpio.DependencyInjection;
 
 namespace Scorpio.Bougainvillea.Rewards
 {
-    internal class AttributeRewardHandlerProvider : IRewardHandlerProvider, ISingletonDependency
+    internal class AttributeRewardHandlerProvider : IRewardHandlerProvider, IScopedDependency
     {
         private readonly AttributeRewardHandlerOptions _options;
         private readonly IServiceProvider _serviceProvider;

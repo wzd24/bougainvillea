@@ -15,13 +15,20 @@ namespace Scorpio.Bougainvillea.AspnetCore
             ApplicationServices = serviceProvider;
             Request = ActivatorUtilities.CreateInstance<AspnetCoreGameRequest>(serviceProvider, this, ctx.Request);
             Response = ActivatorUtilities.CreateInstance<AspnetCoreGameResponse>(serviceProvider, this, ctx.Response);
-            Items = new Dictionary<object, object>();
+            Items = ctx.Items;
+            ConnectionInfo=new AspnetCoreConnectionInfo(ctx.Connection);
         }
 
         public IServiceProvider ApplicationServices { get; }
+        
         public IGameRequest Request { get; }
+        
         public IGameResponse Response { get; }
+        
         public IGameUser User { get; set; }
+
+        public ConnectionInfo  ConnectionInfo { get; }
+
         public IDictionary<object, object> Items { get; }
     }
 }

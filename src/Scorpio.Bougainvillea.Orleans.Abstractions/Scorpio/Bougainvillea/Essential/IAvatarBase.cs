@@ -21,5 +21,11 @@ namespace Scorpio.Bougainvillea.Essential
         /// <param name="generateInfo"></param>
         /// <returns></returns>
         ValueTask<int> GenerateAsync(GenerateInfo generateInfo);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        ValueTask<IDictionary<string, object>> GetLoginInfoAsync();
     }
 }

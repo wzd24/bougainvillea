@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Numerics;
+
+using Dapper.Extensions;
 
 namespace Sailina.Tang.Essential
 {
-    partial class AvatarState
+    internal partial class AvatarState
     {
         /// <summary>
         /// 
         /// </summary>
-        public AvatarCurrency Currency { get; set; } = new  AvatarCurrency();
+        public AvatarCurrency Currency { get; set; } = new AvatarCurrency();
     }
 
     /// <summary>
@@ -23,11 +20,8 @@ namespace Sailina.Tang.Essential
         /// <summary>
         /// 玩家角色编号
         /// </summary>
+        [ExplicitKey]
         public long AvatarId { get; set; }
-        /// <summary>
-        /// 所属服务器Id
-        /// </summary>
-        public int ServerId { get; set; }
 
         /// <summary>
         /// 角色当前阅历

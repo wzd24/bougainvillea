@@ -13,7 +13,10 @@ using Scorpio.DependencyInjection;
 
 namespace Scorpio.Bougainvillea.Props
 {
-    internal class PropsHandleManager : IPropsHandleManager,ITransientDependency
+    /// <summary>
+    /// 
+    /// </summary>
+    public class PropsHandleManager : IPropsHandleManager,IScopedDependency
     {
         private readonly Lazy<IEnumerable<IPropsHandlerProvider>> _providers;
         private readonly PropsHandleOptions _options;
@@ -24,8 +27,21 @@ namespace Scorpio.Bougainvillea.Props
         private readonly IGameSettingManager _settingManager;
         private readonly ILogger<PropsHandleManager> _logger;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IEnumerable<IPropsHandlerProvider> Providers => _providers.Value;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        /// <param name="options"></param>
+        /// <param name="propsSet"></param>
+        /// <param name="currentUser"></param>
+        /// <param name="currentServer"></param>
+        /// <param name="settingManager"></param>
+        /// <param name="logger"></param>
         public PropsHandleManager(IServiceProvider serviceProvider,
                                   IOptions<PropsHandleOptions> options,
                                   IPropsSet propsSet,
@@ -45,7 +61,14 @@ namespace Scorpio.Bougainvillea.Props
                   _options.HandlerProviders.Select(t => _serviceProvider.GetService(t) as IPropsHandlerProvider), true);
         }
 
-        public async Task<int> AddPropAsync(int propId, int num, string reason)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="propId"></param>
+        /// <param name="num"></param>
+        /// <param name="reason"></param>
+        /// <returns></returns>
+        public async ValueTask<int> AddPropAsync(int propId, int num, string reason)
         {
             if (num == 0)
                 return PropsErrorCodes.ExceptionParameter;
@@ -66,7 +89,14 @@ namespace Scorpio.Bougainvillea.Props
             return code;
         }
 
-        public async Task<int> CanUseAsync(int propId, int num, object para = null)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="propId"></param>
+        /// <param name="num"></param>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        public async ValueTask<int> CanUseAsync(int propId, int num, object para = null)
         {
             var code = await EnoughAsync(propId, num);
             if (code != 0)
@@ -86,7 +116,7 @@ namespace Scorpio.Bougainvillea.Props
             return SystemErrorCodes.Success;
         }
 
-        private async Task<int> ConsumeAsync(int propId, int num)
+        private async ValueTask<int> ConsumeAsync(int propId, int num)
         {
             var code = await EnoughAsync(propId, num);
             if (code != 0)
@@ -101,15 +131,27 @@ namespace Scorpio.Bougainvillea.Props
             return await _propsSet.AddOrSubtractAsync(propId, -num);
         }
 
-        public async Task<int> ConsumeAsync(int propId, int num, string reason)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="propId"></param>
+        /// <param name="num"></param>
+        /// <param name="reason"></param>
+        /// <returns></returns>
+        public async ValueTask<int> ConsumeAsync(int propId, int num, string reason)
         {
             var code = await ConsumeAsync(propId, num);
             _logger.LogInformation("玩家{ServerId}-{AvatarId} 消费数量为 {Num}的道具 {PropId},消费原因：{Reason}，消费返回结果：{@Result}", _currentServer.ServerId, _currentUser.AvatarId, num, propId, reason, code);
             return code;
         }
 
-
-        public async Task<int> EnoughAsync(int propId, int num)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="propId"></param>
+        /// <param name="num"></param>
+        /// <returns></returns>
+        public async ValueTask<int> EnoughAsync(int propId, int num)
         {
             if (num == 0)
                 return PropsErrorCodes.ExceptionParameter;
@@ -136,8 +178,15 @@ namespace Scorpio.Bougainvillea.Props
             return SystemErrorCodes.Success;
         }
 
-
-        public async Task<(int code, object data)> UseAsync(int propId, int num, string reason, object para = null)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="propId"></param>
+        /// <param name="num"></param>
+        /// <param name="reason"></param>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        public async ValueTask<(int code, object data)> UseAsync(int propId, int num, string reason, object para = null)
         {
             var code = await CanUseAsync(propId, num, para);
             object data = null;
@@ -153,7 +202,7 @@ namespace Scorpio.Bougainvillea.Props
             return (code, data);
         }
 
-        private async Task<(bool handled, int code, object data)> Handle<T>(int propId, int num, object parameter, Func<T, PropsHandleContext, Task<(int code, object data)>> action)
+        private async ValueTask<(bool handled, int code, object data)> Handle<T>(int propId, int num, object parameter, Func<T, PropsHandleContext, Task<(int code, object data)>> action)
            where T : class
         {
             if (GetHandler(propId) is not T handler)

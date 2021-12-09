@@ -34,6 +34,11 @@ namespace Scorpio.Bougainvillea.Essential.Dtos.Servers
         /// <summary>
         /// 
         /// </summary>
+        public bool IsForbid { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public DateTimeOffset ServerTime { get; set; }
 
         /// <summary>

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.Options;
+
 using Orleans;
 using Orleans.Runtime;
 using Orleans.Streams;
@@ -19,7 +21,6 @@ namespace Sailina.Tang.Essential
     /// <summary>
     /// 
     /// </summary>
-    [ImplicitStreamSubscription(AvatarBase.LoginStreamSubscription)]
     internal partial class Avatar : AvatarBase<Avatar, AvatarState, AvatarBaseInfo>, IAvatar
     {
         private readonly IDateTimeProvider _dateTimeProvider;
@@ -29,10 +30,12 @@ namespace Sailina.Tang.Essential
         /// </summary>
         /// <param name="serviceProvider"></param>
         /// <param name="dateTimeProvider"></param>
-        public Avatar(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider) : base(serviceProvider)
+        /// <param name="options"></param>
+        public Avatar(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider,IOptions<AvatarOptions> options) : base(serviceProvider,options)
         {
             _dateTimeProvider = dateTimeProvider;
         }
+
 
         public override async Task OnActivateAsync()
         {
@@ -47,14 +50,16 @@ namespace Sailina.Tang.Essential
         protected override async ValueTask LoginAsync(LoginData d)
         {
             UpdateDeviceInfo(d);
-            await UpdateLoginStatus();
+            await UpdateLoginStatus(d);
             await base.LoginAsync(d);
         }
 
 
-        private async ValueTask UpdateLoginStatus()
+        private async ValueTask UpdateLoginStatus(LoginData d)
         {
             State.HotData.LastOfflineTime = await _dateTimeProvider.GetNowAsync();
+            State.ColdData.LoginIp = d.LoginIp;
+
             State.HotData.LoginTimes++;
             State.HotData.LoginStatus = true;
         }
@@ -76,9 +81,22 @@ namespace Sailina.Tang.Essential
         /// 
         /// </summary>
         /// <returns></returns>
-        public Task<string> GetAvatarNameAsync()
+         ValueTask<string> IAvatar.GetAvatarNameAsync()
         {
-            return Task.FromResult(State.Base.NickName);
+            return ValueTask.FromResult(State.Base.NickName);
+        }
+
+        public override ValueTask<IDictionary<string, object>> GetLoginInfoAsync() => throw new NotImplementedException();
+
+        protected override async ValueTask<bool> NeedDailyReset()
+        {
+            var date = (await _dateTimeProvider.GetNowAsync()).Date;
+            if (State.HotData.ResetTime < date)
+            {
+                State.HotData.ResetTime =await _dateTimeProvider.GetNowAsync();
+                return true;
+            }
+            return false;
         }
     }
 

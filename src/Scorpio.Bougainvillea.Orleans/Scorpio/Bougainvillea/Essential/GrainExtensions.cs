@@ -35,6 +35,20 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="grain"></param>
+        /// <param name="key"></param>
+        /// <param name="streamNamesapce"></param>
+        /// <param name="providerName"></param>
+        /// <returns></returns>
+        public static IAsyncStream<T> GetStreamAsync<T>(this GrainBase grain, long key, string streamNamesapce, string providerName = null)
+        {
+            return GetStreamAsync<T>(grain, 0, key, streamNamesapce, providerName);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="grain"></param>
         /// <param name="n0Key"></param>
         /// <param name="n1Key"></param>
         /// <param name="streamNamesapce"></param>

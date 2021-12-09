@@ -2,7 +2,9 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
+using Scorpio.Bougainvillea.Essential;
 using Scorpio.Bougainvillea.Setting;
+using Scorpio.EventBus;
 using Scorpio.Modularity;
 using Scorpio.Setting;
 
@@ -14,6 +16,7 @@ namespace Scorpio.Bougainvillea
     [DependsOn(
         typeof(BougainvilleaModule),
         typeof(BougainvileaOrleansAbstractionsModule), 
+        typeof(EventBusModule),
         typeof(BougainvileaOrleansStoragesModule))]
     public class BougainvileaOrleansModule : ScorpioModule
     {
@@ -29,6 +32,7 @@ namespace Scorpio.Bougainvillea
                 opts.SettingProviders.Add<GlobalGrainGameSettingProvider>();
                 opts.SettingProviders.Add<ServerGrainGameSettingProvider>();
             });
+            context.Services.ReplaceScoped<IEventBus, GrainEventBus>();
 
             base.ConfigureServices(context);
         }

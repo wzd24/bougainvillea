@@ -20,14 +20,14 @@ namespace Sailina.Tang.Tokens
         {
             _tokenEncodeProvider = tokenEncodeProvider;
         }
-        public string GenerateToken(UserData user)
+        public string GenerateToken(object user)
         {
             return _tokenEncodeProvider.Encode(user);
         }
 
-        public UserData GetUserData(string token)
+        public T GetUserData<T>(string token)
         {
-            return _tokenEncodeProvider.Decode<UserData>(token);
+            return _tokenEncodeProvider.Decode<T>(token);
         }
 
     }

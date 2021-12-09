@@ -8,6 +8,7 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.0" />
     <PackageReference Include="Microsoft.Orleans.Core" Version="$(OrleansVersion)" />
     <PackageReference Include="Microsoft.Orleans.Runtime.Abstractions" Version="$(OrleansVersion)" />
+    <PackageReference Include="Scorpio.EventBus" Version="$(ScorpioVersion)" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Scorpio.Bougainvillea.Orleans.Abstractions\Scorpio.Bougainvillea.Orleans.Abstractions.csproj" />

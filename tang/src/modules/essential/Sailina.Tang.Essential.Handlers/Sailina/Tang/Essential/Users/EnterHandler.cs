@@ -8,9 +8,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Orleans;
 
+using Sailina.Tang.Essential.Avatars;
+
 using Scorpio.Bougainvillea.Handler;
 using Scorpio.Bougainvillea.Middleware;
 using Scorpio.Bougainvillea.Tokens;
+
+using ErrorCode = Sailina.Tang.Essential.Avatars.ErrorCode;
 
 namespace Sailina.Tang.Essential.Users
 {
@@ -29,10 +33,10 @@ namespace Sailina.Tang.Essential.Users
         protected override async Task<IResponseMessage> ExecuteAsync(EnterData request)
         {
             var server=_grainFactory.GetGrain<IServer>(request.ServerId);
-            var userData=_userTokenProvider.GetUserData(request.Token);
+            var userData=_userTokenProvider.GetUserData<UserData>(request.Token);
             if (userData == null)
             {
-                return Error(100001);
+                return Error((int)ErrorCode.TokenVerifyFail);
             }
             var result =await server.CheckUserAsync(userData);
             return Success(result);

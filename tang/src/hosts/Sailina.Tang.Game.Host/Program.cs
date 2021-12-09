@@ -26,6 +26,7 @@ internal static class Program
         {
 
             var env = context.Configuration["Server:Env"];
+            builder.UseDashboard();
             builder.Action(env == "local", a => a.UseLocalhostClustering())
             .Configure<GrainCollectionOptions>(opts =>
             {

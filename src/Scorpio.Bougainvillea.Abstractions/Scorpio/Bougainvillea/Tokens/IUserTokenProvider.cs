@@ -16,13 +16,13 @@ namespace Scorpio.Bougainvillea.Tokens
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        string GenerateToken(UserData user);
+        string GenerateToken(object user);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        UserData GetUserData(string token);
+        T GetUserData<T>(string token);
     }
 }

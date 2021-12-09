@@ -37,15 +37,18 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <param name="serviceProvider"></param>
         /// <param name="dateTimeProvider"></param>
-        protected ServerBase(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider) : base(serviceProvider)
+        /// <param name="userTokenProvider"></param>
+        protected ServerBase(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider, IUserTokenProvider userTokenProvider) : base(serviceProvider)
         {
             _dateTimeProvider = dateTimeProvider;
+            _userTokenProvider = userTokenProvider;
         }
 
         private StreamSubscriptionHandle<ServerInfo> _handler;
 
         private ServerState _serverState;
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IUserTokenProvider _userTokenProvider;
 
         /// <summary>
         /// 
@@ -92,7 +95,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <param name="info"></param>
         /// <returns></returns>
-        protected virtual async Task GenerateAsync(ServerInfo info)
+        protected virtual async ValueTask GenerateAsync(ServerInfo info)
         {
             ServerInfo.State = info;
             await ServerInfo.WriteStateAsync();
@@ -102,7 +105,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <param name="generateInfo"></param>
         /// <returns></returns>
-        public virtual async Task<int> GenerateAvatarAsync(GenerateInfo generateInfo)
+        public virtual async ValueTask<int> GenerateAvatarAsync(RegisterData generateInfo)
         {
 
             var code = await CheckWords(generateInfo.Name);
@@ -124,8 +127,26 @@ namespace Scorpio.Bougainvillea.Essential
             {
                 return (int)ErrorCode.GenerateAvatarLoseHeadDoNotChoose;
             }
-            var current = ServiceProvider.GetService<ICurrentUser>();
-            await this.GetStreamAsync<GenerateInfo>(0, current.AvatarId, AvatarBase.GenerateStreamSubscription).OnNextAsync(generateInfo);
+            var avatarId = (AvatarList.State.MaxId == 0 ? ServerInfo.State.Id * 1000000 : AvatarList.State.MaxId) + 1;
+            var token = _userTokenProvider.GenerateToken(new AvatarData
+            {
+                AvatarId = avatarId,
+                ServerId = generateInfo.ServerId,
+                TimeStamp = DateTimeOffset.Now,
+            });
+            AvatarList.State.AddIfNotContains(new AvatarInfo
+            {
+                AccountId = generateInfo.AccountId,
+                AvatarId = avatarId,
+                ForbidExpired = DateTimeOffset.MinValue,
+                IsDeleted = false,
+                Name = generateInfo.Name,
+                ServerId = generateInfo.ServerId,
+                Status = AvatarInfoStatus.OnRegistering,
+                UserId = generateInfo.UserId,
+                Token = token,
+            });
+            await this.GetStreamAsync<RegisterData>(avatarId, AvatarBase.GenerateStreamSubscription).OnNextAsync(generateInfo);
             return (int)ErrorCode.None;
         }
 
@@ -134,12 +155,12 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <param name="avatarId"></param>
         /// <returns></returns>
-        public virtual Task<bool> IsGenerated(long avatarId)
+        public virtual ValueTask<bool> IsGeneratedAsync(long avatarId)
         {
-            return Task.FromResult(AvatarList.State.Any(a => a.AvatarId == avatarId));
+            return ValueTask.FromResult(AvatarList.State.Any(a => a.AvatarId == avatarId && a.Status != AvatarInfoStatus.OnRegistering));
         }
 
-        private async Task<ErrorCode> CheckWords(string text)
+        private async ValueTask<ErrorCode> CheckWords(string text)
         {
             if (string.IsNullOrEmpty(text))
             {
@@ -256,6 +277,7 @@ namespace Scorpio.Bougainvillea.Essential
                 {
                     AvatarId = user.AvatarId,
                     CanRegister = ServerInfo.State.CanRegister,
+                    IsForbid = user.ForbidExpired > await _dateTimeProvider.GetNowAsync(),
                     CanLogin = user.ForbidExpired < await _dateTimeProvider.GetNowAsync(),
                     Exists = true,
                     ServerId = (int)this.GetPrimaryKeyLong(),
@@ -286,6 +308,21 @@ namespace Scorpio.Bougainvillea.Essential
             {
                 await context.Invoke();
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public ValueTask<(int code, AvatarInfo result)> EndGenerateAvatarAsync(long userId)
+        {
+            var info = AvatarList.State.FirstOrDefault((a) => a.UserId == userId);
+            if (info != null)
+            {
+                return ValueTask.FromResult((0, info));
+            }
+            return ValueTask.FromResult(((int)ErrorCode.PlayersNotExist, default(AvatarInfo)));
         }
 
         private enum ErrorCode
@@ -479,6 +516,11 @@ namespace Scorpio.Bougainvillea.Essential
         protected AvatarListState(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public long MaxId => Max?.AvatarId ?? 0;
     }
 
 

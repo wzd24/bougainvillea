@@ -8,7 +8,7 @@ using Scorpio.DependencyInjection;
 
 namespace Scorpio.Bougainvillea.Rewards
 {
-    internal class RewardHandleManager : IRewardHandleManager,ISingletonDependency
+    internal class RewardHandleManager : IRewardHandleManager, IScopedDependency
     {
         private readonly IEnumerable<IRewardHandlerProvider> _providers;
         private readonly IJsonSerializer _serializer;

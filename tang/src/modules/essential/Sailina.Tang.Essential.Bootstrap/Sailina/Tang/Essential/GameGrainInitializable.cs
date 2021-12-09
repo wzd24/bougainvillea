@@ -23,11 +23,6 @@ namespace Scorpio.Bougainvillea
         public async ValueTask InitializeAsync()
         {
             await _grainFactory.GetGrain<IGame>(Guid.Empty).BeginInitializeAsync();
-            var servers=await _grainFactory.GetGrain<IGame>(Guid.Empty).GetServersAsync();
-            foreach (var server in servers)
-            {
-                Console.WriteLine(server.Name);
-            }
         }
     }
 }

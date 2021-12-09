@@ -23,7 +23,12 @@ namespace Scorpio.Bougainvillea.Handler
         /// <summary>
         /// 
         /// </summary>
-        protected ICurrentUser CurrentUser { get; set; }
+        protected ICurrentUser CurrentUser { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ICurrentServer  CurrentServer { get; }
 
         /// <summary>
         /// 
@@ -33,6 +38,7 @@ namespace Scorpio.Bougainvillea.Handler
         {
             ServiceProvider = serviceProvider;
             CurrentUser = serviceProvider.GetService<ICurrentUser>();
+            CurrentServer = serviceProvider.GetService<ICurrentServer>();
         }
 
         /// <summary>
@@ -115,6 +121,14 @@ namespace Scorpio.Bougainvillea.Handler
         protected IResponseMessage Success(object data)
         {
             return Response(0, data: data);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected IResponseMessage Success()
+        {
+            return Response(0);
         }
     }
 }

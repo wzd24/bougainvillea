@@ -29,9 +29,9 @@ namespace Sailina.Tang.Essential
         {
             var server =  _grainFactory.GetGrain<IServer>(1);
             var ava = await server.GetAvatarAsync(1000001);
-            Console.WriteLine(_jsonSerializer.Serialize(ava));
-            var avatar = _grainFactory.GetGrain<IAvatar>(1);
-            Console.WriteLine(await avatar.GetAvatarNameAsync());
+            var avatar = _grainFactory.GetGrain<IAvatarProps>(1);
+            await avatar.AddPropAsync(1201, 10, "ceshi");
+            await avatar.UseAsync(1201, 1, "ceshi");
         }
     }
 }

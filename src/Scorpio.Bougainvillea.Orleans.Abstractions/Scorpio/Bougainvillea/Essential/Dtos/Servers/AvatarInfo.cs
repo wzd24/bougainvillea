@@ -64,6 +64,12 @@ namespace Scorpio.Bougainvillea.Essential
         [Ignore]
         public AvatarInfoStatus Status { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        [Ignore]
+        public string Token { get; set; }
+
         bool IModifiable.Modified => _modified;
         /// <summary>
         /// 
@@ -85,11 +91,25 @@ namespace Scorpio.Bougainvillea.Essential
         /// 
         /// </summary>
         OffLine,
+        /// <summary>
+        /// 
+        /// </summary>
+        OnRegistering,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        RegisterFaild,
 
         /// <summary>
         /// 
         /// </summary>
         OnLoging,
+        /// <summary>
+        /// 
+        /// </summary>
+        LoginFaild,
+
 
         /// <summary>
         /// 

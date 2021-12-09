@@ -13,7 +13,7 @@ using Scorpio.DependencyInjection;
 
 namespace Scorpio.Bougainvillea.Depletion
 {
-    internal class AttributeDepletionHandlerProvider : IDepleteHandlerProvider, ISingletonDependency
+    internal class AttributeDepletionHandlerProvider : IDepleteHandlerProvider, IScopedDependency
     {
         private readonly AttributeDepleteHandlerOptions _options;
         private readonly IServiceProvider _serviceProvider;

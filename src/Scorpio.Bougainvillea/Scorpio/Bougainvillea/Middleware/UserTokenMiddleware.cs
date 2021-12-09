@@ -48,28 +48,7 @@ namespace Scorpio.Bougainvillea.Middleware
 
         private Task<User> GetOrCreateUserAsync(string token)
         {
-            User user = null;
-            //if (cached != null)
-            //{
-            //    await _cache.RefreshAsync(token);
-            //    user = JsonConvert.DeserializeObject<User>(await _cache.GetStringAsync(token));
-            //    if (user != null)
-            //    {
-            //        if (user.IsValid && user.Expiration.Subtract(DateTime.Now).TotalHours < 1)
-            //        {
-            //            user.Expiration = DateTime.Now.AddHours(2);
-            //        }
-            //        else
-            //        {
-            //            return user;
-            //        }
-            //    }
-            //}
-            if (user == null)
-            {
-                user = GenerateUser(token);
-            }
-            //await _cache.SetStringAsync(token, JsonConvert.SerializeObject(user), new DistributedCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromHours(2)));
+            var user = GenerateUser(token);
             return Task.FromResult(user);
         }
 
