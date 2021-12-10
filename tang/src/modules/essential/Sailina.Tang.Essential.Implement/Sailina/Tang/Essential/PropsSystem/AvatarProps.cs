@@ -15,7 +15,7 @@ namespace Sailina.Tang.Essential
 {
     internal partial class Avatar : IAvatarProps
     {
-        private PropsSubSystem PropsSubSystem => SubSystems.GetOrDefault(nameof(PropsSubSystem)) as PropsSubSystem;
+        internal PropsSubSystem PropsSubSystem => SubSystems.GetOrDefault(nameof(PropsSubSystem)) as PropsSubSystem;
 
         /// <summary>
         /// 判断是否有足够的道具。

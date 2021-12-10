@@ -87,5 +87,10 @@ namespace Sailina.Tang.Essential.Settings
         /// </summary>
         public int StarItem { get; set; }
 
+        /// <summary>
+        /// 重复获得英雄转化碎片
+        /// </summary>
+        public int Chip { get; set; }
+
     }
 }

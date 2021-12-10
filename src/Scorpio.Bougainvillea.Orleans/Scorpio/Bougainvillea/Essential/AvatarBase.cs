@@ -42,7 +42,7 @@ namespace Scorpio.Bougainvillea.Essential
 
         private StreamSubscriptionHandle<GenerateInfo> _generateHandler;
         private StreamSubscriptionHandle<LoginData> _loginHandler;
-
+        private readonly Lazy<long> _id ;
         /// <summary>
         /// 
         /// </summary>
@@ -71,6 +71,10 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
+        public long Id=>_id.Value;
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="serviceProvider"></param>
         /// <param name="options"></param>
         protected AvatarBase(IServiceProvider serviceProvider, IOptions<AvatarOptions> options)
@@ -80,7 +84,7 @@ namespace Scorpio.Bougainvillea.Essential
             Options = options.Value;
             EventBus = serviceProvider.GetService<IEventBus>();
             InitSubSystems(serviceProvider);
-
+            _id = new Lazy<long>(() => this.GetPrimaryKeyLong());
         }
 
         /// <summary>
@@ -202,7 +206,7 @@ namespace Scorpio.Bougainvillea.Essential
             }
             await InitAvatarBaseInfoAsync(generateInfo, roleSetting.HeadFrameId);
             await GenerateCoreAsync(generateInfo);
-            await this.GetStreamAsync<LoginStatusNotify>(0, State.Base.ServerId, AvatarBase.LoginResultStreamSubscription).OnNextAsync(new LoginStatusNotify { AvatarId = this.GetPrimaryKeyLong(), Status = AvatarInfoStatus.OnLine });
+            await this.GetStreamAsync<LoginStatusNotify>(0, State.Base.ServerId, AvatarBase.LoginResultStreamSubscription).OnNextAsync(new LoginStatusNotify { AvatarId = Id, Status = AvatarInfoStatus.OnLine });
             await PostGenerateAsync();
             return (int)ErrorCode.None;
         }

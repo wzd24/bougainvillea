@@ -20,6 +20,22 @@ namespace Sailina.Tang.Essential
     internal class AvatarBaseInfo : AvatarBaseEntityBase
     {
         /// <summary>
+        /// 已解锁头像ID列表
+        /// </summary>
+        public List<int> HeadIds { get; set; }
+
+        /// <summary>
+        /// 已解锁时装 key 时装ID value 等级
+        /// </summary>
+        public Dictionary<int, int> FashionIds { get; set; }
+
+        /// <summary>
+        /// 已解锁头像框ID列表 key 头像框ID value 过期时间戳
+        /// </summary>
+        public Dictionary<int, long> HeadFrameIds { get; set; }
+
+
+        /// <summary>
         /// 当前穿戴称号ID
         /// </summary>
         public int TitleId { get; set; }

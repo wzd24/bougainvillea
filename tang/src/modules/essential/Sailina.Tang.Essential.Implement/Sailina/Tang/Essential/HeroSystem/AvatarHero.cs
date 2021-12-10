@@ -6,15 +6,17 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
+using Sailina.Tang.Essential.Dtos.Heros;
 using Sailina.Tang.Essential.HeroSystem;
+using Sailina.Tang.Essential.Settings;
 
 using Scorpio.Bougainvillea.Essential;
 
 namespace Sailina.Tang.Essential
 {
-    internal partial class Avatar:IAvatarHero
+    internal partial class Avatar : IAvatarHero
     {
-        private HeroSubSystem HeroSubSystem=>SubSystems.GetOrDefault(nameof(HeroSubSystem)) as HeroSubSystem;
+        private HeroSubSystem HeroSubSystem => SubSystems.GetOrDefault(nameof(HeroSubSystem)) as HeroSubSystem;
     }
 
     internal partial class AvatarState
@@ -26,7 +28,7 @@ namespace Sailina.Tang.Essential
     /// <summary>
     /// 
     /// </summary>
-    public class HeroState : Dictionary<int, HeroInfo>
+    public class HeroState : Dictionary<int, Hero>
     {
         /// <summary>
         /// 
@@ -39,7 +41,7 @@ namespace Sailina.Tang.Essential
         /// 
         /// </summary>
         /// <param name="dictionary"></param>
-        public HeroState(IDictionary<int, HeroInfo> dictionary) : base(dictionary)
+        public HeroState(IDictionary<int, Hero> dictionary) : base(dictionary)
         {
         }
 
@@ -47,7 +49,7 @@ namespace Sailina.Tang.Essential
         /// 
         /// </summary>
         /// <param name="collection"></param>
-        public HeroState(IEnumerable<KeyValuePair<int, HeroInfo>> collection) : base(collection)
+        public HeroState(IEnumerable<KeyValuePair<int, Hero>> collection) : base(collection)
         {
         }
 
@@ -72,7 +74,7 @@ namespace Sailina.Tang.Essential
         /// </summary>
         /// <param name="dictionary"></param>
         /// <param name="comparer"></param>
-        public HeroState(IDictionary<int, HeroInfo> dictionary, IEqualityComparer<int> comparer) : base(dictionary, comparer)
+        public HeroState(IDictionary<int, Hero> dictionary, IEqualityComparer<int> comparer) : base(dictionary, comparer)
         {
         }
 
@@ -81,7 +83,7 @@ namespace Sailina.Tang.Essential
         /// </summary>
         /// <param name="collection"></param>
         /// <param name="comparer"></param>
-        public HeroState(IEnumerable<KeyValuePair<int, HeroInfo>> collection, IEqualityComparer<int> comparer) : base(collection, comparer)
+        public HeroState(IEnumerable<KeyValuePair<int, Hero>> collection, IEqualityComparer<int> comparer) : base(collection, comparer)
         {
         }
 
@@ -107,8 +109,33 @@ namespace Sailina.Tang.Essential
     /// <summary>
     /// 
     /// </summary>
-    public class HeroInfo
+    public class Hero
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public Hero()
+        {
+            Skills = new Dictionary<int, int>();
+            Skins = new Dictionary<int, int>();
+            RewardPool = new Dictionary<FromType, Dictionary<int, long>>();
+            Lv = 1;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="avatarId"></param>
+        /// <param name="heroSetting"></param>
+        public Hero(long avatarId, HeroSetting heroSetting) : this()
+        {
+            AvatarId = avatarId;
+            Id = heroSetting.Id;
+            WearSkinId = heroSetting.DefaultSkin;
+            Ability = heroSetting.Ability;
+            Skills = heroSetting.Skills.ToDictionary(i => i, i => 1);
+        }
+
         /// <summary>
         /// 名士ID
         /// </summary>
@@ -162,24 +189,48 @@ namespace Sailina.Tang.Essential
         /// <summary>
         /// 财力
         /// </summary>
-        public BigInteger Power { get; set; }
+        public double Power { get; set; }
         /// <summary>
         /// 实力
         /// </summary>
-        public BigInteger Hp { get; set; }
+        public double Hp { get; set; }
         /// <summary>
         /// 谋略
         /// </summary>
-        public BigInteger Atk { get; set; }
+        public double Atk { get; set; }
         /// <summary>
         /// 经营
         /// </summary>
-        public BigInteger Bias { get; set; }
+        public double Bias { get; set; }
         /// <summary>
         /// 名气
         /// </summary>
-        public BigInteger Fame { get; set; }
+        public double Fame { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public HeroInfo ToHeroInfo(HeroSetting setting)
+        {
+            var info = new HeroInfo(Id, Lv, StudyLv, StarLv)
+            {
+                PetId = PetId,
+                WearSkinId = WearSkinId,
+                Skills = Skills.Select(t => new SkillInfo() { Id = t.Key, Lv = t.Value }).ToList(),
+                Skins = Skins.Select(t => new SkinInfo() { Id = t.Key, Lv = t.Value }).ToList(),
+                Profession = setting.Profession,
+                Quality = setting.Quality,
+                ItemAddAttrs = RewardPool.GetOrDefault(FromType.Prop)?.Select(t => ((int)t.Key, (double)t.Value)).ToList() ?? new List<(int, double)>(),
+                OtherAddAttrs = RewardPool.Where(t => t.Key != FromType.Prop).SelectMany(t => (t.Value)).GroupBy(t => t.Key).Select(g => ((int)g.Key, g.Sum(v => (double)v.Value))).ToList(),
+            };
+            return info;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public HeroBaseInfo ToHeroBaseInfo(HeroSetting setting) => new HeroBaseInfo(Id, Lv, StudyLv, StarLv) { Profession = setting.Profession, Quality = setting.Quality };
     }
 
     /// <summary>

@@ -11,6 +11,7 @@ using Orleans.Runtime;
 using Orleans.Streams;
 
 using Sailina.Tang.Essential.Dtos;
+using Sailina.Tang.Essential.Settings;
 using Sailina.Tang.Essential.StreamDatas;
 
 using Scorpio.Bougainvillea;
@@ -97,6 +98,20 @@ namespace Sailina.Tang.Essential
                 return true;
             }
             return false;
+        }
+
+        public async ValueTask<int> AddHead(int headId,string reason)
+        {
+            var setting = (await GameSettingManager.GetAsync<HeadSetting>()).SingleOrDefault(s => s.Id == headId);
+            if (setting == null)
+            {
+                return (int)Avatars.ErrorCode.ConfigurationDoesNotExist;
+            }
+            if (!State.Base.HeadIds.Contains(headId))
+            {
+                State.Base.HeadIds.Add(headId);
+            }
+            return 0;
         }
     }
 

@@ -32,6 +32,12 @@ namespace Scorpio.Bougainvillea.Essential
          where TServer : ServerBase<TServer>
     {
         private StreamSubscriptionHandle<LoginStatusNotify> _streamSubscriptionHandle;
+        private readonly Lazy<int> _id;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int Id=> _id.Value;
         /// <summary>
         /// 
         /// </summary>
@@ -42,6 +48,7 @@ namespace Scorpio.Bougainvillea.Essential
         {
             _dateTimeProvider = dateTimeProvider;
             _userTokenProvider = userTokenProvider;
+            _id = new Lazy<int>(() =>(int)this.GetPrimaryKeyLong());
         }
 
         private StreamSubscriptionHandle<ServerInfo> _handler;
@@ -267,7 +274,7 @@ namespace Scorpio.Bougainvillea.Essential
                     AvatarId = 0,
                     CanRegister = ServerInfo.State.CanRegister,
                     Exists = false,
-                    ServerId = (int)this.GetPrimaryKeyLong(),
+                    ServerId = Id,
                     ServerTime = DateTimeOffset.Now.Add(ServerInfo.State.ServerTimeOffset)
                 };
             }
@@ -280,7 +287,7 @@ namespace Scorpio.Bougainvillea.Essential
                     IsForbid = user.ForbidExpired > await _dateTimeProvider.GetNowAsync(),
                     CanLogin = user.ForbidExpired < await _dateTimeProvider.GetNowAsync(),
                     Exists = true,
-                    ServerId = (int)this.GetPrimaryKeyLong(),
+                    ServerId = Id,
                     ServerTime = DateTimeOffset.Now.Add(ServerInfo.State.ServerTimeOffset)
                 };
             }
