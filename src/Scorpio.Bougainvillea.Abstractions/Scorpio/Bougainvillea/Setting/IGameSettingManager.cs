@@ -15,23 +15,22 @@ namespace Scorpio.Bougainvillea.Setting
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<IReadOnlyCollection<T>> GetAsync<T>() where T : GameSettingBase;
+        ValueTask<IReadOnlyCollection<T>> GetAsync<T>() where T : GameSettingBase;
 
         /// <summary>
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        Task SetAsync<T>( T value) where T : GameSettingBase;
+        ValueTask<T> GetAsync<T>(int id) where T : GameSettingBase;
 
         /// <summary>
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="values"></param>
         /// <returns></returns>
-        Task SetAsync<T>(IReadOnlyCollection<T> values) where T : GameSettingBase;
+        ValueTask<int> GetMaxIdAsync<T>() where T : GameSettingBase;
 
     }
 }

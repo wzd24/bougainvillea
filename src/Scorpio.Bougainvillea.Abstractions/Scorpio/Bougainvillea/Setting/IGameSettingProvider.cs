@@ -20,24 +20,21 @@ namespace Scorpio.Bougainvillea.Setting
         /// </summary>
         /// <param name="settingDefinition"></param>
         /// <returns></returns>
-        Task<GameSettingValue> GetAsync(GameSettingDefinition settingDefinition);
+        ValueTask<GameSettingValue<T>> GetAsync<T>(GameSettingDefinition settingDefinition) where T:GameSettingBase;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="setting"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        ValueTask<GameSettingValue<T>> GetAsync<T>(GameSettingDefinition setting, int id) where T:GameSettingBase;
 
         /// <summary>
         /// 
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="settingDefinition"></param>
-        /// <param name="value"></param>
+        /// <param name="setting"></param>
         /// <returns></returns>
-        Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, T value) where T : GameSettingBase;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="settingDefinition"></param>
-        /// <param name="values"></param>
-        /// <returns></returns>
-        Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, IReadOnlyCollection<T> values) where T : GameSettingBase;
+        ValueTask<int> GetMaxIdAsync<T>(GameSettingDefinition setting) where T : GameSettingBase;
     }
 }

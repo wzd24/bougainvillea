@@ -20,7 +20,6 @@ namespace Scorpio.Bougainvillea.Setting
         {
             context.Types.ForEach(t =>
             {
-                context.Services.AddTransient(t);
                 context.Services.Configure<AttributeDepleteHandlerOptions>(opt => opt.AddHandlerType(t));
             });
         }

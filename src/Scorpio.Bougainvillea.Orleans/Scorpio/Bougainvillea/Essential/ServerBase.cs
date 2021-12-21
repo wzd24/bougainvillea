@@ -18,6 +18,7 @@ using Sailina.Tang.Essential.StreamDatas;
 
 using Scorpio.Bougainvillea.Essential.Dtos;
 using Scorpio.Bougainvillea.Essential.Dtos.Servers;
+using Scorpio.Bougainvillea.Setting;
 using Scorpio.Bougainvillea.Tokens;
 using Scorpio.Setting;
 
@@ -37,7 +38,7 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
-        public int Id=> _id.Value;
+        public int Id => _id.Value;
         /// <summary>
         /// 
         /// </summary>
@@ -48,7 +49,7 @@ namespace Scorpio.Bougainvillea.Essential
         {
             _dateTimeProvider = dateTimeProvider;
             _userTokenProvider = userTokenProvider;
-            _id = new Lazy<int>(() =>(int)this.GetPrimaryKeyLong());
+            _id = new Lazy<int>(() => (int)this.GetPrimaryKeyLong());
         }
 
         private StreamSubscriptionHandle<ServerInfo> _handler;
@@ -257,7 +258,12 @@ namespace Scorpio.Bougainvillea.Essential
         /// 
         /// </summary>
         /// <returns></returns>
-        public virtual ValueTask BeginInitializeAsync() => ValueTask.CompletedTask;
+        public virtual async ValueTask BeginInitializeAsync()
+        {
+            var settingDefinitionManager = ServiceProvider.GetService<IGameSettingDefinitionManager>();
+            var settingDefinitions = settingDefinitionManager.GetAll();
+            await settingDefinitions.ForEachAsync(async x => await GrainFactory.GetGrain<IServerSettingManager>(Id, x.Name).InitializeAsync());
+        }
 
         /// <summary>
         /// 

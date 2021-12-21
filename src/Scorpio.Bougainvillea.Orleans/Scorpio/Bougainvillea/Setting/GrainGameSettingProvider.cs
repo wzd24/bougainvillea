@@ -11,6 +11,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Orleans;
 
 using Scorpio.DependencyInjection;
+using Scorpio.Setting;
 
 namespace Scorpio.Bougainvillea.Setting
 {
@@ -18,13 +19,10 @@ namespace Scorpio.Bougainvillea.Setting
     {
         private readonly IGrainFactory _grainFactory;
         private readonly ICurrentServer _currentServer;
-        private readonly IMemoryCache _memoryCache;
-        private readonly MethodInfo _getValue = typeof(GrainGameSettingProvider).GetMethod(nameof(GetValueAsync), BindingFlags.NonPublic | BindingFlags.Instance);
-        protected GrainGameSettingProvider(IGrainFactory grainFactory, ICurrentServer currentServer, IMemoryCache memoryCache)
+        protected GrainGameSettingProvider(IGrainFactory grainFactory, ICurrentServer currentServer)
         {
             _grainFactory = grainFactory;
             _currentServer = currentServer;
-            _memoryCache = memoryCache;
         }
         public abstract GameSettingScope Scope { get; }
 
@@ -33,45 +31,84 @@ namespace Scorpio.Bougainvillea.Setting
         /// </summary>
         /// <param name="settingDefinition"></param>
         /// <returns></returns>
-        public async Task<GameSettingValue> GetAsync(GameSettingDefinition settingDefinition)
+        public async ValueTask<GameSettingValue<T>> GetAsync<T>(GameSettingDefinition settingDefinition) where T : GameSettingBase
         {
             if (settingDefinition.Scope == GameSettingScope.Server && _currentServer.ServerId == 0)
             {
                 return null;
             }
-            var value = _memoryCache.Get<GameSettingValue>(settingDefinition.Name);
-            if (value == null)
-            {
-                var method = _getValue.MakeGenericMethod(settingDefinition.ValueType);
-                var task = (ValueTask<GameSettingValue>)method.Invoke(this, new object[] { _currentServer.ServerId, settingDefinition });
-                value = await task;
-                _memoryCache.Set(settingDefinition.Name, value,DateTimeOffset.Now.AddMinutes(30).AddSeconds(Random.Shared.Next(0, 60)));
-            }
-            return value;
+            return await GetValueAsync<T>(_currentServer.ServerId, settingDefinition);
         }
 
-        private async ValueTask<GameSettingValue> GetValueAsync<T>(int serverId, GameSettingDefinition gameSettingDefinition)
+        public async ValueTask<GameSettingValue<T>> GetAsync<T>(GameSettingDefinition settingDefinition, int id) where T : GameSettingBase
+        {
+            if (settingDefinition.Scope == GameSettingScope.Server && _currentServer.ServerId == 0)
+            {
+                return null;
+            }
+            return await GetValueAsync<T>(_currentServer.ServerId, settingDefinition, id);
+        }
+
+        public async ValueTask<int> GetMaxIdAsync<T>(GameSettingDefinition settingDefinition) where T : GameSettingBase
+        {
+            if (settingDefinition.Scope == GameSettingScope.Server && _currentServer.ServerId == 0)
+            {
+                return 0;
+            }
+            return await GetMaxIdAsync<T>(_currentServer.ServerId, settingDefinition);
+        }
+
+        private async ValueTask<GameSettingValue<T>> GetValueAsync<T>(int serverId, GameSettingDefinition gameSettingDefinition)
             where T : GameSettingBase
         {
             if (serverId != 0)
             {
-                var grain = _grainFactory.GetGrain<IServerSettingManager>(_currentServer.ServerId);
+                var grain = _grainFactory.GetGrain<IServerSettingManager>(_currentServer.ServerId, gameSettingDefinition.Name);
                 return new GameSettingValue<T>(await grain.GetAsync<T>()) { Definition = gameSettingDefinition };
             }
             else
             {
-                var grain = _grainFactory.GetGrain<IGlobalSettingManager>(Guid.Empty);
+                var grain = _grainFactory.GetGrain<IGlobalSettingManager>(gameSettingDefinition.Name);
                 return new GameSettingValue<T>(await grain.GetAsync<T>()) { Definition = gameSettingDefinition };
             }
         }
 
-        public Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, T value) where T : GameSettingBase => throw new NotImplementedException();
-        public Task SetAsync<T>(GameSettingDefinition<T> settingDefinition, IReadOnlyCollection<T> values) where T : GameSettingBase => throw new NotImplementedException();
+        private async ValueTask<int> GetMaxIdAsync<T>(int serverId, GameSettingDefinition gameSettingDefinition)
+    where T : GameSettingBase
+        {
+            if (serverId != 0)
+            {
+                var grain = _grainFactory.GetGrain<IServerSettingManager>(_currentServer.ServerId, gameSettingDefinition.Name);
+                return await grain.GetMaxIdAsync<T>();
+            }
+            else
+            {
+                var grain = _grainFactory.GetGrain<IGlobalSettingManager>(gameSettingDefinition.Name);
+                return await grain.GetMaxIdAsync<T>();
+            }
+        }
+
+
+        private async ValueTask<GameSettingValue<T>> GetValueAsync<T>(int serverId, GameSettingDefinition gameSettingDefinition, int id)
+    where T : GameSettingBase
+        {
+            if (serverId != 0)
+            {
+                var grain = _grainFactory.GetGrain<IServerSettingManager>(_currentServer.ServerId, gameSettingDefinition.Name);
+                return new GameSettingValue<T>(new List<T> { await grain.GetAsync<T>(id) }) { Definition = gameSettingDefinition };
+            }
+            else
+            {
+                var grain = _grainFactory.GetGrain<IGlobalSettingManager>(gameSettingDefinition.Name);
+                return new GameSettingValue<T>(new List<T> { await grain.GetAsync<T>(id) }) { Definition = gameSettingDefinition };
+            }
+        }
+
     }
 
     internal class GlobalGrainGameSettingProvider : GrainGameSettingProvider
     {
-        public GlobalGrainGameSettingProvider(IGrainFactory grainFactory, ICurrentServer currentServer, IMemoryCache memoryCache) : base(grainFactory, currentServer, memoryCache)
+        public GlobalGrainGameSettingProvider(IGrainFactory grainFactory, ICurrentServer currentServer) : base(grainFactory, currentServer)
         {
         }
 
@@ -80,7 +117,7 @@ namespace Scorpio.Bougainvillea.Setting
 
     internal class ServerGrainGameSettingProvider : GrainGameSettingProvider
     {
-        public ServerGrainGameSettingProvider(IGrainFactory grainFactory, ICurrentServer currentServer, IMemoryCache memoryCache) : base(grainFactory, currentServer, memoryCache)
+        public ServerGrainGameSettingProvider(IGrainFactory grainFactory, ICurrentServer currentServer) : base(grainFactory, currentServer)
         {
         }
 

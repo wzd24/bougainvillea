@@ -17,7 +17,7 @@ namespace Scorpio.Bougainvillea.Depletion
         /// 
         /// </summary>
         /// <param name="depletion"></param>
-        public DepleteHandlerAttribute(params int[] depletion)
+        public DepleteHandlerAttribute(params long[] depletion)
         {
             Depletion = depletion;
         }
@@ -25,6 +25,6 @@ namespace Scorpio.Bougainvillea.Depletion
         /// <summary>
         /// 
         /// </summary>
-        public int[] Depletion { get; }
+        public long[] Depletion { get; }
     }
 }

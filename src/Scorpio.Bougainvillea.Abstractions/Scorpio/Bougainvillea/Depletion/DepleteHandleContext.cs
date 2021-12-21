@@ -11,7 +11,7 @@ namespace Scorpio.Bougainvillea.Depletion
         /// <summary>
         /// 
         /// </summary>
-        public int[] Depletion { get; set; }
+        public long[] Depletion { get; set; }
 
         /// <summary>
         /// 

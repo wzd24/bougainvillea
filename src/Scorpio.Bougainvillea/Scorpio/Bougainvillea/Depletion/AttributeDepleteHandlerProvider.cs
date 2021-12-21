@@ -23,7 +23,7 @@ namespace Scorpio.Bougainvillea.Depletion
             _options = options.Value;
             _serviceProvider = serviceProvider;
         }
-        public IDepleteHandler GetHandler(int[] depletion)
+        public IDepleteHandler GetHandler(long[] depletion)
         {
             var type = _options.GetHandlerType(depletion);
             if (type==null)

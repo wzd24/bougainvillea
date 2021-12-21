@@ -10,7 +10,7 @@ using Scorpio.Bougainvillea;
 using Scorpio.Bougainvillea.Tokens;
 using Scorpio.DependencyInjection;
 
-namespace Sailina.Tang.Tokens
+namespace Scorpio.Bougainvillea.Plugins.Tokens
 {
     internal class UserTokenProvider : IUserTokenProvider, ISingletonDependency
     {

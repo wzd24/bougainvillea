@@ -12,13 +12,20 @@ namespace Scorpio.Bougainvillea.Depletion
     /// <summary>
     /// 
     /// </summary>
-    public interface IDepleteHandler : ITransientDependency
+    public interface IDepleteHandler : IScopedDependency
     {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        Task<int> ExecuteAsync(DepleteHandleContext context);
+        ValueTask<int> CanExecuteAsync(DepleteHandleContext context);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        ValueTask<int> ExecuteAsync(DepleteHandleContext context);
     }
 }

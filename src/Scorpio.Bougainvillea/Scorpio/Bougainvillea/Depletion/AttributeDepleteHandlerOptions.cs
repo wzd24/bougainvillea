@@ -10,16 +10,16 @@ namespace Scorpio.Bougainvillea.Depletion
     internal class AttributeDepleteHandlerOptions
     {
 
-        private readonly IDictionary<int, DepleteHandlerTypeNode> _nodes = new Dictionary<int, DepleteHandlerTypeNode>();
+        private readonly IDictionary<long, DepleteHandlerTypeNode> _nodes = new Dictionary<long, DepleteHandlerTypeNode>();
 
 
-        public Type GetHandlerType(int[] depletion)
+        public Type GetHandlerType(long[] depletion)
         {
             return GetHandlerTypes(_nodes, depletion.AsSpan());
         }
 
         public void AddHandlerType<T>()
-            where T:IDepleteHandler
+            where T : IDepleteHandler
         {
             AddHandlerType(typeof(T));
         }
@@ -37,7 +37,7 @@ namespace Scorpio.Bougainvillea.Depletion
             }
         }
 
-        public void AddHandlerType(int[] depletion, Type type)
+        public void AddHandlerType(long[] depletion, Type type)
         {
             if (!type.IsAssignableTo<IDepleteHandler>())
             {
@@ -47,13 +47,13 @@ namespace Scorpio.Bougainvillea.Depletion
             var node = default(DepleteHandlerTypeNode);
             foreach (var item in depletion)
             {
-                node = nodes.GetOrAdd(item,k=>new DepleteHandlerTypeNode { Key = k });
+                node = nodes.GetOrAdd(item, k => new DepleteHandlerTypeNode { Key = k });
                 nodes = node.Children;
             }
             node.Type = type;
         }
 
-        private Type GetHandlerTypes(IDictionary<int, DepleteHandlerTypeNode> nodes, Span<int> depletion)
+        private Type GetHandlerTypes(IDictionary<long, DepleteHandlerTypeNode> nodes, Span<long> depletion)
         {
             var key = depletion[0];
             var node = nodes.GetOrDefault(key);
@@ -66,9 +66,9 @@ namespace Scorpio.Bougainvillea.Depletion
 
         private class DepleteHandlerTypeNode
         {
-            public int Key { get; set; }
+            public long Key { get; set; }
 
-            public IDictionary<int, DepleteHandlerTypeNode> Children { get; } = new Dictionary<int, DepleteHandlerTypeNode>();
+            public IDictionary<long, DepleteHandlerTypeNode> Children { get; } = new Dictionary<long, DepleteHandlerTypeNode>();
 
             public Type Type { get; set; }
         }

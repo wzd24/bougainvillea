@@ -17,7 +17,8 @@ namespace Scorpio.Bougainvillea.Depletion
         {
             _propsHandleManager = propsHandleManager;
         }
-        public async Task<int> ExecuteAsync(DepleteHandleContext context)
+
+        public async ValueTask<int> CanExecuteAsync(DepleteHandleContext context)
         {
             if (context.Depletion.Length != 3)
             {
@@ -25,7 +26,18 @@ namespace Scorpio.Bougainvillea.Depletion
             }
             var propsId = context.Depletion[1];
             var num = context.Depletion[2];
-            return await _propsHandleManager.ConsumeAsync(propsId, num * context.Num, context.Reason);
+            return await _propsHandleManager.EnoughAsync((int)propsId, (int)(num * context.Num));
+        }
+
+        public async ValueTask<int> ExecuteAsync(DepleteHandleContext context)
+        {
+            if (context.Depletion.Length != 3)
+            {
+                return -1;
+            }
+            var propsId = context.Depletion[1];
+            var num = context.Depletion[2];
+            return await _propsHandleManager.ConsumeAsync((int)propsId, (int)(num * context.Num), context.Reason);
         }
     }
 }

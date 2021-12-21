@@ -16,6 +16,6 @@ namespace Scorpio.Bougainvillea.Depletion
         /// </summary>
         /// <param name="depletion"></param>
         /// <returns></returns>
-        IDepleteHandler GetHandler(int[] depletion);
+        IDepleteHandler GetHandler(long[] depletion);
     }
 }
