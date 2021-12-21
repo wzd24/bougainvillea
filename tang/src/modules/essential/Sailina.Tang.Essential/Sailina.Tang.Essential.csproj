@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\src\Scorpio.Bougainvillea.Orleans.Abstractions\Scorpio.Bougainvillea.Orleans.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Sailina\Tang\Essential\Dtos\" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    
+    <RootNamespace />
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+      <RootNamespace />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Scorpio\Bougainvillea\CurrentGrainExtensions.cs" />
+    <Compile Remove="Scorpio\Bougainvillea\Handler\GameHandlerBase.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Scorpio" Version="$(ScorpioVersion)" />
+  </ItemGroup>
+
+</Project>

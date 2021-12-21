@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace/>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Scorpio.Hosting" Version="$(ScorpioVersion)" />
+    <FrameworkReference Include="Microsoft.AspnetCore.App"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Scorpio.Bougainvillea\Scorpio.Bougainvillea.csproj" />
+  </ItemGroup>
+
+</Project>

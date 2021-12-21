@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="$(OrleansVersion)" />
+    <PackageReference Include="Microsoft.Orleans.Runtime.Abstractions" Version="$(OrleansVersion)" />
+    <PackageReference Include="Scorpio.EventBus" Version="$(ScorpioVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Scorpio.Bougainvillea.Orleans.Abstractions\Scorpio.Bougainvillea.Orleans.Abstractions.csproj" />
+    <ProjectReference Include="..\Scorpio.Bougainvillea.Orleans.Storages\Scorpio.Bougainvillea.Orleans.Storages.csproj" />
+    <ProjectReference Include="..\Scorpio.Bougainvillea\Scorpio.Bougainvillea.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="$(OrleansVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scorpio\Bougainvillea\Storages\" />
+  </ItemGroup>
+</Project>

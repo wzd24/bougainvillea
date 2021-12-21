@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Scorpio" Version="$(ScorpioVersion)" />
+    <PackageReference Include="Dapper" Version="2.0.123" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Scorpio.Bougainvillea.Abstractions\Scorpio.Bougainvillea.Abstractions.csproj" />
+  </ItemGroup>
+</Project>

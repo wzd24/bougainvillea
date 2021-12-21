@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    
+    <RootNamespace />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sailina.Tang.Essential.Handlers\Sailina.Tang.Essential.Handlers.csproj" />
+    <ProjectReference Include="..\Sailina.Tang.Essential.Implement\Sailina.Tang.Essential.Implement.csproj" />
+  </ItemGroup>
+
+</Project>
