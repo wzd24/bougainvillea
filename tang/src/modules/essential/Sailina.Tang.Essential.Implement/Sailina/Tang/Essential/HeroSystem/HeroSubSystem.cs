@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json.Linq;
@@ -16,6 +17,7 @@ using Scorpio.Bougainvillea;
 using Scorpio.Bougainvillea.Depletion;
 using Scorpio.Bougainvillea.Essential;
 using Scorpio.Bougainvillea.Setting;
+using Scorpio.Bougainvillea.Skills;
 using Scorpio.Bougainvillea.Skills.Settings;
 using Scorpio.DependencyInjection;
 
@@ -57,10 +59,10 @@ namespace Sailina.Tang.Essential.HeroSystem
             if (!_data.ContainsKey(heroId))
             {
                 var hero = new Hero(_avatar.Id, setting);
-                var skillSettings = (await _gameSettingManager.GetAsync<SkillSetting>()).Where(s=>s.OwnerType==1 && s.OwnerId==heroId && s.UnLockCondition.IsNullOrWhiteSpace());
+                var skillSettings = (await _gameSettingManager.GetAsync<SkillSetting>()).Where(s => s.OwnerType == 1 && s.OwnerId == heroId && s.UnLockCondition.IsNullOrWhiteSpace());
                 skillSettings.ForEach(s =>
                 {
-                    hero.Skills.AddOrUpdate(s.Id,k=> 1);
+                    hero.Skills.AddOrUpdate(s.Id, k => 1);
                 });
                 _data.Add(heroId, hero);
             }
@@ -141,7 +143,6 @@ namespace Sailina.Tang.Essential.HeroSystem
             }
             return 0;
         }
-
 
         public async ValueTask<int> UpgradeHeroStudy(int heroId, string reason)
         {
@@ -228,9 +229,58 @@ namespace Sailina.Tang.Essential.HeroSystem
             if (code != 0)
                 return code;
             hero.Skills.AddOrUpdate(skillId, k => 1, (k, v) => v + 1);
-            await _avatar.EventBus.PublishAsync(new HeroSkillUpgradeEventData(heroId,skillId, 1, hero.Skills[skillId], reason));
+            await _avatar.EventBus.PublishAsync(new HeroSkillUpgradeEventData(heroId, skillId, 1, hero.Skills[skillId], reason));
             return SystemErrorCodes.Success;
         }
 
+        public async ValueTask<int> UnlockOrUpgradeSkin(int heroId, int skinId, string reason)
+        {
+            var hero = _data.GetOrDefault(heroId);
+            if (hero == null)
+            {
+                return HeroErrorCode.UnlockedHero;
+            }
+            var skinSetting = await _gameSettingManager.GetAsync<SkinSetting>(skinId);
+            if (skinSetting == null || skinSetting.SkinType != 1 || skinSetting.OwnerId != heroId)
+            {
+                return (int)CommonErrorCode.Skin_UnlockOrUpgradeFail;
+            }
+            var level = hero.Skins.GetOrDefault(skinId, 0) + 1;
+            var levelSetting = await _gameSettingManager.GetAsync<SkinLevelSetting>(skinId * 100 + level);
+            if (levelSetting == null)
+            {
+                return (int)CommonErrorCode.AlreadyMax;
+            }
+            var code = await _depleteHandleManager.CanHandleAsync(levelSetting.Depletion, 1);
+            if (code != SystemErrorCodes.Success)
+            {
+                return code;
+            }
+            code = await _depleteHandleManager.HandleAsync(levelSetting.Depletion, 1, reason);
+            if (code != SystemErrorCodes.Success)
+            {
+                return code;
+            }
+            hero.Skins.AddOrUpdate(skinId, k => 1, (k, v) => v + 1);
+            await _avatar.EventBus.PublishAsync(new HeroSkinUpgradeEventData(heroId, skinId, 1, hero.Skins[skinId], reason));
+            return SystemErrorCodes.Success;
+        }
+
+        public async ValueTask<int> WearSkin(int heroId, int skinId, string reason)
+        {
+            var hero = _data.GetOrDefault(heroId);
+            if (hero == null)
+            {
+                return HeroErrorCode.UnlockedHero;
+            }
+            if (!hero.Skins.ContainsKey(skinId))
+            {
+                return (int)CommonErrorCode.Skin_WearFail;
+            }
+            var oldId = hero.WearSkinId;
+            hero.WearSkinId = skinId;
+            await _avatar.EventBus.PublishAsync(new HeroSkinWearEventData(heroId, oldId, skinId, reason));
+            return SystemErrorCodes.Success;
+        }
     }
 }

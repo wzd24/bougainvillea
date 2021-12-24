@@ -32,4 +32,13 @@ namespace Sailina.Tang.Essential.HeroSystem
     /// 名士升级技能事件数据
     /// </summary>
     public record HeroSkillUpgradeEventData(int HeroId,int SkillId, int AddValue, int Level, string Reason) : HeroEventData(HeroId, Reason);
+    /// <summary>
+    /// 名士升级皮肤事件数据
+    /// </summary>
+    public record HeroSkinUpgradeEventData(int HeroId, int SkinId, int AddValue, int Level, string Reason) : HeroEventData(HeroId, Reason);
+    /// <summary>
+    /// 名士更换皮肤事件数据
+    /// </summary>
+    public record HeroSkinWearEventData(int HeroId, int Before, int After, string Reason) : HeroEventData(HeroId, Reason);
+
 }

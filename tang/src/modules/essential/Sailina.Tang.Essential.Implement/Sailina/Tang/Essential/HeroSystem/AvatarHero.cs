@@ -134,6 +134,7 @@ namespace Sailina.Tang.Essential
             WearSkinId = heroSetting.DefaultSkin;
             Ability = heroSetting.Ability;
             Skills = heroSetting.Skills.ToDictionary(i => i, i => 1);
+            Skins.AddOrUpdate(heroSetting.DefaultSkin, k => 1);
         }
 
         /// <summary>
