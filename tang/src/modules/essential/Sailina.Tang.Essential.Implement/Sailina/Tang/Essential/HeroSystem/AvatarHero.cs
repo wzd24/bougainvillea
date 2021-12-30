@@ -1,16 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
+using Dapper;
+using Dapper.Extensions;
+
+using EasyMigrator;
+
 using Sailina.Tang.Essential.Dtos.Heros;
 using Sailina.Tang.Essential.HeroSystem;
 using Sailina.Tang.Essential.Settings;
 
+using Scorpio.Bougainvillea.Data;
 using Scorpio.Bougainvillea.Essential;
+using Scorpio.Bougainvillea.Props;
+
+using static Dapper.SqlMapper;
 
 namespace Sailina.Tang.Essential
 {
@@ -28,7 +38,7 @@ namespace Sailina.Tang.Essential
     /// <summary>
     /// 
     /// </summary>
-    public class HeroState : Dictionary<int, Hero>
+    internal class HeroState : Dictionary<int, Hero>
     {
         /// <summary>
         /// 
@@ -36,6 +46,8 @@ namespace Sailina.Tang.Essential
         public HeroState()
         {
         }
+
+
 
         /// <summary>
         /// 
@@ -104,12 +116,24 @@ namespace Sailina.Tang.Essential
         protected HeroState(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
-    }
 
+        internal static async ValueTask<HeroState> InitializeAsync(GridReader r)
+        {
+            return new HeroState((await r.ReadAsync<Hero>()).Select(h => h.GenerateProxy()).ToDictionary(m => m.Id, m => m));
+        }
+
+        internal virtual async ValueTask WriteAsync(IDbConnection connection)
+        {
+            var items = Values.Where(p => !(p is IModifiable { Modified: false })).ToArray();
+            await connection.InsertOrUpdateAsync<Hero>(items);
+        }
+
+    }
     /// <summary>
     /// 
     /// </summary>
-    public class Hero
+
+    internal class Hero
     {
         /// <summary>
         /// 
@@ -140,79 +164,88 @@ namespace Sailina.Tang.Essential
         /// <summary>
         /// 名士ID
         /// </summary>
-        public int Id { get; set; }
+        [ExplicitKey]
+        [Pk]
+        public virtual int Id { get; set; }
 
         /// <summary>
         /// 所属玩家ID
         /// </summary>
-        public long AvatarId { get; set; }
+        [ExplicitKey]
+        [Pk]
+        [Index]
+        public virtual long AvatarId { get; set; }
 
         /// <summary>
         /// 当前等级
         /// </summary>
-        public int Lv { get; set; }
+        public virtual int Lv { get; set; }
         /// <summary>
         /// 研修等级
         /// </summary>
-        public int StudyLv { get; set; }
+        public virtual int StudyLv { get; set; }
         /// <summary>
         /// 升星等级
         /// </summary>
-        public int StarLv { get; set; }
+        public virtual int StarLv { get; set; }
         /// <summary>
         /// 名士使用中的宠物（0代表善未添加使用中的宠物）
         /// </summary>
-        public int PetId { get; set; }
+        public virtual int PetId { get; set; }
         /// <summary>
         /// 穿戴中的服装Id，0为默认穿戴
         /// </summary>
-        public int WearSkinId { get; set; }
+        public virtual int WearSkinId { get; set; }
 
         /// <summary>
         /// 技能
         /// </summary>
-        public Dictionary<int, int> Skills { get; set; }
+        [DbType(DbType.String), Max, Default(null)]
+
+        public virtual Dictionary<int, int> Skills { get; set; }
 
         /// <summary>
         /// 服装
         /// </summary>
-        public Dictionary<int, int> Skins { get; set; }
+        [DbType(DbType.String), Max, Default(null)]
+        public virtual Dictionary<int, int> Skins { get; set; }
 
         /// <summary>
         /// 添加的名士属性 Dictionary(来源类型, Dictionary(属性Id, BigInteger))
         /// </summary>
-        public Dictionary<FromType, Dictionary<int, long>> RewardPool { get; set; }
+        [DbType(DbType.String), Max, Default(null)]
+        public virtual Dictionary<FromType, Dictionary<int, long>> RewardPool { get; set; }
 
         /// <summary>
         /// 资质
         /// </summary>
-        public int Ability { get; set; }
+        public virtual int Ability { get; set; }
         /// <summary>
         /// 财力
         /// </summary>
-        public double Power { get; set; }
+        public virtual double Power { get; set; }
         /// <summary>
         /// 实力
         /// </summary>
-        public double Hp { get; set; }
+        public virtual double Hp { get; set; }
         /// <summary>
         /// 谋略
         /// </summary>
-        public double Atk { get; set; }
+        public virtual double Atk { get; set; }
         /// <summary>
         /// 经营
         /// </summary>
-        public double Bias { get; set; }
+        public virtual double Bias { get; set; }
         /// <summary>
         /// 名气
         /// </summary>
-        public double Fame { get; set; }
+        public virtual double Fame { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public HeroInfo ToHeroInfo(HeroSetting setting)
+        public virtual HeroInfo ToHeroInfo(HeroSetting setting)
         {
             var info = new HeroInfo(Id, Lv, StudyLv, StarLv)
             {
@@ -231,7 +264,7 @@ namespace Sailina.Tang.Essential
         /// 
         /// </summary>
         /// <returns></returns>
-        public HeroBaseInfo ToHeroBaseInfo(HeroSetting setting) => new HeroBaseInfo(Id, Lv, StudyLv, StarLv) { Profession = setting.Profession, Quality = setting.Quality };
+        public virtual HeroBaseInfo ToHeroBaseInfo(HeroSetting setting) => new HeroBaseInfo(Id, Lv, StudyLv, StarLv) { Profession = setting.Profession, Quality = setting.Quality };
     }
 
     /// <summary>

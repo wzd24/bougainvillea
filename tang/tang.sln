@@ -35,9 +35,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvillea.Stora
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "framework", "framework", "{93C9E634-C8F0-43EE-A4E7-FF65E761DAE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sailina.Tang.Essential.Bootstrap", "src\modules\essential\Sailina.Tang.Essential.Bootstrap\Sailina.Tang.Essential.Bootstrap.csproj", "{169DEB4B-3B70-49EC-89FF-CBE08E312BCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sailina.Tang.Essential.Bootstrap", "src\modules\essential\Sailina.Tang.Essential.Bootstrap\Sailina.Tang.Essential.Bootstrap.csproj", "{169DEB4B-3B70-49EC-89FF-CBE08E312BCC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sailina.Tang.Essential.Handlers", "src\modules\essential\Sailina.Tang.Essential.Handlers\Sailina.Tang.Essential.Handlers.csproj", "{B2A92B65-AA4B-491C-8A2E-D1B89DEA5AF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sailina.Tang.Essential.Handlers", "src\modules\essential\Sailina.Tang.Essential.Handlers\Sailina.Tang.Essential.Handlers.csproj", "{B2A92B65-AA4B-491C-8A2E-D1B89DEA5AF5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

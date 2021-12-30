@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
+using Dapper;
 using Dapper.Extensions;
+
+using EasyMigrator;
+
+using Scorpio.Bougainvillea.Data;
+
+using static Dapper.SqlMapper;
 
 namespace Sailina.Tang.Essential
 {
@@ -14,67 +22,81 @@ namespace Sailina.Tang.Essential
         /// <summary>
         /// 
         /// </summary>
-        public AvatarHotData HotData { get; set; }=new AvatarHotData();
+        public AvatarHotData HotData { get; set; } = new AvatarHotData();
     }
 
     /// <summary>
     /// 
     /// </summary>
     [Serializable]
-    public class AvatarHotData
+    internal class AvatarHotData
     {
+        public AvatarHotData()
+        {
+            ReceiveGradeIds = new List<int>();
+        }
         /// <summary>
         /// 玩家角色编号
         /// </summary>
         [ExplicitKey]
-        public long AvatarId { get; set; }
+        [Pk]
+        public virtual long AvatarId { get; set; }
         /// <summary>
         /// 玩家登录状态
         /// </summary>
-        public bool LoginStatus { get; set; }
+        public virtual bool LoginStatus { get; set; }
         /// <summary>
         /// 上一次登录时间
         /// </summary>
-        public DateTimeOffset LastLoginTime { get; set; }
+        [DbType(DbType.Int64)]
+        public virtual DateTimeOffset LastLoginTime { get; set; }
         /// <summary>
         /// 最后离线时间
         /// </summary>
-        public DateTimeOffset LastOfflineTime { get; set; }
+        [DbType(DbType.Int64)]
+        public virtual DateTimeOffset LastOfflineTime { get; set; }
         /// <summary>
         /// 每日奖励领取状态
         /// </summary>
-        public bool IsReceive { get; set; }
+        public virtual bool IsReceive { get; set; }
         /// <summary>
         /// 每日数据重置时间
         /// </summary>
-        public DateTimeOffset ResetTime { get; set; }
+        [DbType(DbType.Int64)]
+        public virtual DateTimeOffset ResetTime { get; set; }
+
         /// <summary>
         /// 当前赚速
         /// </summary>
-        public double EarnSpeed { get; set; }
+        public virtual double EarnSpeed { get; set; }
         /// <summary>
         /// 历史最高赚速
         /// </summary>
-        public double TotalEarnSpeed { get; set; }
+        public virtual double TotalEarnSpeed { get; set; }
         /// <summary>
         /// 财神送财今日次数
         /// </summary>
-        public int SendMoneyTimes { get; set; }
+        public virtual int SendMoneyTimes { get; set; }
         /// <summary>
         /// 今日已领取财神送财奖励
         /// </summary>
-        public List<int> ReceiveGradeIds { get; set; } = new List<int>();
+        [DbType(DbType.String),Max,Default(null)]
+        public virtual List<int> ReceiveGradeIds { get; set; }
         /// <summary>
         /// 最后更新财神送财时间
         /// </summary>
-        public DateTime FinallyTime { get; set; }
+        [DbType(DbType.Int64)]
+        public virtual DateTime FinallyTime { get; set; }
         /// <summary>
         /// 登录次数
         /// </summary>
-        public int LoginTimes { get; set; }
+        public virtual int LoginTimes { get; set; }
         /// <summary>
         /// 累计在线时长(分钟数)
         /// </summary>
-        public long OnLineTime { get; set; }
+        public virtual long OnLineTime { get; set; }
+
+        internal static async ValueTask<AvatarHotData> InitializeAsync(GridReader dataReader) => (await dataReader.ReadSingleOrDefaultAsync<AvatarHotData>())?.GenerateProxy();
+        internal async ValueTask WriteAsync(IDbConnection conn) => await this.Action(!(this is IModifiable { Modified: false }), async a => await conn.InsertOrUpdateAsync<AvatarHotData>(this));
     }
 }

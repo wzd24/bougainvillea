@@ -14,11 +14,16 @@ namespace Scorpio.Bougainvillea.Data
         /// <summary>
         /// 
         /// </summary>
-        bool Modified { get;}
+        public bool Modified { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        void ResetModifyState();
+        public void ResetModifyState()=>Modified = false;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void SetModifyState()=>Modified=true;
     }
 }

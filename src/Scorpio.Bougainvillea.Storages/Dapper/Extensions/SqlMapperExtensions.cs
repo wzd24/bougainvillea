@@ -59,9 +59,11 @@ namespace Dapper.Extensions
                 _getQueries[type.TypeHandle] = sql;
             }
 
-            var dynParams = ids.Zip(keys, (value, key) => new { value, key }).Aggregate(new DynamicParameters(), (p, k) => p.Add($"@{k.key.Name}", k.value));
+            var dynParams = ids.Zip(keys, (value, key) => new { value, key }).Aggregate(new DynamicParameters(), (p, k) => p.Action(void (DynamicParameters pp) => pp.Add(k.key.Name, k.value)));
             if (!type.IsInterface)
+            {
                 return (await connection.QueryAsync(type, sql, dynParams, transaction, commandTimeout).ConfigureAwait(false)).FirstOrDefault();
+            }
             if (!((await connection.QueryAsync<dynamic>(sql, dynParams).ConfigureAwait(false)).FirstOrDefault() is IDictionary<string, object> res))
             {
                 return null;
@@ -102,7 +104,7 @@ namespace Dapper.Extensions
         /// <returns>Entity of T</returns>
         public static async Task<IEnumerable<T>> GetAllAsync<T>(this IDbConnection connection, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
-            return (await GetAllAsync(connection, typeof(T),tableName, transaction, commandTimeout)).OfType<T>();
+            return (await GetAllAsync(connection, typeof(T), tableName, transaction, commandTimeout)).OfType<T>();
         }
 
         /// <summary>
@@ -124,7 +126,7 @@ namespace Dapper.Extensions
             if (!_getQueries.TryGetValue(cacheType.TypeHandle, out var sql))
             {
                 GetKeys(type, nameof(GetAllAsync));
-                var name =tableName?? GetTableName(type);
+                var name = tableName ?? GetTableName(type);
 
                 sql = "SELECT * FROM " + name;
                 _getQueries[cacheType.TypeHandle] = sql;
@@ -150,9 +152,9 @@ namespace Dapper.Extensions
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>Entity of T</returns>
-        public static async Task<IEnumerable<T>> GetAllAsync<T>(this IDbConnection connection,object parameters, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static async Task<IEnumerable<T>> GetAllAsync<T>(this IDbConnection connection, object parameters, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
-            return (await GetAllAsync(connection, typeof(T),parameters, tableName, transaction, commandTimeout)).OfType<T>();
+            return (await GetAllAsync(connection, typeof(T), parameters, tableName, transaction, commandTimeout)).OfType<T>();
         }
 
         /// <summary>
@@ -520,7 +522,7 @@ namespace Dapper.Extensions
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>true if deleted, false if not found</returns>
-        public static async Task<bool> DeleteAsync(this IDbConnection connection,Type type, object entityToDelete, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static async Task<bool> DeleteAsync(this IDbConnection connection, Type type, object entityToDelete, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             if (entityToDelete == null)
                 throw new ArgumentException("Cannot Delete null Object", nameof(entityToDelete));

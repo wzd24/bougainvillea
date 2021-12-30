@@ -60,7 +60,6 @@ namespace Sailina.Tang.Essential
         {
             State.HotData.LastOfflineTime = await _dateTimeProvider.GetNowAsync();
             State.ColdData.LoginIp = d.LoginIp;
-
             State.HotData.LoginTimes++;
             State.HotData.LoginStatus = true;
         }

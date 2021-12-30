@@ -10,67 +10,57 @@ namespace Scorpio.Bougainvillea.Essential
     /// <summary>
     /// 
     /// </summary>
-    public class AvatarInfo : IEqualityComparer<AvatarInfo>, IComparable<AvatarInfo>, IModifiable
+    public class AvatarInfo : IEqualityComparer<AvatarInfo>, IComparable<AvatarInfo>
     {
-        private bool _modified = false;
-        private string _name;
 
         /// <summary>
         /// 
         /// </summary>
         [ExplicitKey]
-        public long AvatarId { get; set; }
+        public virtual long AvatarId { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public int ServerId { get; set; }
+        public virtual int ServerId { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string Name
-        {
-            get => _name; set
-            {
-                _name = value;
-                _modified = true;
-            }
-        }
+        public virtual string Name { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public long UserId { get; set; }
+        public virtual long UserId { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string AccountId { get; set; }
+        public virtual string AccountId { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public bool IsDeleted { get; set; }
+        public virtual bool IsDeleted { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public DateTimeOffset ForbidExpired { get; set; }
+        public virtual DateTimeOffset ForbidExpired { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         [Ignore]
-        public AvatarInfoStatus Status { get; set; }
+        public virtual AvatarInfoStatus Status { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         [Ignore]
-        public string Token { get; set; }
+        public virtual string Token { get; set; }
 
-        bool IModifiable.Modified => _modified;
         /// <summary>
         /// 
         /// </summary>
@@ -79,7 +69,6 @@ namespace Scorpio.Bougainvillea.Essential
         int IComparable<AvatarInfo>.CompareTo(AvatarInfo other) => AvatarId.CompareTo(other.AvatarId);
         bool IEqualityComparer<AvatarInfo>.Equals(AvatarInfo x, AvatarInfo y) => x.AvatarId.Equals(y.AvatarId);
         int IEqualityComparer<AvatarInfo>.GetHashCode(AvatarInfo obj) => obj.GetHashCode();
-        void IModifiable.ResetModifyState() => _modified = false;
     }
 
     /// <summary>

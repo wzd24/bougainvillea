@@ -59,11 +59,6 @@ namespace Sailina.Tang.Essential.HeroSystem
             if (!_data.ContainsKey(heroId))
             {
                 var hero = new Hero(_avatar.Id, setting);
-                var skillSettings = (await _gameSettingManager.GetAsync<SkillSetting>()).Where(s => s.OwnerType == 1 && s.OwnerId == heroId && s.UnLockCondition.IsNullOrWhiteSpace());
-                skillSettings.ForEach(s =>
-                {
-                    hero.Skills.AddOrUpdate(s.Id, k => 1);
-                });
                 _data.Add(heroId, hero);
             }
             else
@@ -144,7 +139,7 @@ namespace Sailina.Tang.Essential.HeroSystem
             return 0;
         }
 
-        public async ValueTask<int> UpgradeHeroStudy(int heroId, string reason)
+        public async ValueTask<int> UpgradeStudy(int heroId, string reason)
         {
             var hero = _data.GetOrDefault(heroId);
             if (hero == null)
@@ -153,10 +148,16 @@ namespace Sailina.Tang.Essential.HeroSystem
             }
             var maxId = await _gameSettingManager.GetMaxIdAsync<HeroStudySetting>();
             if (maxId <= hero.StudyLv)
+            {
                 return (int)CommonErrorCode.AlreadyMax;
+            }
+
             var setting = await _gameSettingManager.GetAsync<HeroStudySetting>(hero.StudyLv + 1);
             if (hero.Lv < setting.RequireLevel)
+            {
                 return HeroErrorCode.NotEnoughtStudyLevel;
+            }
+
             var code = await _depleteHandleManager.CanHandleAsync(setting.Depletion, 1);
             if (code != 0)
             {
@@ -172,7 +173,7 @@ namespace Sailina.Tang.Essential.HeroSystem
             return SystemErrorCodes.Success;
         }
 
-        public async ValueTask<int> UpgradeHeroStar(int heroId, string reason)
+        public async ValueTask<int> UpgradeStar(int heroId, string reason)
         {
             var hero = _data.GetOrDefault(heroId);
             if (hero == null)
@@ -201,7 +202,7 @@ namespace Sailina.Tang.Essential.HeroSystem
             return SystemErrorCodes.Success;
         }
 
-        public async ValueTask<int> UpgradeHeroSkill(int heroId, int skillId, string reason)
+        public async ValueTask<int> UpgradeSkill(int heroId, int skillId, string reason)
         {
             var hero = _data.GetOrDefault(heroId);
             if (hero == null)

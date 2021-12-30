@@ -18,6 +18,7 @@ namespace Sailina.Tang.Essential
     internal class PropsSubSystem : ISubSystem, IPropsSet, ITransientDependency
     {
         private readonly IServiceProvider _serviceProvider;
+        private Avatar _avatar;
         private PropsState _props;
 
         public PropsSubSystem(IServiceProvider serviceProvider)
@@ -28,13 +29,13 @@ namespace Sailina.Tang.Essential
 
         public IPropsHandleManager PropsHandleManager { get; }
 
-        public ValueTask<int> AddOrSubtractAsync(int propsId, int num)
+        ValueTask<int> IPropsSet.AddOrSubtractAsync(int propsId, int num)
         {
-            var count = _props.GetOrAdd(propsId, id => new Props { Count = 0, LastGetTime = DateTime.Now, PropsId = propsId }).Count += num;
+            var count = _props.AddOrUpdate(propsId, id => new Props { Count = num, LastGetTime = DateTime.Now, PropsId = propsId, AvatarId = _avatar.Id }, (k, p) => p.Action(pp => pp.Count += num)).Count;
             return ValueTask.FromResult(0);
         }
 
-        public ValueTask<Props> GetPropsAsync(int propsId) => ValueTask.FromResult(_props.GetOrDefault(propsId));
+        ValueTask<Props> IPropsSet.GetPropsAsync(int propsId) => ValueTask.FromResult(_props.GetOrDefault(propsId));
 
         public ValueTask InitializeAsync()
         {
@@ -48,8 +49,8 @@ namespace Sailina.Tang.Essential
         /// <returns></returns>
         public ValueTask OnSetupAsync(IAvatarBase avatarBase)
         {
-            var ava = avatarBase as Avatar;
-            _props = ava.State.Props;
+            _avatar = avatarBase as Avatar;
+            _props = _avatar.State.Props;
             return ValueTask.CompletedTask;
         }
     }

@@ -1,15 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
+using System.Reflection.Metadata;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
+using Castle.DynamicProxy;
+
+using Dapper;
 using Dapper.Extensions;
 
+using Scorpio.Bougainvillea.Data;
 using Scorpio.Bougainvillea.Essential;
 using Scorpio.Bougainvillea.Props;
+
+using static Dapper.SqlMapper;
 
 namespace Sailina.Tang.Essential
 {
@@ -61,7 +71,7 @@ namespace Sailina.Tang.Essential
         /// <param name="num"></param>
         /// <param name="para"></param>
         /// <returns>表示异步获取操作的任务。 其 Result 属性的值包含判断的结果代码。</returns>
-        ValueTask<int> IAvatarProps.CanUseAsync(int propId, int num, object para )
+        ValueTask<int> IAvatarProps.CanUseAsync(int propId, int num, object para)
         {
             return PropsSubSystem.PropsHandleManager.CanUseAsync(propId, num, para);
         }
@@ -74,7 +84,7 @@ namespace Sailina.Tang.Essential
         /// <param name="para"></param>
         /// <param name="reason">使用道具原因。</param>
         /// <returns>表示异步获取操作的任务。 其 Result 属性的值包含使用道具的处理结果。</returns>
-        ValueTask<(int code, object data)> IAvatarProps.UseAsync(int propId, int num, string reason, object para )
+        ValueTask<(int code, object data)> IAvatarProps.UseAsync(int propId, int num, string reason, object para)
         {
             return PropsSubSystem.PropsHandleManager.UseAsync(propId, num, reason, para);
         }
@@ -91,7 +101,6 @@ namespace Sailina.Tang.Essential
     /// <summary>
     /// 
     /// </summary>
-    [Serializable]
     public class PropsState : Dictionary<int, Props>
     {
         /// <summary>
@@ -168,6 +177,21 @@ namespace Sailina.Tang.Essential
         protected PropsState(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
+
+
+        internal static async ValueTask<PropsState> InitializeAsync(GridReader r)
+        {
+            return new PropsState((await r.ReadAsync<Props>()).Select(p => p.GenerateProxy()).ToDictionary(m => m.PropsId, m => m));
+        }
+
+        internal async ValueTask WriteAsync(IDbConnection connection)
+        {
+            var items = Values.Where(p => !(p is IModifiable { Modified: false })).ToArray();
+            await connection.InsertOrUpdateAsync<Props>(items);
+        }
+
+
+
     }
 
 }

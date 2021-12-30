@@ -37,7 +37,6 @@ internal static class Program
                 await sp.GetRequiredService<IGrainInitializableManager>().InitializeAsync();
             })
             .AddMemoryGrainStorageAsDefault()
-            .AddMemoryGrainStorage(AvatarBase.AvatarStateStorageName)
             .AddSimpleMessageStreamProvider("SMSProvider")
             .AddMemoryGrainStorage("PubSubStore")
             .ConfigureApplicationParts(c => c.AddFromDependencyContext().WithReferences());

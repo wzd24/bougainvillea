@@ -51,6 +51,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scorpio.Bougainvillea.Orlea
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scorpio.Bougainvillea.Entities", "src\Scorpio.Bougainvillea.Entities\Scorpio.Bougainvillea.Entities.csproj", "{1C6E0D7A-7A3E-475C-A102-9503CB247109}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scorpio.Bougainvillea.CodeGenerator", "src\Scorpio.Bougainvillea.CodeGenerator\Scorpio.Bougainvillea.CodeGenerator.csproj", "{064CD96F-DA6A-40B3-A765-1D51917FD690}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -157,6 +159,18 @@ Global
 		{1C6E0D7A-7A3E-475C-A102-9503CB247109}.Release|x64.Build.0 = Release|Any CPU
 		{1C6E0D7A-7A3E-475C-A102-9503CB247109}.Release|x86.ActiveCfg = Release|Any CPU
 		{1C6E0D7A-7A3E-475C-A102-9503CB247109}.Release|x86.Build.0 = Release|Any CPU
+		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Debug|x64.Build.0 = Debug|Any CPU
+		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Debug|x86.Build.0 = Debug|Any CPU
+		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Release|Any CPU.Build.0 = Release|Any CPU
+		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Release|x64.ActiveCfg = Release|Any CPU
+		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Release|x64.Build.0 = Release|Any CPU
+		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Release|x86.ActiveCfg = Release|Any CPU
+		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -171,6 +185,7 @@ Global
 		{976900A0-ADE1-45D3-8B09-8903542C2BFA} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
 		{1C6E0D7A-7A3E-475C-A102-9503CB247109} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
 		{3870485E-145C-4C8C-9AB8-B91DBBD9AE13} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
+		{064CD96F-DA6A-40B3-A765-1D51917FD690} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CD707EC-7121-4BAD-8359-0031FE028920}
