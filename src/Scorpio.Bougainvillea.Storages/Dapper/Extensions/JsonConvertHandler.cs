@@ -42,8 +42,8 @@ namespace Dapper.Extensions
     /// <typeparam name="T"></typeparam>
     public class FuncConvertHandler<T> : SqlMapper.TypeHandler<T>
     {
-        private Func<object,T> _parseFunc;
-        private Func<IDbDataParameter,T, object> _setFunc;
+        private readonly Func<object,T> _parseFunc;
+        private readonly Func<IDbDataParameter,T, object> _setFunc;
 
         /// <summary>
         /// 

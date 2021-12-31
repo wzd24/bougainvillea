@@ -65,12 +65,10 @@ namespace Sailina.Tang.Essential
         /// <summary>
         /// 商会的公告时间
         /// </summary>
-        [DbType(DbType.Int64)]
         public virtual DateTime AnnounceTime { set; get; }
         /// <summary>
         /// 最后一次离开商会的时间
         /// </summary>
-        [DbType(DbType.Int64)]
         public virtual DateTime LeaveGuildTime { set; get; }
         /// <summary>
         /// 申请入会的商会ID列表
@@ -140,7 +138,7 @@ namespace Sailina.Tang.Essential
         /// <summary>
         /// 封禁结束时间
         /// </summary>
-        [DbType(DbType.Int64)]
+        [DbType(System.Data.DbType.DateTime)]
         public virtual DateTime ForbidEndTime { get; set; }
         /// <summary>
         /// 是否删除角色 0 正常 1 已删除

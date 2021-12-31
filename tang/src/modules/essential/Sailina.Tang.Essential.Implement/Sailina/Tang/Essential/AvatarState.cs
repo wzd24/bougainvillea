@@ -58,23 +58,26 @@ namespace Sailina.Tang.Essential
     [Name("AvatarBase")]
     internal class AvatarBaseInfo : AvatarBaseEntityBase
     {
+        public AvatarBaseInfo()
+        {
+        }
         /// <summary>
         /// 已解锁头像ID列表
         /// </summary>
         [DbType(DbType.String),Max, Default(null)]
-        public virtual List<int> HeadIds { get; set; }
+        public virtual List<int> HeadIds { get; set; } = new List<int>();
 
         /// <summary>
         /// 已解锁时装 key 时装ID value 等级
         /// </summary>
         [DbType(DbType.String), Max, Default(null)]
-        public virtual Dictionary<int, int> FashionIds { get; set; }
+        public virtual Dictionary<int, int> FashionIds { get; set; } = new Dictionary<int, int>();
 
         /// <summary>
         /// 已解锁头像框ID列表 key 头像框ID value 过期时间戳
         /// </summary>
         [DbType(DbType.String), Max, Default(null)]
-        public virtual Dictionary<int, long> HeadFrameIds { get; set; }
+        public virtual Dictionary<int, long> HeadFrameIds { get; set; } = new Dictionary<int, long>();
 
 
         /// <summary>
@@ -121,7 +124,7 @@ namespace Sailina.Tang.Essential
 
         public bool ShouldInterceptMethod(Type type, MethodInfo methodInfo)
         {
-            return methodInfo.IsSpecialName && !methodInfo.Name.Contains(nameof(IModifiable.Modified)) && methodInfo.Name.StartsWith("set_");
+            return methodInfo.IsSpecialName && !methodInfo.Name.Contains(nameof(IModifiable.Modified)) && (methodInfo.Name.StartsWith("set_")|| methodInfo.Name.StartsWith("get_"));
         }
     }
 
@@ -134,7 +137,7 @@ namespace Sailina.Tang.Essential
             {
                 var propertyName = methodName.Substring(4);
                 var property = invocation.TargetType.GetProperty(propertyName);
-                if (property != null && property.GetValue(invocation.Proxy, null) != invocation.Arguments.First())
+                if (property != null && !property.GetValue(invocation.Proxy, null).Equals( invocation.Arguments.First()))
                 {
                     (invocation.Proxy as IModifiable).SetModifyState();
                 }

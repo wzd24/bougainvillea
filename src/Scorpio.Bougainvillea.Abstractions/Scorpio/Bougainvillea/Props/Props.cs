@@ -38,7 +38,7 @@ namespace Scorpio.Bougainvillea.Props
         /// <summary>
         /// 最后一次获取时间
         /// </summary>
-        [DbType(System.Data.DbType.Int64)]
+       [DbType(System.Data.DbType.DateTime)]
         public virtual DateTime LastGetTime { get; set; }
     }
 }

@@ -125,7 +125,7 @@ namespace Sailina.Tang.Essential
         internal virtual async ValueTask WriteAsync(IDbConnection connection)
         {
             var items = Values.Where(p => !(p is IModifiable { Modified: false })).ToArray();
-            await connection.InsertOrUpdateAsync<Hero>(items);
+            await items.Action(!items.IsNullOrEmpty(),async l=>await connection.InsertOrUpdateAsync<Hero>(l));
         }
 
     }
@@ -140,10 +140,6 @@ namespace Sailina.Tang.Essential
         /// </summary>
         public Hero()
         {
-            Skills = new Dictionary<int, int>();
-            Skins = new Dictionary<int, int>();
-            RewardPool = new Dictionary<FromType, Dictionary<int, long>>();
-            Lv = 1;
         }
 
         /// <summary>
@@ -179,7 +175,7 @@ namespace Sailina.Tang.Essential
         /// <summary>
         /// 当前等级
         /// </summary>
-        public virtual int Lv { get; set; }
+        public virtual int Lv { get; set; } = 1;
         /// <summary>
         /// 研修等级
         /// </summary>
@@ -202,19 +198,19 @@ namespace Sailina.Tang.Essential
         /// </summary>
         [DbType(DbType.String), Max, Default(null)]
 
-        public virtual Dictionary<int, int> Skills { get; set; }
+        public virtual Dictionary<int, int> Skills { get; set; }= new Dictionary<int, int>();
 
         /// <summary>
         /// 服装
         /// </summary>
         [DbType(DbType.String), Max, Default(null)]
-        public virtual Dictionary<int, int> Skins { get; set; }
+        public virtual Dictionary<int, int> Skins { get; set; } = new Dictionary<int, int>();
 
         /// <summary>
         /// 添加的名士属性 Dictionary(来源类型, Dictionary(属性Id, BigInteger))
         /// </summary>
         [DbType(DbType.String), Max, Default(null)]
-        public virtual Dictionary<FromType, Dictionary<int, long>> RewardPool { get; set; }
+        public virtual Dictionary<FromType, Dictionary<int, long>> RewardPool { get; set; } = new Dictionary<FromType, Dictionary<int, long>>();
 
         /// <summary>
         /// 资质

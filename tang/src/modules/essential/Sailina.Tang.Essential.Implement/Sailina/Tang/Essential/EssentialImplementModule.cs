@@ -1,5 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Dapper.Extensions;
+using Dapper;
 
+using Microsoft.Extensions.DependencyInjection;
+
+using Sailina.Tang.Essential.BeautySystem;
 using Sailina.Tang.Essential.HeroSystem;
 using Sailina.Tang.Essential.PropsHandlers;
 
@@ -25,7 +29,19 @@ public class EssentialImplementModule:ScorpioModule
         {
             opts.SubSystems.Add<PropsSubSystem>();
             opts.SubSystems.Add<HeroSubSystem>();
+            opts.SubSystems.Add<BeautySubSystem>();
         });
         context.Services.Configure<PropsHandleOptions>(opts => opts.HandlerProviders.Add<PropsHandlerProvider>());
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="context"></param>
+    public override void Initialize(ApplicationInitializationContext context)
+    {
+        SqlMapper.AddTypeHandler(new JsonConvertHandler<Dictionary<FromType, Dictionary<int, long>>>());
+        SqlMapper.AddTypeHandler(new JsonConvertHandler<Dictionary<int, SystemRewardInfo>>());
+
     }
 }

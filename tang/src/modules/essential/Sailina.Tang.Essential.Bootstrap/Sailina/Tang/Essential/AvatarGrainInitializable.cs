@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Orleans;
+using Orleans.Runtime;
 
 using Scorpio.Bougainvillea;
 using Scorpio.Bougainvillea.Essential;
@@ -29,9 +30,11 @@ namespace Sailina.Tang.Essential
         {
             var server =  _grainFactory.GetGrain<IServer>(1);
             var ava = await server.GetAvatarAsync(1000001);
-            var avatar = _grainFactory.GetGrain<IAvatarProps>(1);
-            await avatar.AddPropAsync(1201, 10, "ceshi");
-            await avatar.UseAsync(1201, 1, "ceshi");
+            var  avatarProps = _grainFactory.GetGrain<IAvatarProps>(ava.AvatarId);
+            await avatarProps.AddPropAsync(1201, 10, "ceshi");
+            await avatarProps.UseAsync(1201, 1, "ceshi");
+            var avatar = _grainFactory.GetGrain<IAvatar>(ava.AvatarId);
+            await avatar.SaveAsync();
         }
     }
 }

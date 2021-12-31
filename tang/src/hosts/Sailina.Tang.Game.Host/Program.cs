@@ -19,12 +19,12 @@ internal static class Program
          {
              builder.UseKestrel().UseStartup<Startup>();
          }).RunConsoleAsync();
+
     }
     private static IHostBuilder UseOrleans(this IHostBuilder builder)
     {
         return builder.UseOrleans((context, builder) =>
         {
-
             var env = context.Configuration["Server:Env"];
             builder.UseDashboard();
             builder.Action(env == "local", a => a.UseLocalhostClustering())

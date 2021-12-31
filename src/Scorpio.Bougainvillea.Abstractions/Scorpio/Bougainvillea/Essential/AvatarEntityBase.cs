@@ -85,13 +85,11 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 角色创建时间
         /// </summary>
-       [DbType(System.Data.DbType.Int64)]
         public virtual DateTime CreateDate { get; set; }
 
         /// <summary>
         /// 最后更新时间
         /// </summary>
-        [DbType(System.Data.DbType.Int64)]
         public virtual DateTime UpdateTime { get; set; }
 
     }

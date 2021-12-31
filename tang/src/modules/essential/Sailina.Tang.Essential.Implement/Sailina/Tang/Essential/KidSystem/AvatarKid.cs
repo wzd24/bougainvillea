@@ -12,98 +12,97 @@ using Dapper.Extensions;
 
 using EasyMigrator;
 
-using Sailina.Tang.Essential.BeautySystem;
-using Sailina.Tang.Essential.HeroSystem;
-using Sailina.Tang.Essential.Settings;
+using Sailina.Tang.Essential.KidSystem;
 
+using Scorpio.Bougainvillea;
 using Scorpio.Bougainvillea.Data;
 
 using static Dapper.SqlMapper;
 
 namespace Sailina.Tang.Essential
 {
-    internal partial class Avatar : IAvatarBeauty
+    internal partial class Avatar : IAvatarKid
     {
-        private BeautySubSystem BeautySubSystem => SubSystems.GetOrDefault(nameof(BeautySubSystem)) as BeautySubSystem;
+        private KidSubSystem KidSubSystem => SubSystems.GetOrDefault(nameof(KidSubSystem)) as KidSubSystem;
 
     }
 
     internal partial class AvatarState
     {
-        public BeautyState Beauties { get; set; } = new BeautyState();
+        public KidState Kids { get; set; } = new KidState();
 
     }
 
-    internal class BeautyState : Dictionary<int, Beauty>
+    internal class KidState : Dictionary<int, Kid>
     {
-        public BeautyState()
+        public KidState()
         {
         }
 
-        public BeautyState(IDictionary<int, Beauty> dictionary) : base(dictionary)
+        public KidState(IDictionary<int, Kid> dictionary) : base(dictionary)
         {
         }
 
-        public BeautyState(IEnumerable<KeyValuePair<int, Beauty>> collection) : base(collection)
+        public KidState(IEnumerable<KeyValuePair<int, Kid>> collection) : base(collection)
         {
         }
 
-        public BeautyState(IEqualityComparer<int> comparer) : base(comparer)
-        {
-        }
-
-
-        public BeautyState(int capacity) : base(capacity)
-        {
-        }
-
-        public BeautyState(IDictionary<int, Beauty> dictionary, IEqualityComparer<int> comparer) : base(dictionary, comparer)
-        {
-        }
-
-        public BeautyState(IEnumerable<KeyValuePair<int, Beauty>> collection, IEqualityComparer<int> comparer) : base(collection, comparer)
-        {
-        }
-
-        public BeautyState(int capacity, IEqualityComparer<int> comparer) : base(capacity, comparer)
-        {
-        }
-
-        protected BeautyState(SerializationInfo info, StreamingContext context) : base(info, context)
+        public KidState(IEqualityComparer<int> comparer) : base(comparer)
         {
         }
 
 
-        public BeautyMisc Misc { get; init; } = new BeautyMisc();
-
-        internal static async ValueTask<BeautyState> InitializeAsync(GridReader r)
+        public KidState(int capacity) : base(capacity)
         {
-            return new BeautyState((await r.ReadAsync<Beauty>()).Select(b => b.GenerateProxy()).ToDictionary(m => m.Id, m => m))
+        }
+
+        public KidState(IDictionary<int, Kid> dictionary, IEqualityComparer<int> comparer) : base(dictionary, comparer)
+        {
+        }
+
+        public KidState(IEnumerable<KeyValuePair<int, Kid>> collection, IEqualityComparer<int> comparer) : base(collection, comparer)
+        {
+        }
+
+        public KidState(int capacity, IEqualityComparer<int> comparer) : base(capacity, comparer)
+        {
+        }
+
+        protected KidState(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+
+
+        public KidMisc Misc { get; init; } = new KidMisc();
+
+        internal static async ValueTask<KidState> InitializeAsync(GridReader r)
+        {
+            return new KidState((await r.ReadAsync<Kid>()).Select(b => b.GenerateProxy()).ToDictionary(m => m.Id, m => m))
             {
-                Misc = (await r.ReadSingleOrDefaultAsync<BeautyMisc>()).GenerateProxy()
+                Misc = (await r.ReadSingleOrDefaultAsync<KidMisc>()).GenerateProxy()
             };
         }
 
         internal async ValueTask WriteAsync(IDbConnection connection)
         {
             var items = Values.Where(p => !(p is IModifiable { Modified: false })).ToArray();
-            await items.Action(!items.IsNullOrEmpty(), async l => await connection.InsertOrUpdateAsync<Beauty>(l));
+            await connection.InsertOrUpdateAsync<Kid>(items);
             if (!(Misc is IModifiable { Modified: false }))
             {
-                await connection.InsertOrUpdateAsync<BeautyMisc>(Misc);
+                await connection.InsertOrUpdateAsync<KidMisc>(Misc);
             }
         }
     }
 
 
-    internal class BeautyMisc
+    internal class KidMisc
     {
         /// <summary>
         /// 所属玩家Id
         /// </summary>
         [ExplicitKey]
         [Pk]
-        public virtual long AvatarId { get; set; }
+        public virtual int AvatarId { get; set; }
         /// <summary>
         /// 传唤赴约生子嗣次数
         /// </summary>
@@ -129,29 +128,29 @@ namespace Sailina.Tang.Essential
         /// 必定传唤美女列表
         /// </summary>
         [DbType(DbType.String), Max, Default(null)]
-        public virtual List<int> AssignCHBeautyIds { get; set; }
+        public virtual List<int> AssignCHKidIds { get; set; }
 
     }
 
-    internal class Beauty
+    internal class Kid
     {
-        public Beauty()
+        public Kid()
         {
             FateSkills = new Dictionary<int, int>();
             Skins = new Dictionary<int, int>();
             ShopSkills = new Dictionary<int, int>();
         }
 
-        public Beauty(long avatarId, BeautySetting beautySetting)
-        {
-            Id = beautySetting.Id;
-            AvatarId = avatarId;
-            FateSkills = beautySetting.FateSkills.ToDictionary(i => i, i => 1);
-            ShopSkills = beautySetting.ShopSkills.ToDictionary(i => i, i => 1);
-            Skins.AddOrUpdate(beautySetting.DefaultSkin, k => 1);
-            WearSkinId = beautySetting.DefaultSkin;
-            TitleLv = 1;
-        }
+        //public Kid(long avatarId, KidSetting KidSetting)
+        //{
+        //    Id = KidSetting.Id;
+        //    AvatarId = avatarId;
+        //    FateSkills = KidSetting.FateSkills.ToDictionary(i => i, i => 1);
+        //    ShopSkills = KidSetting.ShopSkills.ToDictionary(i => i, i => 1);
+        //    Skins.AddOrUpdate(KidSetting.DefaultSkin, k => 1);
+        //    WearSkinId = KidSetting.DefaultSkin;
+        //    TitleLv = 1;
+        //}
         /// <summary>
         /// 情缘ID
         /// </summary>

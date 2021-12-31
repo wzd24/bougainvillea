@@ -33,7 +33,6 @@ namespace Sailina.Tang.Essential
     {
         public AvatarHotData()
         {
-            ReceiveGradeIds = new List<int>();
         }
         /// <summary>
         /// 玩家角色编号
@@ -48,13 +47,13 @@ namespace Sailina.Tang.Essential
         /// <summary>
         /// 上一次登录时间
         /// </summary>
-        [DbType(DbType.Int64)]
-        public virtual DateTimeOffset LastLoginTime { get; set; }
+        [DbType(System.Data.DbType.DateTime)]
+        public virtual DateTime LastLoginTime { get; set; }
         /// <summary>
         /// 最后离线时间
         /// </summary>
-        [DbType(DbType.Int64)]
-        public virtual DateTimeOffset LastOfflineTime { get; set; }
+        [DbType(System.Data.DbType.DateTime)]
+        public virtual DateTime LastOfflineTime { get; set; }
         /// <summary>
         /// 每日奖励领取状态
         /// </summary>
@@ -62,8 +61,8 @@ namespace Sailina.Tang.Essential
         /// <summary>
         /// 每日数据重置时间
         /// </summary>
-        [DbType(DbType.Int64)]
-        public virtual DateTimeOffset ResetTime { get; set; }
+        [DbType(System.Data.DbType.DateTime)]
+        public virtual DateTime ResetTime { get; set; }
 
         /// <summary>
         /// 当前赚速
@@ -81,11 +80,11 @@ namespace Sailina.Tang.Essential
         /// 今日已领取财神送财奖励
         /// </summary>
         [DbType(DbType.String),Max,Default(null)]
-        public virtual List<int> ReceiveGradeIds { get; set; }
+        public virtual List<int> ReceiveGradeIds { get; set; } = new List<int>();
         /// <summary>
         /// 最后更新财神送财时间
         /// </summary>
-        [DbType(DbType.Int64)]
+        [DbType(System.Data.DbType.DateTime)]
         public virtual DateTime FinallyTime { get; set; }
         /// <summary>
         /// 登录次数

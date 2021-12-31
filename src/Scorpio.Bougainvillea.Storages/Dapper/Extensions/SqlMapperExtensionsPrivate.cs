@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using EasyMigrator;
 
 namespace Dapper.Extensions
 {
@@ -89,7 +90,7 @@ namespace Dapper.Extensions
             //NOTE: This as dynamic trick falls back to handle both our own Table-attribute as well as the one in EntityFramework 
             var tableAttrName =
                 type.GetCustomAttribute<TableAttribute>(false)?.Name
-                ?? (type.GetCustomAttributes(false).FirstOrDefault(attr => attr.GetType().Name == "TableAttribute") as dynamic)?.Name;
+                ?? type.GetCustomAttribute<NameAttribute>(false)?.Name;
 
             if (tableAttrName != null)
             {
@@ -97,7 +98,7 @@ namespace Dapper.Extensions
             }
             else
             {
-                name = type.Name + "s";
+                name = type.Name;
                 if (type.IsInterface)
                     name = name.RemovePreFix("I");
             }

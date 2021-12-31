@@ -32,7 +32,7 @@ namespace Sailina.Tang.Essential
         /// <param name="serviceProvider"></param>
         /// <param name="dateTimeProvider"></param>
         /// <param name="options"></param>
-        public Avatar(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider,IOptions<AvatarOptions> options) : base(serviceProvider,options)
+        public Avatar(IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider, IOptions<AvatarOptions> options) : base(serviceProvider, options)
         {
             _dateTimeProvider = dateTimeProvider;
         }
@@ -41,6 +41,7 @@ namespace Sailina.Tang.Essential
         public override async Task OnActivateAsync()
         {
             await base.OnActivateAsync();
+            State.ColdData.AvatarId = State.HotData.AvatarId = State.Currency.AvatarId = State.Beauties.Misc.AvatarId = State.Base.Id = Id;
         }
 
         public override async Task OnDeactivateAsync()
@@ -58,7 +59,7 @@ namespace Sailina.Tang.Essential
 
         private async ValueTask UpdateLoginStatus(LoginData d)
         {
-            State.HotData.LastOfflineTime = await _dateTimeProvider.GetNowAsync();
+            State.HotData.LastOfflineTime = (await _dateTimeProvider.GetNowAsync()).DateTime;
             State.ColdData.LoginIp = d.LoginIp;
             State.HotData.LoginTimes++;
             State.HotData.LoginStatus = true;
@@ -81,7 +82,7 @@ namespace Sailina.Tang.Essential
         /// 
         /// </summary>
         /// <returns></returns>
-         ValueTask<string> IAvatar.GetAvatarNameAsync()
+        ValueTask<string> IAvatar.GetAvatarNameAsync()
         {
             return ValueTask.FromResult(State.Base.NickName);
         }
@@ -93,13 +94,13 @@ namespace Sailina.Tang.Essential
             var date = (await _dateTimeProvider.GetNowAsync()).Date;
             if (State.HotData.ResetTime < date)
             {
-                State.HotData.ResetTime =await _dateTimeProvider.GetNowAsync();
+                State.HotData.ResetTime = (await _dateTimeProvider.GetNowAsync()).DateTime;
                 return true;
             }
             return false;
         }
 
-        public async ValueTask<int> AddHead(int headId,string reason)
+        public async ValueTask<int> AddHead(int headId, string reason)
         {
             var setting = (await GameSettingManager.GetAsync<HeadSetting>()).SingleOrDefault(s => s.Id == headId);
             if (setting == null)
@@ -111,6 +112,11 @@ namespace Sailina.Tang.Essential
                 State.Base.HeadIds.Add(headId);
             }
             return 0;
+        }
+
+        public async ValueTask SaveAsync()
+        {
+            await AvatarState.WriteStateAsync();
         }
     }
 

@@ -223,7 +223,7 @@ namespace Sailina.Tang.Essential.BeautySystem
             var (code, _) = await _avatar.PropsSubSystem.PropsHandleManager.UseAsync(propId, num, reason, beautyId);
             if (code == 0)
             {
-                await _avatar.EventBus.PublishAsync(new BeautyPresentingEventData(beautyId, reason, propId, num));
+                await _avatar.EventBus.PublishAsync(new BeautyPresentingEventData(beautyId, reason,propId, num));
             }
             return code;
         }

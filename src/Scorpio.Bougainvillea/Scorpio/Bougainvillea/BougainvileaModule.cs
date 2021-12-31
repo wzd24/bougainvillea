@@ -16,6 +16,7 @@ namespace Scorpio.Bougainvillea
     /// </summary>
     [DependsOn(typeof(BougainvilleaAbstractionsModule))]
     [DependsOn(typeof(BougainvilleaStoragesModule))]
+    [DependsOn(typeof(SettingModule))]
     public class BougainvilleaModule:ScorpioModule
     {
         /// <summary>

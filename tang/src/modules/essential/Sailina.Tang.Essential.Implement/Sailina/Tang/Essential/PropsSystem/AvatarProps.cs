@@ -187,7 +187,7 @@ namespace Sailina.Tang.Essential
         internal async ValueTask WriteAsync(IDbConnection connection)
         {
             var items = Values.Where(p => !(p is IModifiable { Modified: false })).ToArray();
-            await connection.InsertOrUpdateAsync<Props>(items);
+            await items.Action(!items.IsNullOrEmpty(), async l => await connection.InsertOrUpdateAsync<Props>(l));
         }
 
 

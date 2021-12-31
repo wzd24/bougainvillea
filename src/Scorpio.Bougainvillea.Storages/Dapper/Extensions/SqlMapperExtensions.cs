@@ -447,7 +447,7 @@ namespace Dapper.Extensions
             var allPropertiesExceptKeyAndComputed = allProperties.Except(keyProperties.Union(computedProperties)).ToList();
             var nonIdProps = allPropertiesExceptKeyAndComputed.Except(keyProperties.Union(explicitKeyProperties)).ToList();
             var key = keyProperties.SingleOrDefault();
-            if (!IsDefaultValue(key.PropertyType, key.GetValue(entity)))
+            if (key != null && !IsDefaultValue(key.PropertyType, key.GetValue(entity)))
             {
                 allPropertiesExceptKeyAndComputed.Insert(0, key);
             }

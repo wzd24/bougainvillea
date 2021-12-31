@@ -17,5 +17,11 @@ namespace Sailina.Tang.Essential
         /// </summary>
         /// <returns></returns>
         ValueTask<string> GetAvatarNameAsync();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        ValueTask SaveAsync();
     }
 }
