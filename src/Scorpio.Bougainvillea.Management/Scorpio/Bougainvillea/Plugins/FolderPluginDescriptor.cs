@@ -14,12 +14,15 @@ namespace Scorpio.Bougainvillea.Plugins
         private readonly bool _includeSubFolders;
         private readonly IDictionary<string, FilePluginDescriptor> _descriptors = new Dictionary<string, FilePluginDescriptor>();
         private readonly FileSystemWatcher _watcher;
+
+        public IEnumerable<PluginDescriptor> Descriptors => _descriptors.Values.SelectMany(d => d.Descriptors);
+
         public FolderPluginDescriptor(string path, bool includeSubFolders)
         {
             _path = path;
             _includeSubFolders = includeSubFolders;
             Initailize();
-            _watcher = new FileSystemWatcher(path,"*.dll");
+            _watcher = new FileSystemWatcher(path, "*.dll");
             _watcher.Created += Watcher_Changed;
             _watcher.Changed += Watcher_Changed;
             _watcher.Deleted += Watcher_Changed;

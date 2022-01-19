@@ -9,16 +9,18 @@ using Dapper;
 using Dapper.Extensions;
 
 using Orleans;
+using Orleans.Streams;
 
 using Scorpio.Bougainvillea.AdoNet;
 using Scorpio.Bougainvillea.Essential;
+using Scorpio.Bougainvillea.Setting.StreamDatas;
 
 namespace Scorpio.Bougainvillea.Setting
 {
     /// <summary>
     /// 
     /// </summary>
-    internal class ServerSettingManager : Grain, IServerSettingManager
+    internal class ServerSettingManager : GrainBase, IServerSettingManager
     {
         private readonly IGameSettingDefinitionManager _definitionManager;
         private readonly IDbConnectionFactory _dbConnectionFactory;
@@ -26,16 +28,32 @@ namespace Scorpio.Bougainvillea.Setting
         private readonly MethodInfo _getMethod = typeof(ServerSettingManager).GetMethod(nameof(GetValueAsync), BindingFlags.NonPublic | BindingFlags.Instance);
         private string _serverSettingName;
         private int _serverId;
-        public ServerSettingManager(IGameSettingDefinitionManager definitionManager, IDbConnectionFactory dbConnectionFactory)
+        private StreamSubscriptionHandle<SettingInitializationData> _handler;
+
+        public ServerSettingManager(IServiceProvider serviceProvider, IGameSettingDefinitionManager definitionManager, IDbConnectionFactory dbConnectionFactory)
+             : base(serviceProvider)
         {
             _definitionManager = definitionManager;
             _dbConnectionFactory = dbConnectionFactory;
         }
 
-        public override Task OnActivateAsync()
+        public override async Task OnActivateAsync()
         {
             _serverId = (int)this.GetPrimaryKeyLong(out _serverSettingName);
-            return base.OnActivateAsync();
+            _handler = await this.GetStreamAsync<SettingInitializationData>(Guid.Empty, $"Setting.Initailization.{_serverSettingName}").SubscribeAsync(async (d, t) =>
+              {
+                  if (d.SettingName == _serverSettingName)
+                  {
+                      await InitializeAsync();
+                  }
+              });
+            await base.OnActivateAsync();
+        }
+
+        public override async Task OnDeactivateAsync()
+        {
+            await _handler?.UnsubscribeAsync();
+            await base.OnDeactivateAsync();
         }
 
         public ValueTask<IReadOnlyCollection<T>> GetAsync<T>() where T : GameSettingBase
@@ -55,7 +73,7 @@ namespace Scorpio.Bougainvillea.Setting
 
         public async ValueTask<T> GetAsync<T>(int id) where T : GameSettingBase
         {
-            return (await GetAsync<T>()).SingleOrDefault(s=>s.Id == id);
+            return (await GetAsync<T>()).SingleOrDefault(s => s.Id == id);
         }
 
         public async ValueTask InitializeAsync()
@@ -70,7 +88,7 @@ namespace Scorpio.Bougainvillea.Setting
         private async Task<GameSettingValue> GetValueAsync<T>(GameSettingDefinition settingDefinition)
            where T : GameSettingBase
         {
-            
+
             if (settingDefinition.Scope == GameSettingScope.Global)
             {
                 var value = await GrainFactory.GetGrain<IGlobalSettingManager>(_serverSettingName).GetAsync<T>();

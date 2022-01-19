@@ -88,7 +88,6 @@ namespace Scorpio.Bougainvillea.Setting
             }
         }
 
-
         private async ValueTask<GameSettingValue<T>> GetValueAsync<T>(int serverId, GameSettingDefinition gameSettingDefinition, int id)
     where T : GameSettingBase
         {

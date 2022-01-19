@@ -11,11 +11,13 @@ namespace Scorpio.Bougainvillea.Plugins
     internal class FilePluginDescriptor : IPluginDescriptor
     {
         private readonly string _path;
-        private readonly Dictionary<string, Type> _types = new Dictionary<string, Type>();
+        private readonly Dictionary<string, PluginDescriptor> _types = new Dictionary<string, PluginDescriptor>();
         private PluginAssemblyLoadContext _loadContext;
         private bool _needLoad = true;
 
-        public IReadOnlyDictionary<string, Type> Types => EnsureLoad();
+        public IReadOnlyDictionary<string, PluginDescriptor> Types => EnsureLoad();
+
+        public IEnumerable<PluginDescriptor> Descriptors => Types.Values;
 
         public FilePluginDescriptor(string path)
         {
@@ -36,7 +38,7 @@ namespace Scorpio.Bougainvillea.Plugins
             {
                 using (var symbolsStream = LoadSymbols())
                 {
-                    var ass = _loadContext.LoadFromStream(stream,symbolsStream);
+                    var ass = _loadContext.LoadFromStream(stream, symbolsStream);
                     var types = ass.GetExportedTypes();
                     foreach (var item in types)
                     {
@@ -45,7 +47,7 @@ namespace Scorpio.Bougainvillea.Plugins
                             continue;
                         }
                         var code = item.GetAttribute<PluginCodeAttribute>().Code;
-                        _types[code] = item;
+                        _types[code] = new PluginDescriptor(item);
                     }
 
                 }
@@ -67,7 +69,7 @@ namespace Scorpio.Bougainvillea.Plugins
             _needLoad = true;
         }
 
-        public IReadOnlyDictionary<string, Type> EnsureLoad()
+        public IReadOnlyDictionary<string, PluginDescriptor> EnsureLoad()
         {
             if (_needLoad)
             {
@@ -79,8 +81,8 @@ namespace Scorpio.Bougainvillea.Plugins
 
         public IManagementPlugin Generate(string code, IServiceProvider serviceProvider)
         {
-            var type = Types[code];
-            return ActivatorUtilities.CreateInstance(serviceProvider, type) as IManagementPlugin;
+            var descriptor = Types[code];
+            return descriptor.Generate(serviceProvider);
         }
 
         public bool ShouldBeCode(string code) => Types.ContainsKey(code);

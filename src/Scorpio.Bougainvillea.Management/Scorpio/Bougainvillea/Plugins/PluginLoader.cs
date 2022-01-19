@@ -21,6 +21,7 @@ namespace Scorpio.Bougainvillea.Plugins
         }
 
         public int Order { get; } = 1;
+        public IEnumerable<PluginDescriptor>  Descriptors => _options.Plugins.SelectMany(p => p.Descriptors);
 
         public IManagementPlugin GetPlugin(string code, IServiceProvider serviceProvider)
         {

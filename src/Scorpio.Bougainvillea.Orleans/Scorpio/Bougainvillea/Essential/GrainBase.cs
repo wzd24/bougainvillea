@@ -39,18 +39,28 @@ namespace Scorpio.Bougainvillea.Essential
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="stateName"></param>
         /// <returns></returns>
-        public virtual Task ReloadAsync()
+        public virtual ValueTask<object> GetStateDataAsync(string stateName)
+        {
+            return new ValueTask<object>(null);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public virtual ValueTask ReloadAsync()
         {
             DeactivateOnIdle();
-            return Task.CompletedTask;
+            return new ValueTask();
         }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        internal new IStreamProvider GetStreamProvider(string name)
+        internal new IStreamProvider GetStreamProvider(string name=null)
         {
             return base.GetStreamProvider(name ?? _options.StreamName);
         }
@@ -62,8 +72,8 @@ namespace Scorpio.Bougainvillea.Essential
     public abstract class GrainBase<TGrain> : GrainBase
         where TGrain : GrainBase<TGrain>
     {
-        private static readonly MethodInfo _getPersistentState = typeof(GrainBase<TGrain>).GetMethod(nameof(GetPersistentState), BindingFlags.NonPublic | BindingFlags.Static);
-
+        private static readonly MethodInfo _getPersistentState = typeof(GrainBase<TGrain>).GetMethod(nameof(GetPersistentState), BindingFlags.NonPublic | BindingFlags.Instance);
+        private readonly Dictionary<string, Func<object>>  _persistentStateReaders=new Dictionary<string, Func<object>>();
         /// <summary>
         /// 
         /// </summary>
@@ -95,6 +105,12 @@ namespace Scorpio.Bougainvillea.Essential
             CurrentServer = serviceProvider.GetService<ICurrentServer>();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stateName"></param>
+        /// <returns></returns>
+        public override ValueTask<object> GetStateDataAsync(string stateName) =>new(_persistentStateReaders.GetOrDefault(stateName)?.Invoke());
 
         /// <summary>
         /// 
@@ -110,14 +126,16 @@ namespace Scorpio.Bougainvillea.Essential
             {
                 var stateType = p.PropertyType.GenericTypeArguments.First();
                 var method = _getPersistentState.MakeGenericMethod(stateType);
-                var state = method.Invoke(null, new object[] { context, factory, p.GetAttribute<PropertyPersistentStateAttribute>(true) });
+                var state = method.Invoke(this, new object[] { context, factory, p.GetAttribute<PropertyPersistentStateAttribute>(true) });
                 p.SetValue(this, state);
             });
         }
 
-        private static IPersistentState<TState> GetPersistentState<TState>(IGrainActivationContext context, IPersistentStateFactory factory, IPersistentStateConfiguration configuration)
+        private IPersistentState<TState> GetPersistentState<TState>(IGrainActivationContext context, IPersistentStateFactory factory, IPersistentStateConfiguration configuration)
         {
-            return factory.Create<TState>(context, configuration);
+            var p= factory.Create<TState>(context, configuration);
+            _persistentStateReaders.TryAdd(configuration.StateName, () => p.State);
+            return p;
         }
 
         /// <summary>

@@ -23,5 +23,11 @@ namespace Scorpio.Bougainvillea.Plugins
         /// <param name="serviceProvider"></param>
         /// <returns></returns>
         IManagementPlugin Generate(string code,IServiceProvider serviceProvider);
+
+        /// <summary>
+        /// 获取所有插件描述
+        /// </summary>
+        public IEnumerable<PluginDescriptor> Descriptors { get; }
+
     }
 }

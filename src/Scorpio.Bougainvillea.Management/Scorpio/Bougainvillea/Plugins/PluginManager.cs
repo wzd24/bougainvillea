@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Microsoft.Extensions.DependencyInjection;
-
-
 using Scorpio.DependencyInjection;
 
 namespace Scorpio.Bougainvillea.Plugins
@@ -19,6 +16,8 @@ namespace Scorpio.Bougainvillea.Plugins
             _pluginLoaders = pluginLoaders.OrderBy(p => p.Order);
         }
 
+        public IEnumerable<PluginDescriptor>  Descriptors => _pluginLoaders.SelectMany(l => l.Descriptors).Distinct();
+
         public IManagementPlugin GetPlugin(IServiceProvider serviceProvider, string code)
         {
             IManagementPlugin plugin = null;
@@ -30,7 +29,7 @@ namespace Scorpio.Bougainvillea.Plugins
                     break;
                 }
             }
-            return plugin ?? throw new GameFriendlyException(-1, "对应的插件不存在");
+            return plugin ?? throw new NotImplementedException("对应的插件不存在");
         }
     }
 }

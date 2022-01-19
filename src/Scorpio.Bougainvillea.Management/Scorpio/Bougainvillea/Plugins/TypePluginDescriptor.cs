@@ -9,15 +9,19 @@ namespace Scorpio.Bougainvillea.Plugins
 {
     internal class TypePluginDescriptor : IPluginDescriptor
     {
-        private readonly string _code;
-        private readonly Type _type;
+        private readonly PluginDescriptor _descriptor;
         public TypePluginDescriptor(Type type)
         {
-            _type = type;
-            _code = type.GetAttribute<PluginCodeAttribute>().Code;
+            _descriptor = new PluginDescriptor(type);
         }
+
+        public IEnumerable<PluginDescriptor> Descriptors
+        {
+            get { yield return _descriptor; }
+        }
+
         public IManagementPlugin Generate(string code, IServiceProvider serviceProvider) =>
-            ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, _type) as IManagementPlugin;
-        public bool ShouldBeCode(string code) => code == _code;
+            _descriptor.Generate(serviceProvider);
+        public bool ShouldBeCode(string code) => code == _descriptor.Code;
     }
 }

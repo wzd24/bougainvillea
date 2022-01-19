@@ -5,18 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Orleans;
+using Orleans.Concurrency;
+
+using Scorpio.Bougainvillea.Essential;
 
 namespace Scorpio.Bougainvillea.Setting
 {
     /// <summary>
     /// 
     /// </summary>
-    public interface IGlobalSettingManager:IGrainWithStringKey
+    public interface IGlobalSettingManager:IGrainWithStringKey,IGrainBase
     {
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
+        [OneWay]
         ValueTask InitializeAsync();
 
         /// <summary>

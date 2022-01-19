@@ -13,13 +13,15 @@ using Newtonsoft.Json.Linq;
 using Orleans;
 
 using Scorpio.Bougainvillea.AdoNet;
+using Scorpio.Bougainvillea.Essential;
+using Scorpio.Bougainvillea.Setting.StreamDatas;
 
 namespace Scorpio.Bougainvillea.Setting
 {
     /// <summary>
     /// 
     /// </summary>
-    internal class GlobalSettingManager : Grain, IGlobalSettingManager
+    internal class GlobalSettingManager : GrainBase, IGlobalSettingManager
     {
         private readonly IGameSettingDefinitionManager _definitionManager;
         private readonly IDbConnectionFactory _dbConnectionFactory;
@@ -27,7 +29,8 @@ namespace Scorpio.Bougainvillea.Setting
         private readonly MethodInfo _getMethod = typeof(GlobalSettingManager).GetMethod(nameof(GetValueAsync), BindingFlags.NonPublic | BindingFlags.Instance);
         private string _settingName;
 
-        public GlobalSettingManager(IGameSettingDefinitionManager definitionManager, IDbConnectionFactory dbConnectionFactory)
+        public GlobalSettingManager(IServiceProvider serviceProvider, IGameSettingDefinitionManager definitionManager, IDbConnectionFactory dbConnectionFactory)
+            : base(serviceProvider)
         {
             _definitionManager = definitionManager;
             _dbConnectionFactory = dbConnectionFactory;
@@ -63,12 +66,12 @@ namespace Scorpio.Bougainvillea.Setting
 
         public async ValueTask InitializeAsync()
         {
-            var  definition = _definitionManager.Get(_settingName);
+            var definition = _definitionManager.Get(_settingName);
             if (definition == null)
             {
                 return;
             }
-            if (definition.Scope!= GameSettingScope.Global)
+            if (definition.Scope != GameSettingScope.Global)
             {
                 return;
             }
@@ -76,6 +79,7 @@ namespace Scorpio.Bougainvillea.Setting
             var result = method.Invoke(this, new object[] { definition }) as Task<GameSettingValue>;
             var value = await result;
             _settings.AddOrUpdate(definition.Name, _ => value);
+            await this.GetStreamAsync<SettingInitializationData>(Guid.Empty, $"Setting.Initailization.{_settingName}").OnNextAsync(new SettingInitializationData { SettingName = _settingName });
         }
 
         private async Task<GameSettingValue> GetValueAsync<T>(GameSettingDefinition settingDefinition)
@@ -94,7 +98,7 @@ namespace Scorpio.Bougainvillea.Setting
 
         public async ValueTask<int> GetMaxIdAsync<T>() where T : GameSettingBase
         {
-            var values =await GetAsync<T>();
+            var values = await GetAsync<T>();
             if (values.IsNullOrEmpty())
             {
                 return 0;

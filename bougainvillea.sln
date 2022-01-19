@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.6.30114.105
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DD533BB9-6E40-4008-A45D-77AB6A23D64D}"
 	ProjectSection(SolutionItems) = preProject
@@ -39,19 +39,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{E5686719
 		build\versions.props = build\versions.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scorpio.Bougainvillea.AspNetCore", "src\Scorpio.Bougainvillea.AspNetCore\Scorpio.Bougainvillea.AspNetCore.csproj", "{DD62DA68-A33F-40ED-BC42-2C69072F90CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvillea.AspNetCore", "src\Scorpio.Bougainvillea.AspNetCore\Scorpio.Bougainvillea.AspNetCore.csproj", "{DD62DA68-A33F-40ED-BC42-2C69072F90CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scorpio.Bougainvillea.Orleans", "src\Scorpio.Bougainvillea.Orleans\Scorpio.Bougainvillea.Orleans.csproj", "{D5998528-2A7B-4A2E-B117-8C11597B01BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvillea.Orleans", "src\Scorpio.Bougainvillea.Orleans\Scorpio.Bougainvillea.Orleans.csproj", "{D5998528-2A7B-4A2E-B117-8C11597B01BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scorpio.Bougainvillea.Orleans.Storages", "src\Scorpio.Bougainvillea.Orleans.Storages\Scorpio.Bougainvillea.Orleans.Storages.csproj", "{A3872D42-3FC8-48E0-B1FC-60C9A47AEECF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvillea.Orleans.Storages", "src\Scorpio.Bougainvillea.Orleans.Storages\Scorpio.Bougainvillea.Orleans.Storages.csproj", "{A3872D42-3FC8-48E0-B1FC-60C9A47AEECF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scorpio.Bougainvillea.Storages", "src\Scorpio.Bougainvillea.Storages\Scorpio.Bougainvillea.Storages.csproj", "{976900A0-ADE1-45D3-8B09-8903542C2BFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvillea.Storages", "src\Scorpio.Bougainvillea.Storages\Scorpio.Bougainvillea.Storages.csproj", "{976900A0-ADE1-45D3-8B09-8903542C2BFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scorpio.Bougainvillea.Orleans.Abstractions", "src\Scorpio.Bougainvillea.Orleans.Abstractions\Scorpio.Bougainvillea.Orleans.Abstractions.csproj", "{3870485E-145C-4C8C-9AB8-B91DBBD9AE13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvillea.Orleans.Abstractions", "src\Scorpio.Bougainvillea.Orleans.Abstractions\Scorpio.Bougainvillea.Orleans.Abstractions.csproj", "{3870485E-145C-4C8C-9AB8-B91DBBD9AE13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scorpio.Bougainvillea.Entities", "src\Scorpio.Bougainvillea.Entities\Scorpio.Bougainvillea.Entities.csproj", "{1C6E0D7A-7A3E-475C-A102-9503CB247109}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvillea.Entities", "src\Scorpio.Bougainvillea.Entities\Scorpio.Bougainvillea.Entities.csproj", "{1C6E0D7A-7A3E-475C-A102-9503CB247109}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scorpio.Bougainvillea.CodeGenerator", "src\Scorpio.Bougainvillea.CodeGenerator\Scorpio.Bougainvillea.CodeGenerator.csproj", "{064CD96F-DA6A-40B3-A765-1D51917FD690}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvillea.Management", "src\Scorpio.Bougainvillea.Management\Scorpio.Bougainvillea.Management.csproj", "{CF482529-D595-4E9C-9E04-162C5C7E83AE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scorpio.Bougainvillea.Management.Abstractions", "src\Scorpio.Bougainvillea.Management.Abstractions\Scorpio.Bougainvillea.Management.Abstractions.csproj", "{4561C994-676A-4C4E-BC95-EFBCEE8199DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -159,18 +161,30 @@ Global
 		{1C6E0D7A-7A3E-475C-A102-9503CB247109}.Release|x64.Build.0 = Release|Any CPU
 		{1C6E0D7A-7A3E-475C-A102-9503CB247109}.Release|x86.ActiveCfg = Release|Any CPU
 		{1C6E0D7A-7A3E-475C-A102-9503CB247109}.Release|x86.Build.0 = Release|Any CPU
-		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Debug|x64.Build.0 = Debug|Any CPU
-		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Debug|x86.Build.0 = Debug|Any CPU
-		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Release|Any CPU.Build.0 = Release|Any CPU
-		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Release|x64.ActiveCfg = Release|Any CPU
-		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Release|x64.Build.0 = Release|Any CPU
-		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Release|x86.ActiveCfg = Release|Any CPU
-		{064CD96F-DA6A-40B3-A765-1D51917FD690}.Release|x86.Build.0 = Release|Any CPU
+		{CF482529-D595-4E9C-9E04-162C5C7E83AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF482529-D595-4E9C-9E04-162C5C7E83AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF482529-D595-4E9C-9E04-162C5C7E83AE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CF482529-D595-4E9C-9E04-162C5C7E83AE}.Debug|x64.Build.0 = Debug|Any CPU
+		{CF482529-D595-4E9C-9E04-162C5C7E83AE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CF482529-D595-4E9C-9E04-162C5C7E83AE}.Debug|x86.Build.0 = Debug|Any CPU
+		{CF482529-D595-4E9C-9E04-162C5C7E83AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF482529-D595-4E9C-9E04-162C5C7E83AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF482529-D595-4E9C-9E04-162C5C7E83AE}.Release|x64.ActiveCfg = Release|Any CPU
+		{CF482529-D595-4E9C-9E04-162C5C7E83AE}.Release|x64.Build.0 = Release|Any CPU
+		{CF482529-D595-4E9C-9E04-162C5C7E83AE}.Release|x86.ActiveCfg = Release|Any CPU
+		{CF482529-D595-4E9C-9E04-162C5C7E83AE}.Release|x86.Build.0 = Release|Any CPU
+		{4561C994-676A-4C4E-BC95-EFBCEE8199DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4561C994-676A-4C4E-BC95-EFBCEE8199DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4561C994-676A-4C4E-BC95-EFBCEE8199DC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4561C994-676A-4C4E-BC95-EFBCEE8199DC}.Debug|x64.Build.0 = Debug|Any CPU
+		{4561C994-676A-4C4E-BC95-EFBCEE8199DC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4561C994-676A-4C4E-BC95-EFBCEE8199DC}.Debug|x86.Build.0 = Debug|Any CPU
+		{4561C994-676A-4C4E-BC95-EFBCEE8199DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4561C994-676A-4C4E-BC95-EFBCEE8199DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4561C994-676A-4C4E-BC95-EFBCEE8199DC}.Release|x64.ActiveCfg = Release|Any CPU
+		{4561C994-676A-4C4E-BC95-EFBCEE8199DC}.Release|x64.Build.0 = Release|Any CPU
+		{4561C994-676A-4C4E-BC95-EFBCEE8199DC}.Release|x86.ActiveCfg = Release|Any CPU
+		{4561C994-676A-4C4E-BC95-EFBCEE8199DC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -183,9 +197,10 @@ Global
 		{D5998528-2A7B-4A2E-B117-8C11597B01BC} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
 		{A3872D42-3FC8-48E0-B1FC-60C9A47AEECF} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
 		{976900A0-ADE1-45D3-8B09-8903542C2BFA} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
-		{1C6E0D7A-7A3E-475C-A102-9503CB247109} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
 		{3870485E-145C-4C8C-9AB8-B91DBBD9AE13} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
-		{064CD96F-DA6A-40B3-A765-1D51917FD690} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
+		{1C6E0D7A-7A3E-475C-A102-9503CB247109} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
+		{CF482529-D595-4E9C-9E04-162C5C7E83AE} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
+		{4561C994-676A-4C4E-BC95-EFBCEE8199DC} = {DD533BB9-6E40-4008-A45D-77AB6A23D64D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CD707EC-7121-4BAD-8359-0031FE028920}

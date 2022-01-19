@@ -49,12 +49,14 @@ namespace Scorpio.Bougainvillea.Essential
         /// </summary>
         /// <param name="serverTimeOffset"></param>
         /// <returns></returns>
+        [OneWay]
         ValueTask SetServerTimeOffset(TimeSpan serverTimeOffset);
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
+        [OneWay]
         ValueTask BeginInitializeAsync();
 
         /// <summary>
