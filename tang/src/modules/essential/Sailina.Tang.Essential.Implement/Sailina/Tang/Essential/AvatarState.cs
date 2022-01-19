@@ -1,9 +1,6 @@
 ﻿
 using System.Data;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-
-using Castle.DynamicProxy;
 
 using Dapper;
 using Dapper.Extensions;
@@ -20,7 +17,6 @@ namespace Sailina.Tang.Essential
     /// <summary>
     /// 
     /// </summary>
-    [Serializable]
     internal partial class AvatarState : AvatarStateBase<AvatarBaseInfo>
     {
         public static async ValueTask<AvatarState> InitializeAsync(GridReader dataReader)
@@ -111,68 +107,6 @@ namespace Sailina.Tang.Essential
         }
 
         internal async ValueTask WriteAsync(IDbConnection conn) => await this.Action(!(this is IModifiable { Modified: false }), async a => await conn.InsertOrUpdateAsync<AvatarBaseInfo>(this));
-    }
-
-    internal class ModifiableProxyGenerationHook : IProxyGenerationHook
-    {
-        public void MethodsInspected()
-        {
-        }
-        public void NonProxyableMemberNotification(Type type, MemberInfo memberInfo)
-        {
-        }
-
-        public bool ShouldInterceptMethod(Type type, MethodInfo methodInfo)
-        {
-            return methodInfo.IsSpecialName && !methodInfo.Name.Contains(nameof(IModifiable.Modified)) && (methodInfo.Name.StartsWith("set_")|| methodInfo.Name.StartsWith("get_"));
-        }
-    }
-
-    internal class ModifiableIInterceptor : IInterceptor
-    {
-        public void Intercept(IInvocation invocation)
-        {
-            var methodName = invocation.Method.Name;
-            if (methodName.StartsWith("set_"))
-            {
-                var propertyName = methodName.Substring(4);
-                var property = invocation.TargetType.GetProperty(propertyName);
-                if (property != null && !property.GetValue(invocation.Proxy, null).Equals( invocation.Arguments.First()))
-                {
-                    (invocation.Proxy as IModifiable).SetModifyState();
-                }
-            }
-            invocation.Proceed();
-        }
-
-    }
-
-    internal static class ModifiableIInterceptorExtensions
-    {
-        private static readonly ProxyGenerator _generator = new ProxyGenerator();
-
-        private static readonly ModifiableProxyGenerationHook _hook = new ModifiableProxyGenerationHook();
-
-        private static readonly IInterceptor _interceptor = new ModifiableIInterceptor();
-
-        public static T GenerateProxy<T>(this T value) where T : class
-        {
-            var _options = new ProxyGenerationOptions { Hook = _hook, }.Action(o => o.AddMixinInstance(new Modifiable()));
-            return _generator.CreateClassProxyWithTarget(value, _options, _interceptor);
-        }
-    }
-
-    internal class Modifiable : IModifiable
-    {
-        public bool Modified { get; set; }
-
-        public void ResetModifyState() => Modified = false;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void SetModifyState() => Modified = true;
-
     }
 
 }

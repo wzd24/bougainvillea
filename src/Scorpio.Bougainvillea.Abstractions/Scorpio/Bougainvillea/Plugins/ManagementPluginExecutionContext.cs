@@ -15,7 +15,6 @@ namespace Scorpio.Bougainvillea.Plugins
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="grainFactory"></param>
         /// <param name="data"></param>
         /// <param name="serviceProvider"></param>
         public ManagementPluginExecutionContext(JToken data, IServiceProvider serviceProvider)

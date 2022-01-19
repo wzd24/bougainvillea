@@ -9,6 +9,7 @@ using Orleans.Runtime;
 
 using Scorpio.Bougainvillea;
 using Scorpio.Bougainvillea.Props;
+using Scorpio.EventBus;
 
 namespace Sailina.Tang.Essential.PropsHandlers
 {

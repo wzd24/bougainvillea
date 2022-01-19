@@ -17,8 +17,15 @@ namespace Sailina.Tang.Databases
     /// <summary>
     /// 
     /// </summary>
+    public class EssentialMigration
+    {
+
+    }
+    /// <summary>
+    /// 
+    /// </summary>
     [TimestampedMigration(2021, 12, 30, 19, 24)]
-    public class EssentialMigration : AutoReversingMigration
+    public class EssentialMigration_2021_12_30_19_24 : AutoReversingMigration
     {
         /// <summary>
         /// 

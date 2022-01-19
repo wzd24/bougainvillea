@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Runtime;
+using Orleans.Serialization;
 
 using Sailina.Tang.Essential;
 
@@ -17,7 +18,6 @@ internal class HostModule : ScorpioModule
 {
     public override void ConfigureServices(ConfigureServicesContext context)
     {
-        
         base.ConfigureServices(context);
     }
 }
