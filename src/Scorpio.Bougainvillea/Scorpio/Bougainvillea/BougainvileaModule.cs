@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+
+using Dapper.Extensions;
+
+using Dapper;
 
 using Microsoft.Extensions.DependencyInjection;
 
 using Scorpio.Bougainvillea;
 using Scorpio.Bougainvillea.Middleware;
 using Scorpio.Bougainvillea.Setting;
-using Scorpio.Bougainvillea.Storages;
 using Scorpio.Modularity;
 using Scorpio.Setting;
 
@@ -15,8 +19,6 @@ namespace Scorpio.Bougainvillea
     /// 
     /// </summary>
     [DependsOn(typeof(BougainvilleaAbstractionsModule))]
-    [DependsOn(typeof(BougainvilleaStoragesModule))]
-    [DependsOn(typeof(SettingModule))]
     public class BougainvilleaModule:ScorpioModule
     {
         /// <summary>
@@ -45,6 +47,20 @@ namespace Scorpio.Bougainvillea
                 opt.AddMiddleware<UserTokenMiddleware>();
                 opt.AddMiddleware<ExceptionMiddleware>();
             });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        public override void Initialize(ApplicationInitializationContext context)
+        {
+            SqlMapper.AddTypeHandler(new JsonConvertHandler<List<int>>());
+            SqlMapper.AddTypeHandler(new JsonConvertHandler<List<long>>());
+            SqlMapper.AddTypeHandler(new JsonConvertHandler<Dictionary<int, int>>());
+            SqlMapper.AddTypeHandler(new JsonConvertHandler<Dictionary<int, long>>());
+            SqlMapper.AddTypeHandler(new FuncConvertHandler<TimeSpan>(v => TimeSpan.FromSeconds(v.To<long>()), (p, t) => (long)t.Seconds));
+            base.Initialize(context);
         }
     }
 }

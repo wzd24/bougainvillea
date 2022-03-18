@@ -66,7 +66,7 @@ namespace Dapper.Extensions
     }
 
     /// <summary>
-    /// 
+    /// Denotes that a property or class should be excluded from database mapping.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class IgnoreAttribute : Attribute

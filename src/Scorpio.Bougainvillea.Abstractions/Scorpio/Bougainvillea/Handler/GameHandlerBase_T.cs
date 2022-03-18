@@ -33,12 +33,23 @@ namespace Scorpio.Bougainvillea.Handler
         /// <summary>
         /// 
         /// </summary>
+        protected IGameContextAccessor GameContextAccessor { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected IGameContext GameContext => GameContextAccessor.GameContext;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="serviceProvider"></param>
         protected GameHandlerBase(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
             CurrentUser = serviceProvider.GetService<ICurrentUser>();
             CurrentServer = serviceProvider.GetService<ICurrentServer>();
+            GameContextAccessor = serviceProvider.GetService<IGameContextAccessor>();
         }
 
         /// <summary>

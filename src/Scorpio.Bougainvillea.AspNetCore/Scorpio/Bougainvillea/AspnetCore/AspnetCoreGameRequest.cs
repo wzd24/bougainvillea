@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 namespace Scorpio.Bougainvillea.AspnetCore
 {
-    internal class AspnetCoreGameRequest : Middleware.IGameRequest
+    internal class AspnetCoreGameRequest : IGameRequest
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IGameContext _context;

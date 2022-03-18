@@ -1,7 +1,10 @@
-﻿
-using Scorpio.Bougainvillea.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Sailina.Tang.Essential
+namespace Scorpio.Bougainvillea.Data
 {
     internal class Modifiable : IModifiable
     {
@@ -15,5 +18,4 @@ namespace Sailina.Tang.Essential
         public void SetModifyState() => Modified = true;
 
     }
-
 }

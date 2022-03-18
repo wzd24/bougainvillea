@@ -77,6 +77,8 @@ namespace Dapper.Extensions
 
         private static bool IsWriteable(PropertyInfo pi)
         {
+            if (pi.AttributeExists<IgnoreAttribute>())
+                return false;
             var attributes = pi.GetCustomAttributes(typeof(WriteAttribute), false).AsList();
             if (attributes.Count != 1) return true;
             var writeAttribute = (WriteAttribute)attributes[0];
@@ -113,34 +115,6 @@ namespace Dapper.Extensions
             if (keys.Count + explicitKeys.Count == 0)
                 throw new DataException($"{method}<T> only supports an entity with a [Key] or an [ExplicitKey] property");
             return keys.Concat(explicitKeys).ToArray();
-        }
-
-
-        private static async Task<IEnumerable<object>> GetAllAsyncImpl(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string sql, Type type, object parameters = null)
-        {
-            var result = await connection.QueryAsync(sql, param: parameters, transaction: transaction, commandTimeout: commandTimeout).ConfigureAwait(false);
-            var list = new List<object>();
-            foreach (IDictionary<string, object> res in result)
-            {
-                var obj = ProxyGenerator.GetInterfaceProxy(type);
-                foreach (var property in TypePropertiesCache(type))
-                {
-                    var val = res[property.Name];
-                    if (val == null) continue;
-                    if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                    {
-                        var genericType = Nullable.GetUnderlyingType(property.PropertyType);
-                        if (genericType != null) property.SetValue(obj, Convert.ChangeType(val, genericType), null);
-                    }
-                    else
-                    {
-                        property.SetValue(obj, Convert.ChangeType(val, property.PropertyType), null);
-                    }
-                }
-                ((IProxy)obj).IsDirty = false;   //reset change tracking and return
-                list.Add(obj);
-            }
-            return list;
         }
 
         private static bool IsDefaultValue(Type t, object value)

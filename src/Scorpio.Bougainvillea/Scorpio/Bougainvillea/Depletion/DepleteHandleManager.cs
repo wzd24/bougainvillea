@@ -11,6 +11,7 @@ namespace Scorpio.Bougainvillea.Depletion
 {
     internal class DepleteHandleManager : IDepleteHandleManager, IScopedDependency
     {
+
         private readonly IEnumerable<IDepleteHandlerProvider> _providers;
         private readonly IJsonSerializer _serializer;
 
@@ -20,13 +21,12 @@ namespace Scorpio.Bougainvillea.Depletion
             _serializer = serializer;
         }
 
-        public async ValueTask<int> CanHandleAsync(long[] depletion, int num)
+        public ValueTask<int> CanHandleAsync(long[] depletion, int num)
         {
             var handler = _providers.Reverse().Select(provider => provider.GetHandler(depletion))
                 .FirstOrDefault(h => h != null) ?? throw new NullReferenceException("未找到对应的消耗处理器");
             var context = new DepleteHandleContext { Depletion = depletion, Num = num };
-            var result = await handler.CanExecuteAsync(context);
-            return result;
+            return handler.CanExecuteAsync(context);
         }
 
         public async ValueTask<int> CanHandleAsync(string depletion, int num)
@@ -51,13 +51,12 @@ namespace Scorpio.Bougainvillea.Depletion
             }
         }
 
-        public async ValueTask<int> HandleAsync(long[] depletion, int num, string reason)
+        public ValueTask<int> HandleAsync(long[] depletion, int num, string reason)
         {
             var handler = _providers.Reverse().Select(provider => provider.GetHandler(depletion))
                 .FirstOrDefault(h => h != null) ?? throw new NullReferenceException("未找到对应的消耗处理器");
             var context = new DepleteHandleContext { Depletion = depletion, Reason = reason, Num = num };
-            var result = await handler.ExecuteAsync(context);
-            return result;
+            return handler.ExecuteAsync(context);
         }
 
         public async ValueTask<int> HandleAsync(string depletion, int num, string reson)

@@ -40,13 +40,13 @@ namespace Scorpio.Bougainvillea.Ranks
             {
                 return true;
             }
-            if (ReferenceEquals(obj, null))
+            if (obj is null)
             {
                 return false;
             }
             if (obj is RankItem rankItem)
             {
-                return this.Equals(rankItem);
+                return Equals(rankItem);
             }
             return false;
         }
@@ -55,7 +55,7 @@ namespace Scorpio.Bougainvillea.Ranks
         /// 
         /// </summary>
         /// <returns></returns>
-        public  override int GetHashCode()
+        public override int GetHashCode()
         {
             return HashCode.Combine(ServerId, AvatarId);
         }
@@ -67,7 +67,11 @@ namespace Scorpio.Bougainvillea.Ranks
         /// <returns></returns>
         public virtual bool Equals(RankItem other)
         {
-            return this.ServerId == other.ServerId && this.AvatarId == other.AvatarId;
+            if (other is null)
+            {
+                return false;
+            }
+            return ServerId == other.ServerId && AvatarId == other.AvatarId;
         }
 
         /// <summary>
@@ -78,11 +82,14 @@ namespace Scorpio.Bougainvillea.Ranks
         /// <returns></returns>
         public static bool operator ==(RankItem left, RankItem right)
         {
-            if (ReferenceEquals(left, null))
+            if (left is null || right is null)
             {
-                return ReferenceEquals(right, null);
+                return false;
             }
-
+            if (ReferenceEquals(left, right))
+            {
+                return true;
+            }
             return left.Equals(right);
         }
 
@@ -105,7 +112,7 @@ namespace Scorpio.Bougainvillea.Ranks
         /// <returns></returns>
         public static bool operator <(RankItem left, RankItem right)
         {
-            return ReferenceEquals(left, null) ? !ReferenceEquals(right, null) : left.CompareTo(right) < 0;
+            return left is null ? right is not null : left.CompareTo(right) < 0;
         }
 
         /// <summary>
@@ -116,7 +123,7 @@ namespace Scorpio.Bougainvillea.Ranks
         /// <returns></returns>
         public static bool operator <=(RankItem left, RankItem right)
         {
-            return ReferenceEquals(left, null) || left.CompareTo(right) <= 0;
+            return left is null || left.CompareTo(right) <= 0;
         }
 
         /// <summary>
@@ -127,7 +134,7 @@ namespace Scorpio.Bougainvillea.Ranks
         /// <returns></returns>
         public static bool operator >(RankItem left, RankItem right)
         {
-            return !ReferenceEquals(left, null) && left.CompareTo(right) > 0;
+            return left is not null && left.CompareTo(right) > 0;
         }
 
         /// <summary>
@@ -138,7 +145,7 @@ namespace Scorpio.Bougainvillea.Ranks
         /// <returns></returns>
         public static bool operator >=(RankItem left, RankItem right)
         {
-            return ReferenceEquals(left, null) ? ReferenceEquals(right, null) : left.CompareTo(right) >= 0;
+            return left is null ? right is null : left.CompareTo(right) >= 0;
         }
     }
 
@@ -148,13 +155,13 @@ namespace Scorpio.Bougainvillea.Ranks
     /// </summary>
     /// <typeparam name="TScore"></typeparam>
     public abstract class RankItem<TScore> : RankItem
-        where TScore:IComparable<TScore>
+        where TScore : IComparable<TScore>
     {
 
         /// <summary>
         /// 
         /// </summary>
-        public TScore  Score { get; set; }
+        public TScore Score { get; set; }
 
         /// <summary>
         /// 

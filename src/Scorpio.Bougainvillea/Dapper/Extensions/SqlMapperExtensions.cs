@@ -13,6 +13,10 @@ using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
 
+using Scorpio.Bougainvillea.Data;
+
+using static Dapper.SqlMapper;
+
 namespace Dapper.Extensions
 {
     /// <summary>
@@ -59,36 +63,77 @@ namespace Dapper.Extensions
                 _getQueries[type.TypeHandle] = sql;
             }
 
-            var dynParams = ids.Zip(keys, (value, key) => new { value, key }).Aggregate(new DynamicParameters(), (p, k) => p.Action(void (DynamicParameters pp) => pp.Add(k.key.Name, k.value)));
-            if (!type.IsInterface)
-            {
-                return (await connection.QueryAsync(type, sql, dynParams, transaction, commandTimeout).ConfigureAwait(false)).FirstOrDefault();
-            }
-            if (!((await connection.QueryAsync<dynamic>(sql, dynParams).ConfigureAwait(false)).FirstOrDefault() is IDictionary<string, object> res))
-            {
-                return null;
-            }
+            var dynParams = ids.Zip(keys, (value, key) => new { value, key }).Aggregate(new DynamicParameters(), (p, k) => p.Action(pp => { pp.Add(k.key.Name, k.value); }));
+            return (await connection.QueryAsync(type, sql, dynParams, transaction, commandTimeout).ConfigureAwait(false)).FirstOrDefault();
+        }
 
-            var obj = ProxyGenerator.GetInterfaceProxy(type);
+        /// <summary>
+        /// Returns a single entity by a single id from table "Ts" asynchronously using Task. T must be of interface type. 
+        /// Id must be marked with [Key] attribute.
+        /// Created entity is tracked/intercepted for changes and used by the Update() extension. 
+        /// </summary>
+        /// <typeparam name="T">Interface type to create and populate</typeparam>
+        /// <param name="connection">Open SqlConnection</param>
+        /// <param name="parameters">Id of the entity to get, must be marked with [Key] attribute</param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction">The transaction to run under, null (the default) if none</param>
+        /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
+        /// <returns>Entity of T</returns>
+        public static async Task<T> GetAsync<T>(this IDbConnection connection, object parameters, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            return (T)await GetAsync(connection, typeof(T), parameters, tableName, transaction, commandTimeout);
+        }
 
-            foreach (var property in TypePropertiesCache(type))
+        /// <summary>
+        /// Returns a single entity by a single id from table "Ts" asynchronously using Task. T must be of interface type. 
+        /// Id must be marked with [Key] attribute.
+        /// Created entity is tracked/intercepted for changes and used by the Update() extension. 
+        /// </summary>
+        /// <param name="type">Interface type to create and populate</param>
+        /// <param name="connection">Open SqlConnection</param>
+        /// <param name="parameters">Id of the entity to get, must be marked with [Key] attribute</param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction">The transaction to run under, null (the default) if none</param>
+        /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
+        /// <returns>Entity of T</returns>
+        public static async Task<object> GetAsync(this IDbConnection connection, Type type, object parameters, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            var name = tableName ?? GetTableName(type);
+            var sb = new StringBuilder();
+            sb.AppendFormat("SELECT * FROM `{0}` ", name);
+            var writeWhere = true;
+            var properties = parameters.GetType().GetProperties();
+            for (var i = 0; i < properties.Length; i++)
             {
-                var val = res[property.Name];
-                if (val == null) continue;
-                if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                var property = properties[i];
+                if (property.GetValue(parameters) == null)
                 {
-                    var genericType = Nullable.GetUnderlyingType(property.PropertyType);
-                    if (genericType != null) property.SetValue(obj, Convert.ChangeType(val, genericType), null);
+                    continue;
+                }
+                if (writeWhere)
+                {
+                    sb.Append(" WHERE ");
+                    writeWhere = false;
                 }
                 else
                 {
-                    property.SetValue(obj, Convert.ChangeType(val, property.PropertyType), null);
+                    sb.Append(" AND ");
+                }
+                if (property.PropertyType.IsEnum && property.PropertyType.AttributeExists<FlagsAttribute>())
+                {
+                    sb.AppendFormat("`{0}`&@{1}>0", property.Name, property.Name);
+
+                }
+                else
+                {
+                    sb.AppendFormat("`{0}` = @{1}", property.Name, property.Name);
                 }
             }
-            ((IProxy)obj).IsDirty = false;   //reset change tracking and return
-
-            return obj;
+            var sql = sb.ToString();
+            var result = await connection.QueryAsync(type, sql, parameters, transaction, commandTimeout);
+            return result.FirstOrDefault();
         }
+
 
         /// <summary>
         /// Returns a list of entities from table "Ts".  
@@ -132,11 +177,7 @@ namespace Dapper.Extensions
                 _getQueries[cacheType.TypeHandle] = sql;
             }
 
-            if (!type.IsInterface)
-            {
-                return connection.QueryAsync(type, sql, null, transaction, commandTimeout);
-            }
-            return GetAllAsyncImpl(connection, transaction, commandTimeout, sql, type);
+            return connection.QueryAsync(type, sql, null, transaction, commandTimeout);
         }
 
         /// <summary>
@@ -204,12 +245,8 @@ namespace Dapper.Extensions
                 }
             }
             var sql = sb.ToString();
-            if (!type.IsInterface)
-            {
-                var result = connection.QueryAsync(type, sql, parameters, transaction, commandTimeout);
-                return result;
-            }
-            return GetAllAsyncImpl(connection, transaction, commandTimeout, sql, type, parameters);
+            var result = connection.QueryAsync(type, sql, parameters, transaction, commandTimeout);
+            return result;
         }
 
 
@@ -246,12 +283,12 @@ namespace Dapper.Extensions
                 isList = true;
                 type = type.GetElementType();
             }
-            else if (type.IsGenericType)
+            else
             {
                 var typeInfo = type.GetTypeInfo();
                 var implementsGenericIEnumerableOrIsGenericIEnumerable =
                     typeInfo.ImplementedInterfaces.Any(ti => ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ||
-                    typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+                   (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>));
 
                 if (implementsGenericIEnumerableOrIsGenericIEnumerable)
                 {
@@ -297,6 +334,14 @@ namespace Dapper.Extensions
                 var key = keyProperties.First();
                 key.SetValue(entityToInsert, Convert.ChangeType(id, key.PropertyType), null);
             }
+            if (isList)
+            {
+                (entityToInsert as IEnumerable)?.OfType<IModifiable>().ForEach(m => m.ResetModifyState());
+            }
+            else
+            {
+                (entityToInsert as IModifiable)?.ResetModifyState();
+            }
             return result;
         }
 
@@ -328,23 +373,22 @@ namespace Dapper.Extensions
         /// <returns>true if updated, false if not found or not modified (tracked entities)</returns>
         public static async Task<bool> UpdateAsync(this IDbConnection connection, Type type, object entityToUpdate, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null)
         {
-            if ((entityToUpdate is IProxy proxy) && !proxy.IsDirty)
-            {
-                return false;
-            }
+            var isList = false;
             if (type.IsArray)
             {
+                isList = true;
                 type = type.GetElementType();
             }
-            else if (type.IsGenericType)
+            else
             {
                 var typeInfo = type.GetTypeInfo();
                 var implementsGenericIEnumerableOrIsGenericIEnumerable =
                     typeInfo.ImplementedInterfaces.Any(ti => ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ||
-                    typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+                   (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>));
 
                 if (implementsGenericIEnumerableOrIsGenericIEnumerable)
                 {
+                    isList = true;
                     type = type.GetGenericArguments()[0];
                 }
             }
@@ -380,9 +424,31 @@ namespace Dapper.Extensions
                     sb.Append(" and ");
             }
             var updated = await connection.ExecuteAsync(sb.ToString(), entityToUpdate, commandTimeout: commandTimeout, transaction: transaction).ConfigureAwait(false);
+            if (isList)
+            {
+                (entityToUpdate as IEnumerable)?.OfType<IModifiable>().ForEach(m => m.ResetModifyState());
+            }
+            else
+            {
+                (entityToUpdate as IModifiable)?.ResetModifyState();
+            }
             return updated > 0;
         }
 
+        /// <summary>
+        /// Inserts or update an entity into table "Ts" asynchronously using Task, checks if the entity is modified if the entity is tracked by the Get() extension.
+        /// </summary>
+        /// <typeparam name="T">The type being inserted or updated.</typeparam>
+        /// <param name="connection">Open SqlConnection</param>
+        /// <param name="entity">Entity to insert</param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction">The transaction to run under, null (the default) if none</param>
+        /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
+        /// <returns>Identity of inserted entity</returns>
+        public static Task<bool> InsertOrUpdateAsync<T>(this IDbConnection connection, T entity, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            return InsertOrUpdateAsync(connection, typeof(T), entity, tableName, transaction, commandTimeout);
+        }
         /// <summary>
         /// Inserts or update an entity into table "Ts" asynchronously using Task, checks if the entity is modified if the entity is tracked by the Get() extension.
         /// </summary>
@@ -411,24 +477,21 @@ namespace Dapper.Extensions
         public static async Task<bool> InsertOrUpdateAsync(this IDbConnection connection, Type type, object entity, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null)
         {
 
-            if ((entity is IProxy proxy) && !proxy.IsDirty)
-            {
-                return false;
-            }
             var isList = false;
             if (type.IsArray)
             {
                 isList = true;
                 type = type.GetElementType();
             }
-            else if (type.IsGenericType)
+            else
             {
                 var typeInfo = type.GetTypeInfo();
-                var implementsGenericIEnumerableOrIsGenericIEnumerable =
-                    typeInfo.ImplementedInterfaces.Any(ti => ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ||
-                    typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>);
-
-                if (implementsGenericIEnumerableOrIsGenericIEnumerable)
+                if (typeInfo.ImplementedInterfaces.Any(ti => ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
+                {
+                    isList = true;
+                    type = typeInfo.ImplementedInterfaces.SingleOrDefault(ti => ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(IEnumerable<>)).GetGenericArguments()[0];
+                }
+                if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                 {
                     isList = true;
                     type = type.GetGenericArguments()[0];
@@ -447,10 +510,6 @@ namespace Dapper.Extensions
             var allPropertiesExceptKeyAndComputed = allProperties.Except(keyProperties.Union(computedProperties)).ToList();
             var nonIdProps = allPropertiesExceptKeyAndComputed.Except(keyProperties.Union(explicitKeyProperties)).ToList();
             var key = keyProperties.SingleOrDefault();
-            if (key != null && !IsDefaultValue(key.PropertyType, key.GetValue(entity)))
-            {
-                allPropertiesExceptKeyAndComputed.Insert(0, key);
-            }
             for (var i = 0; i < allPropertiesExceptKeyAndComputed.Count; i++)
             {
                 var property = allPropertiesExceptKeyAndComputed[i];
@@ -471,7 +530,7 @@ namespace Dapper.Extensions
             var sb = new StringBuilder(null);
             if (key != null)
             {
-                sb.AppendFormat("`{0} = LAST_INSERT_ID(`{0}`),", key.Name);
+                sb.AppendFormat("`{0}` = LAST_INSERT_ID(`{0}`),", key.Name);
             }
             for (var i = 0; i < nonIdProps.Count; i++)
             {
@@ -496,6 +555,14 @@ namespace Dapper.Extensions
                 }
                 key.SetValue(entity, Convert.ChangeType(id, key.PropertyType), null);
             }
+            if (isList)
+            {
+                (entity as IEnumerable)?.OfType<IModifiable>().ForEach(m => m.ResetModifyState());
+            }
+            else
+            {
+                (entity as IModifiable)?.ResetModifyState();
+            }
             return true;
         }
 
@@ -508,9 +575,9 @@ namespace Dapper.Extensions
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>true if deleted, false if not found</returns>
-        public static Task<bool> DeleteAsync<T>(this IDbConnection connection, T entityToDelete, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static Task<bool> DeleteAsync<T>(this IDbConnection connection, T entityToDelete, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
-            return DeleteAsync(connection, typeof(T), entityToDelete, transaction, commandTimeout);
+            return DeleteAsync(connection, typeof(T), entityToDelete, tableName, transaction, commandTimeout);
         }
 
         /// <summary>
@@ -522,10 +589,77 @@ namespace Dapper.Extensions
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>true if deleted, false if not found</returns>
-        public static async Task<bool> DeleteAsync(this IDbConnection connection, Type type, object entityToDelete, IDbTransaction transaction = null, int? commandTimeout = null)
+        public static async Task<bool> DeleteAsync(this IDbConnection connection, Type type, object entityToDelete, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null)
         {
             if (entityToDelete == null)
                 throw new ArgumentException("Cannot Delete null Object", nameof(entityToDelete));
+
+            if (type.IsArray)
+            {
+                type = type.GetElementType();
+            }
+            else
+            {
+                var typeInfo = type.GetTypeInfo();
+                var implementsGenericIEnumerableOrIsGenericIEnumerable =
+                    typeInfo.ImplementedInterfaces.Any(ti => ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ||
+                   (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+
+                if (implementsGenericIEnumerableOrIsGenericIEnumerable)
+                {
+                    type = type.GetGenericArguments()[0];
+                }
+            }
+
+            var keyProperties = KeyPropertiesCache(type);
+            var explicitKeyProperties = ExplicitKeyPropertiesCache(type);
+            if (keyProperties.Count == 0 && explicitKeyProperties.Count == 0)
+                throw new ArgumentException("Entity must have at least one [Key] or [ExplicitKey] property");
+
+            var name = tableName ?? GetTableName(type);
+            var allKeyProperties = keyProperties.Concat(explicitKeyProperties).ToList();
+
+            var sb = new StringBuilder();
+            sb.AppendFormat("DELETE FROM {0} WHERE ", name);
+
+            for (var i = 0; i < allKeyProperties.Count; i++)
+            {
+                var property = allKeyProperties[i];
+                sb.AppendFormat("`{0}` = @{1}", property.Name, property.Name);
+                if (i < allKeyProperties.Count - 1)
+                    sb.Append(" AND ");
+            }
+            var deleted = await connection.ExecuteAsync(sb.ToString(), entityToDelete, transaction, commandTimeout).ConfigureAwait(false);
+            return deleted > 0;
+        }
+
+        /// <summary>
+        /// Delete entity in table "Ts" asynchronously using Task.
+        /// </summary>
+        /// <typeparam name="T">Type of entity</typeparam>
+        /// <param name="connection">Open SqlConnection</param>
+        /// <param name="condition">Entity to delete</param>
+        /// <param name="transaction">The transaction to run under, null (the default) if none</param>
+        /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
+        /// <returns>true if deleted, false if not found</returns>
+        public static Task<bool> DeleteConditionAsync<T>(this IDbConnection connection, object condition, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            return DeleteConditionAsync(connection, typeof(T), condition, tableName, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// Delete entity in table "Ts" asynchronously using Task.
+        /// </summary>
+        /// <param name="type">Type of entity</param>
+        /// <param name="connection">Open SqlConnection</param>
+        /// <param name="condition">Entity to delete</param>
+        /// <param name="transaction">The transaction to run under, null (the default) if none</param>
+        /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
+        /// <returns>true if deleted, false if not found</returns>
+        public static async Task<bool> DeleteConditionAsync(this IDbConnection connection, Type type, object condition, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null)
+        {
+            if (condition == null)
+                throw new ArgumentException("Cannot Delete null Object", nameof(condition));
 
             if (type.IsArray)
             {
@@ -544,25 +678,42 @@ namespace Dapper.Extensions
                 }
             }
 
-            var keyProperties = KeyPropertiesCache(type);
-            var explicitKeyProperties = ExplicitKeyPropertiesCache(type);
-            if (keyProperties.Count == 0 && explicitKeyProperties.Count == 0)
-                throw new ArgumentException("Entity must have at least one [Key] or [ExplicitKey] property");
-
-            var name = GetTableName(type);
-            var allKeyProperties = keyProperties.Concat(explicitKeyProperties).ToList();
+            var name = tableName ?? GetTableName(type);
 
             var sb = new StringBuilder();
             sb.AppendFormat("DELETE FROM {0} WHERE ", name);
 
-            for (var i = 0; i < allKeyProperties.Count; i++)
+            var writeWhere = true;
+            var properties = condition.GetType().GetProperties();
+            for (var i = 0; i < properties.Length; i++)
             {
-                var property = allKeyProperties[i];
-                sb.AppendFormat("`{0}` = @{1}", property.Name, property.Name);
-                if (i < allKeyProperties.Count - 1)
+                var property = properties[i];
+                if (property.GetValue(condition) == null)
+                {
+                    continue;
+                }
+                if (writeWhere)
+                {
+                    sb.Append(" WHERE ");
+                    writeWhere = false;
+                }
+                else
+                {
                     sb.Append(" AND ");
+                }
+                if (property.PropertyType.IsEnum && property.PropertyType.AttributeExists<FlagsAttribute>())
+                {
+                    sb.AppendFormat("`{0}`&@{1}>0", property.Name, property.Name);
+
+                }
+                else
+                {
+                    sb.AppendFormat("`{0}` = @{1}", property.Name, property.Name);
+
+                }
+
             }
-            var deleted = await connection.ExecuteAsync(sb.ToString(), entityToDelete, transaction, commandTimeout).ConfigureAwait(false);
+            var deleted = await connection.ExecuteAsync(sb.ToString(), condition, transaction, commandTimeout).ConfigureAwait(false);
             return deleted > 0;
         }
     }

@@ -106,9 +106,9 @@ namespace Scorpio.Bougainvillea.Handler
             {
                 AddHandler(code, async context =>
                 {
-                    using (var scope=context.ApplicationServices.CreateScope())
+                    using (var scope = context.ApplicationServices.CreateScope())
                     {
-                        var instance = ActivatorUtilities.CreateInstance(scope.ServiceProvider, type, args) as IGameHandler;
+                        var instance = ActivatorUtilities.GetServiceOrCreateInstance(scope.ServiceProvider, type) as IGameHandler;
                         await instance.ExecuteAsync(context);
                     }
                 });
@@ -138,7 +138,7 @@ namespace Scorpio.Bougainvillea.Handler
                                 using (var scope = context.ApplicationServices.CreateScope())
                                 {
                                     var serviceProvider = scope.ServiceProvider;
-                                    var instance = serviceProvider.GetService<T>() ?? ActivatorUtilities.CreateInstance<T>(serviceProvider, args);
+                                    var instance = serviceProvider.GetService<T>() ?? ActivatorUtilities.GetServiceOrCreateInstance<T>(serviceProvider);
                                     var @delegate = (Func<Task<TResult>>)method.CreateDelegate(typeof(Func<Task<TResult>>), instance);
                                     var result = await @delegate();
                                     await WriteResult(context, result);
@@ -154,7 +154,7 @@ namespace Scorpio.Bougainvillea.Handler
                                 using (var scope = context.ApplicationServices.CreateScope())
                                 {
                                     var serviceProvider = scope.ServiceProvider;
-                                    var instance = serviceProvider.GetService<T>() ?? ActivatorUtilities.CreateInstance<T>(serviceProvider, args);
+                                    var instance = serviceProvider.GetService<T>() ?? ActivatorUtilities.GetServiceOrCreateInstance<T>(serviceProvider);
                                     var @delegate = (InvokeDelegate<TResult>)method.CreateDelegate(typeof(InvokeDelegate<TResult>), instance);
                                     var result = await @delegate(context);
                                     await WriteResult(context, result);
@@ -166,7 +166,7 @@ namespace Scorpio.Bougainvillea.Handler
                         }
                     default:
                         {
-                            GenerateDelegate<T, TResult>(code, factory, method, parameters,args);
+                            GenerateDelegate<T, TResult>(code, factory, method, parameters, args);
                             break;
                         }
                 }
@@ -187,7 +187,7 @@ namespace Scorpio.Bougainvillea.Handler
                                 using (var scope = context.ApplicationServices.CreateScope())
                                 {
                                     var serviceProvider = scope.ServiceProvider;
-                                    var instance = serviceProvider.GetService<T>() ?? ActivatorUtilities.CreateInstance<T>(serviceProvider, args);
+                                    var instance = serviceProvider.GetService<T>() ?? ActivatorUtilities.GetServiceOrCreateInstance<T>(serviceProvider);
                                     var @delegate = (Func<Task>)method.CreateDelegate(typeof(Func<Task>), instance);
                                     await @delegate();
                                     await context.Response.WriteEmptyAsync();
@@ -203,7 +203,7 @@ namespace Scorpio.Bougainvillea.Handler
                                 using (var scope = context.ApplicationServices.CreateScope())
                                 {
                                     var serviceProvider = scope.ServiceProvider;
-                                    var instance = serviceProvider.GetService<T>() ?? ActivatorUtilities.CreateInstance<T>(serviceProvider, args);
+                                    var instance = serviceProvider.GetService<T>() ?? ActivatorUtilities.GetServiceOrCreateInstance<T>(serviceProvider);
                                     var @delegate = (Func<IGameContext, Task>)method.CreateDelegate(typeof(Func<IGameContext, Task>), instance);
                                     await @delegate(context);
                                     await context.Response.WriteEmptyAsync();
@@ -261,7 +261,7 @@ namespace Scorpio.Bougainvillea.Handler
                 using (var scope = context.ApplicationServices.CreateScope())
                 {
                     var serviceProvider = scope.ServiceProvider;
-                    var instance = serviceProvider.GetService<T>() ?? ActivatorUtilities.CreateInstance<T>(serviceProvider, args);
+                    var instance = serviceProvider.GetService<T>() ?? ActivatorUtilities.GetServiceOrCreateInstance<T>(serviceProvider);
                     var result = await facory(instance, context, token);
                     if (result == null)
                     {
@@ -284,7 +284,7 @@ namespace Scorpio.Bougainvillea.Handler
                 using (var scope = context.ApplicationServices.CreateScope())
                 {
                     var serviceProvider = scope.ServiceProvider;
-                    var instance = serviceProvider.GetService<T>() ?? ActivatorUtilities.CreateInstance<T>(serviceProvider, args);
+                    var instance = serviceProvider.GetService<T>() ?? ActivatorUtilities.GetServiceOrCreateInstance<T>(serviceProvider);
                     await facory(instance, context, token);
                     await context.Response.WriteEmptyAsync();
                 }

@@ -239,7 +239,7 @@ dotnet_naming_style.under_line_camel_case.capitalization = camel_case
 dotnet_diagnostic.IDE1006.severity = error
 
 # CS1591: 缺少对公共可见类型或成员的 XML 注释
-dotnet_diagnostic.CS1591.severity = error
+dotnet_diagnostic.CS1591.severity = none
 
 # IDE0079: Remove unnecessary suppression
 dotnet_diagnostic.IDE0079.severity = none
